@@ -1,9 +1,9 @@
 <main>
-	<section class="text-brand-400 body-font">
+	<section class="text-brand-500 body-font">
 	  <div class="container px-5 py-24 mx-auto flex flex-col">
 	    <div class="lg:w-4/6 mx-auto">
 	      <div class="rounded-lg h-64 overflow-hidden">
-	        <img alt="content" class="object-cover object-center h-full w-full" src="assets/images/reveal-meme.jpg">
+	        <img alt="content" class="object-cover object-center h-full w-full" loading=lazy src="assets/images/reveal-meme.jpg">
 	      </div>
 	      <div class="flex flex-col sm:flex-row mt-10">
 	        <div class="sm:w-1/3 text-center sm:pr-8 sm:py-8">
@@ -47,16 +47,12 @@
 </main>
 
 <style>
-  main {
-    @apply p-8 text-xl;
-  }
-
   p {
     @apply my-4;
   }
 
   a {
-    @apply text-reepolee-500 font-bold;
+    @apply text-brand-400 hover:text-brand-300 font-bold;
   }
 
 </style>
