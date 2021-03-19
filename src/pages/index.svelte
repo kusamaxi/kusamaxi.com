@@ -1,9 +1,13 @@
+<script>
+	  import Matrix from "svelte-matrix";
+</script>
+
 <main>
 	<section class="text-brand-400 body-font">
 	  <div class="container px-5 py-24 mx-auto flex flex-col">
 	    <div class="lg:w-4/6 mx-auto">
 	      <div class="rounded-lg h-64 overflow-hidden">
-	        <img alt="content" class="object-cover object-center h-full w-full" src="assets/images/reveal-meme.jpg">
+	        <img alt="reveal-meme" class="object-cover object-center h-full w-full" src="assets/images/reveal-meme.jpg">
 	      </div>
 	      <div class="flex flex-col sm:flex-row mt-10">
 	        <div class="sm:w-1/3 text-center sm:pr-8 sm:py-8">
@@ -34,12 +38,13 @@
 	          	DOT is designed to be extremely expensive to be participated to avoid chain size growth. 
 	          	Like come on, all accounts with less than 1 DOT are considered dust and staking minimum on-chain is 200 DOTs...
 	          </p>
-	           <a class="text-brand-500 hover:text-brand-300 inline-flex items-center">Learn More
+	           <a href={null} class="text-brand-500 hover:text-brand-300 inline-flex items-center">Learn More
 	            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
 	              <path d="M5 12h14M12 5l7 7-7 7"></path>
 	            </svg>
 	          </a>
 	        </div>
+			<Matrix width={30} color='#ce206e'/>
 	      </div>
 	    </div>
 	  </div>
@@ -56,7 +61,7 @@
   }
 
   a {
-    @apply text-reepolee-500 font-bold;
+    @apply text-brand-400 font-bold;
   }
 
 </style>
