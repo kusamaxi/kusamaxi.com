@@ -1,13 +1,27 @@
 <main class="mx-auto">
-	<section class="text-brand-500 absolute top-0 right-0 left-0 mx-auto">
+	<section class="text-brand-500 absolute top-0 right-0 left-0 mx-auto z-2">
 		<div class="container px-5 py-10 mx-auto flex flex-col">
-			<div class="lg:w-4/6 mx-auto bg-black opacity-80">
+			<div class="lg:w-9/12 mx-auto bg-black opacity-85">
 				<div class="rounded-lg h-7/12 overflow-hidden">
 					<img
 						alt="content"
-						class="object-cover object-center h-full w-full"
+						class="object-fill object-center h-full w-full"
 						src="assets/images/reveal-meme.jpg"
 					/>
+				</div>
+				<div class="flex py-4 border-b-1 border-brand-200 p-2">
+					<div class="w-1/3">
+						pricefeeds implemented here
+					</div>
+					<div>
+						$KSM:
+						USD:
+						BTC:
+						ETH:
+						DOT:
+						staked
+						bonded
+					</div>
 				</div>
 				<div class="flex flex-col sm:flex-row">
 					<div class="sm:w-1/3 text-center sm:pr-8 py-8 px-8 mx-auto">
@@ -35,43 +49,48 @@
 							/>
 							<p class="text-base">
 								Will be publishing here 11 steps to take on the
-								road to Kusama Maximalism, talking about best staking
-								and PLO strategy.
+								road to Kusama Maximalism, talking about best
+								staking and PLO strategy.
 							</p>
 						</div>
 					</div>
 					<div
-						class="sm:w-2/3 sm:pl-8 sm:py-8 sm:border-l border-gray-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-center sm:text-left"
+						class="sm:w-2/3 sm:px-8 sm:py-8 sm:border-l border-brand-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-left"
 					>
-						<h2 class="text-center">
-							Why is $KSM likely to become more valuable than
-							$DOT?
-						</h2>
-						<p>
-							First mover advantage in cryptocurrencies is always
-							huge. People are more than likely to dump their
-							other tokens as well as DOTs to participate in
-							upcoming parachain auction to obtain layer 1 tokens.
-							Parachain Lease Offerings will mean that a lot of
-							$KSM will get unstaked leading higher staking
-							rewards to atract new stakers to the chain.
-						</p>
-						<p>
-							$KSM has much stronger fundamentals as a network of
-							community and has shown much more decentralized
-							decision making compared to Polkadot at
-							Polkassembly. Polkadot was distributed mainly
-							through ICO sale to huge companies that are barely
-							participating
-						</p>
-						<p>
-							Polkadot uses an existential deposit (ED) to prevent
-							dust accounts from bloating state. If an account
-							drops below the ED, it will be reaped, i.e.
-							completely removed from storage and the nonce reset.
-							Polkadot's ED is 1 DOT, while Kusama's is 0.0016666
-							KSM.
-						</p>
+						<div class="">
+							<h2 class="text-center">
+								Why is $KSM likely to become more valuable than
+								$DOT?
+							</h2>
+							<p>
+								First mover advantage in cryptocurrencies is
+								always huge. People are more than likely to dump
+								their other tokens as well as DOTs to
+								participate in upcoming parachain auction to
+								obtain layer 1 tokens. Parachain Lease Offerings
+								will mean that a lot of $KSM will get unstaked
+								leading higher staking rewards to attract new
+								onchain stakers out.
+							</p>
+							<p>
+								$KSM has much stronger fundamentals as a network
+								of community and has shown much more
+								decentralized decision making compared to
+								Polkadot at Polkassembly. Polkadot was
+								distributed mainly through ICO sale to huge
+								companies that are more investors than participators
+								on chain. 
+							</p>
+							<p>
+								Polkadot uses an existential deposit (ED) to
+								prevent dust accounts from bloating state. If an
+								account drops below the ED, it will be reaped,
+								i.e. completely removed from storage and the
+								nonce reset. Polkadot's ED is 1 DOT, while
+								Kusama's is 0.0016666 KSM.
+							</p>
+							<p></p>
+						</div>
 						<a
 							href={null}
 							class="text-brand-500 hover:text-brand-300 inline-flex items-center"

@@ -3,7 +3,7 @@
 	export let chars = 'ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍKSM'.split('')
 	export let width = null
 	export let height = null
-	export const noInitialDrop = false
+	export const noInitialDrop = true
 	export const fontSize = 20	
 	export const color = '#ce206e'
 	export const interval = 40
@@ -19,7 +19,7 @@
 		const ctx = canvas.getContext('2d')
 		while (true) {
 			// Black bg for the canvas, translucent to show trail
-			ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.06)'
 			ctx.fillRect(0, 0, canvas.width, canvas.height)
 			
 			// brand text
@@ -42,6 +42,6 @@
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}/> 
 
 <main class="">
-  <canvas class="fixed" bind:this={canvas} width={width ? width : windowWidth} height={height ? height : windowHeight}></canvas>
+  <canvas class="fixed z-1 bg-black" bind:this={canvas} width={width ? width : windowWidth} height={height ? height : windowHeight}></canvas>
   <slot />
 </main>
