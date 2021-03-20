@@ -62,13 +62,17 @@
 							</h2>
 							<p>
 								First mover advantage in cryptocurrencies is
-								always huge. People are more than likely to dump
-								their other tokens as well as DOTs to
-								participate in upcoming parachain auction to
-								obtain layer 1 tokens. Parachain Lease Offerings
-								will mean that a lot of $KSM will get unstaked
-								leading higher staking rewards to attract new
-								onchain stakers out.
+								huge. $KSM will be first interoperable blockchain
+								in the world with well thought out sharding in 
+								form of parachains. Projects need to auction for the
+								parachain slots they want to obtain in kusama.network
+								Most projects are going to do Parachain Lease Offering(PLO)
+								to lock borrowed $KSM for certain period of time in exchange
+								of their project tokens. This will be one of the only
+								ways to obtain tokens in the parachain projects meaning
+								that a lot of $KSM will get unstaked to be locked in PLO.
+								Less staked KSM will mean that staking reward will get in
+								higher levels that will drive new adaption even more.
 							</p>
 							<p>
 								$KSM has much stronger fundamentals as a network
