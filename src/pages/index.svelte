@@ -6,11 +6,13 @@
 	<section class="text-brand-500 absolute top-0 right-0 left-0 mx-auto z-2">
 		<div class="container px-5 py-10 mx-auto flex flex-col">
 			<div class="lg:w-9/12 mx-auto bg-black opacity-85">
-				<div class="rounded-lg h-7/12 overflow-hidden">
+				<div class="rounded-lg overflow-hidden">
 					<img
 						alt="content"
-						class="object-fill object-center h-full w-full"
-						src="assets/images/reveal-meme.jpg"
+						width="1200px"
+						height="450px"
+						class="object-cover lg:object-fill object-center h-full w-full"
+						src="assets/images/reveal-meme.webp"
 					/>
 				</div>
 				<div class="flex border-b-1 border-brand-200 p-2">
@@ -108,7 +110,7 @@
 						</div>
 						<a
 							href="https://polkaview.network/dot"
-							class="text-brand-500 hover:text-brand-400 inline-flex items-center"
+							class="inline-flex items-center"
 							>Learn More
 							<svg
 								fill="none"
