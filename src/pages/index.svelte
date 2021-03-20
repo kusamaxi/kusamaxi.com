@@ -1,3 +1,7 @@
+<script>
+	let ksmusd=null;
+</script>
+
 <main class="mx-auto">
 	<section class="text-brand-500 absolute top-0 right-0 left-0 mx-auto z-2">
 		<div class="container px-5 py-10 mx-auto flex flex-col">
@@ -9,18 +13,10 @@
 						src="assets/images/reveal-meme.jpg"
 					/>
 				</div>
-				<div class="flex py-4 border-b-1 border-brand-200 p-2">
-					<div class="w-1/3">
-						pricefeeds implemented here
-					</div>
-					<div>
-						$KSM:
-						USD:
-						BTC:
-						ETH:
-						DOT:
-						staked
-						bonded
+				<div class="flex border-b-1 border-brand-200 p-2">
+					<div class="w-1/3 ">pricefeeds implemented here</div>
+					<div class=" w-2/3">
+						$KSM: /USD /BTC /ETH /DOT staked bonded
 					</div>
 				</div>
 				<div class="flex flex-col sm:flex-row">
@@ -78,8 +74,8 @@
 								decentralized decision making compared to
 								Polkadot at Polkassembly. Polkadot was
 								distributed mainly through ICO sale to huge
-								companies that are more investors than participators
-								on chain. 
+								companies that are more investors than
+								participators on chain.
 							</p>
 							<p>
 								Polkadot uses an existential deposit (ED) to
@@ -89,11 +85,30 @@
 								nonce reset. Polkadot's ED is 1 DOT, while
 								Kusama's is 0.0016666 KSM.
 							</p>
-							<p></p>
+							<p>
+								Due to the way the Phragmen algorithm generates
+								the solution set, and due to the fact that the
+								solution set must fit in a single block, there
+								is a minimum number of DOT you must nominate
+								with in order to receive staking rewards. 
+								You need <a href="https://polkaview.network/dot">at least 200 DOTs</a> to 
+								nominate/stake DOT and million DOTs to validate onchain.
+							</p>
+							<p>
+								Setting these values so high means that there
+								will be barely adaption from community onchain
+								and ethereans are less likely to change over 
+								from expensive to another expensive chain. 
+								Existensial deposit on Polkadot means that
+								if you hold under 40$(({ksmusd}) on your wallet,
+								it will be reaped and deleted. Theoreticly if $DOT
+								reaches marketcap of Bitcoin wallets under 1200$
+								are in danger to be reaped...
+							</p>
 						</div>
 						<a
-							href={null}
-							class="text-brand-500 hover:text-brand-300 inline-flex items-center"
+							href="https://polkaview.network/dot"
+							class="text-brand-500 hover:text-brand-400 inline-flex items-center"
 							>Learn More
 							<svg
 								fill="none"
