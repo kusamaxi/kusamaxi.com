@@ -4,7 +4,7 @@
 	export let width = null
 	export let height = null
 	export const noInitialDrop = false
-	export const fontSize = 12	
+	export const fontSize = 16	
 	export const color = '#ce206e'
 	export const interval = 50
 	let canvas
@@ -39,11 +39,11 @@
 		}
 	})
 </script>
-
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}/> 
 
+<main class="mx-auto bg-black">
 <canvas class="fixed" bind:this={canvas} width={width ? width : windowWidth} height={height ? height : windowHeight}></canvas>
-<main class="mx-auto">
+
 	<section class="text-brand-500 absolute top-0 right-0 left-0 mx-auto">
 	  <div class="container px-5 py-24 mx-auto flex flex-col">
 	    <div class="lg:w-4/6 mx-auto bg-black opacity-80">
