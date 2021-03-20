@@ -1,3 +1,3 @@
-<main class="bg-black min-h-screen">
+<main class="">
   <slot />
 </main>

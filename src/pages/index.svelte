@@ -1,12 +1,12 @@
 <script>
 	import { onMount } from 'svelte'
-	export let chars = 'ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ'.split('')
+	export let chars = 'ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍKSM'.split('')
 	export let width = null
 	export let height = null
 	export const noInitialDrop = false
-	export const fontSize = 16
+	export const fontSize = 12	
 	export const color = '#ce206e'
-	export const interval = 33
+	export const interval = 50
 	let canvas
 	let windowWidth = 300
 	let windowHeight = 150
@@ -22,7 +22,7 @@
 			ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'
 			ctx.fillRect(0, 0, canvas.width, canvas.height)
 			
-			// Green text
+			// brand text
 			ctx.fillStyle = color
 			ctx.font = `${fontSize}px arial`
 			// Looping
@@ -40,13 +40,13 @@
 	})
 </script>
 
-<svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight} />
+<svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}/> 
 
-<canvas bind:this={canvas} width={width ? width : windowWidth} height={height ? height : windowHeight}></canvas>
-<main>
-	<section class="text-brand-500 body-font">
+<canvas class="fixed" bind:this={canvas} width={width ? width : windowWidth} height={height ? height : windowHeight}></canvas>
+<main class="mx-auto">
+	<section class="text-brand-500 absolute top-0 right-0 left-0 mx-auto">
 	  <div class="container px-5 py-24 mx-auto flex flex-col">
-	    <div class="lg:w-4/6 mx-auto">
+	    <div class="lg:w-4/6 mx-auto bg-black opacity-80">
 	      <div class="rounded-lg h-64 overflow-hidden">
 	        <img alt="content" class="object-cover object-center h-full w-full" src="assets/images/reveal-meme.jpg">
 	      </div>
