@@ -1,104 +1,106 @@
-<script>
-	import { onMount } from 'svelte'
-	export let chars = 'ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍKSM'.split('')
-	export let width = null
-	export let height = null
-	export const noInitialDrop = false
-	export const fontSize = 16	
-	export const color = '#ce206e'
-	export const interval = 50
-	let canvas
-	let windowWidth = 300
-	let windowHeight = 150
-	$: cols = Math.round((width ? width : windowWidth) / fontSize)
-	$: drops = Array(cols).fill(noInitialDrop ? (height ? height : windowHeight) : 0)
-	const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-	onMount(async () => {
-		// Sync canvas dimensions with window
-		[windowWidth, windowHeight] = await [window.innerWidth, window.innerHeight]
-		const ctx = canvas.getContext('2d')
-		while (true) {
-			// Black bg for the canvas, translucent to show trail
-			ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'
-			ctx.fillRect(0, 0, canvas.width, canvas.height)
-			
-			// brand text
-			ctx.fillStyle = color
-			ctx.font = `${fontSize}px arial`
-			// Looping
-			for (let i = 0; i < drops.length; i++) {
-				// Displays a random character from chars
-				const randomChar = Math.floor(Math.random() * chars.length)
-				const text = chars[randomChar]
-				ctx.fillText(text, i * fontSize, drops[i] * fontSize)
-				const reachedEndOfScreen = drops[i] * fontSize > canvas.height && Math.random() > 0.975
-				if (reachedEndOfScreen) drops[i] = 0
-				drops[i]++
-			}
-			await sleep(interval)
-		}
-	})
-</script>
-<svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight}/> 
-
-<main class="mx-auto bg-black">
-<canvas class="fixed" bind:this={canvas} width={width ? width : windowWidth} height={height ? height : windowHeight}></canvas>
-
+<main class="mx-auto">
 	<section class="text-brand-500 absolute top-0 right-0 left-0 mx-auto">
-	  <div class="container px-5 py-24 mx-auto flex flex-col">
-	    <div class="lg:w-4/6 mx-auto bg-black opacity-80">
-	      <div class="rounded-lg h-64 overflow-hidden">
-	        <img alt="content" class="object-cover object-center h-full w-full" src="assets/images/reveal-meme.jpg">
-	      </div>
-	      <div class="flex flex-col sm:flex-row mt-10">
-	        <div class="sm:w-1/3 text-center sm:pr-8 sm:py-8">
-	          <div class="w-20 h-20 rounded-full inline-flex items-center justify-center bg-gray-200 text-gray-400">
-	            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-10 h-10" viewBox="0 0 24 24">
-	              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path>
-	              <circle cx="12" cy="7" r="4"></circle>
-	            </svg>
-	          </div>
-	          <div class="flex flex-col items-center text-center justify-center">
-	            <h1 class="mt-4">Kusama XI</h1>
-	            <div class="w-12 h-1 bg-brand-500 rounded mt-2 mb-4"></div>
-	            <p class="text-base">11 steps to take on the road to Kusama Maximalism.</p>
-	          </div>
-	        </div>
-	        <div class="sm:w-2/3 sm:pl-8 sm:py-8 sm:border-l border-gray-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-center sm:text-left">
-	 
-	          <h2>Why is $KSM likely to become more valuable than $DOT?</h2>
-	          <p>First mover advantage in cryptocurrencies is always huge. 
-	          People are more than likely to dump their other tokens as well as DOTs to participate 
-	          in upcoming parachain auction to obtain layer 1 tokens. Parachain Lease Offerings will mean that
-	          a lot of $KSM will get unbonded.</p>
-	          <p>
-	          $KSM has much stronger fundamentals	as a network of community and has shown much more 
-	          decentralized decision making compared to Polkadot at Polkassembly.
-	          </p>
-	          <p>
-	          	DOT is designed to be extremely expensive to be participated to avoid chain size growth. 
-	          	Like come on, all accounts with less than 1 DOT are considered dust and staking minimum on-chain is 200 DOTs...
-	          </p>
-	           <a href={null} class="text-brand-500 hover:text-brand-300 inline-flex items-center">Learn More
-	            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
-	              <path d="M5 12h14M12 5l7 7-7 7"></path>
-	            </svg>
-	          </a>
-	        </div>
-	      </div>
-	    </div>
-	  </div>
+		<div class="container px-5 py-10 mx-auto flex flex-col">
+			<div class="lg:w-4/6 mx-auto bg-black opacity-80">
+				<div class="rounded-lg h-7/12 overflow-hidden">
+					<img
+						alt="content"
+						class="object-cover object-center h-full w-full"
+						src="assets/images/reveal-meme.jpg"
+					/>
+				</div>
+				<div class="flex flex-col sm:flex-row">
+					<div class="sm:w-1/3 text-center sm:pr-8 py-8 px-8 mx-auto">
+						<div
+							class="w-36 h-36 rounded-full inline-flex items-center justify-center bg-brand-600 text-brand-100"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 2000 1225.75"
+								class="w-28 h-28"
+							>
+								>
+								<path
+									d="M1887,67.73c-37.49-33.32-79.15-58.32-129.14-66.65-62.48-8.33-125,33.33-166.62,62.48s-125,104.14-158.29,133.3S1316.32,242.68,1178.85,326,508.2,750.88,508.2,750.88H645.66L25,1071.63H87.48L0,1138.28c50,12.49,100,4.16,145.79-20.83v20.83S883.1,846.69,1024.73,921.67l-87.48,25c8.33,0,145.79,8.33,145.79,8.33,8.34,58.32,41.66,112.47,91.65,141.63,83.31,54.15,87.47,87.48,87.47,87.48s-41.65,16.66-41.65,41.65c79.14-25,162.45-25,237.43,0,0,0-4.16-25-62.48-41.65-58.32-25-108.3-62.48-145.79-116.64-33.33-45.82-45.82-104.14-25-158.29s91.65-83.31,237.44-158.29c170.79-87.48,212.44-154.12,233.27-208.28s62.49-154.12,79.15-204.11c16.66-45.82,45.82-83.31,83.31-116.63,45.82-25,95.81-45.83,141.63-62.49C2007.8,163.54,1916.15,88.56,1887,67.73Z"
+									fill="#fff"
+								/>
+							</svg>
+						</div>
+						<div
+							class="flex flex-col items-center text-center justify-center"
+						>
+							<h1 class="mt-4">Kusama XI</h1>
+							<div
+								class="w-12 h-1 bg-brand-500 rounded mt-2 mb-4"
+							/>
+							<p class="text-base">
+								Will be publishing here 11 steps to take on the
+								road to Kusama Maximalism, talking about best staking
+								and PLO strategy.
+							</p>
+						</div>
+					</div>
+					<div
+						class="sm:w-2/3 sm:pl-8 sm:py-8 sm:border-l border-gray-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-center sm:text-left"
+					>
+						<h2 class="text-center">
+							Why is $KSM likely to become more valuable than
+							$DOT?
+						</h2>
+						<p>
+							First mover advantage in cryptocurrencies is always
+							huge. People are more than likely to dump their
+							other tokens as well as DOTs to participate in
+							upcoming parachain auction to obtain layer 1 tokens.
+							Parachain Lease Offerings will mean that a lot of
+							$KSM will get unstaked leading higher staking
+							rewards to atract new stakers to the chain.
+						</p>
+						<p>
+							$KSM has much stronger fundamentals as a network of
+							community and has shown much more decentralized
+							decision making compared to Polkadot at
+							Polkassembly. Polkadot was distributed mainly
+							through ICO sale to huge companies that are barely
+							participating
+						</p>
+						<p>
+							Polkadot uses an existential deposit (ED) to prevent
+							dust accounts from bloating state. If an account
+							drops below the ED, it will be reaped, i.e.
+							completely removed from storage and the nonce reset.
+							Polkadot's ED is 1 DOT, while Kusama's is 0.0016666
+							KSM.
+						</p>
+						<a
+							href={null}
+							class="text-brand-500 hover:text-brand-300 inline-flex items-center"
+							>Learn More
+							<svg
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								class="w-4 h-4 ml-0.5"
+								viewBox="0 0 24 24"
+							>
+								<path d="M5 12h14M12 5l7 7-7 7" />
+							</svg>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
 	</section>
 </main>
 
-
 <style>
-  p {
-    @apply my-4;
-  }
+	p {
+		@apply my-4;
+	}
 
-  a {
-    @apply text-brand-400 font-bold;
-  }
-
+	a {
+		@apply text-brand-400 font-bold;
+	}
 </style>
