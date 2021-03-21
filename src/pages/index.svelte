@@ -1,5 +1,19 @@
 <script>
-	let ksmusd=null;
+	var ccStreamer = new WebSocket(
+		"wss://streamer.cryptocompare.com/v2?api_key=d0f1cfbfbcf3b4868cef28e5eed939705f5247ce336e65f167d2f8f5181f7a85"
+	);
+	ccStreamer.onopen = function onStreamOpen() {
+		var subRequest = {
+			action: "SubAdd",
+			subs: ["21~BTC"],
+		};
+		ccStreamer.send(JSON.stringify(subRequest));
+	};
+
+	ccStreamer.onmessage = function onStreamMessage(message) {
+		var message = event.data;
+		console.log("Received from Cryptocompare: " + message);
+	};
 </script>
 
 <main class="mx-auto">
@@ -11,15 +25,12 @@
 						alt="content"
 						width="1200px"
 						height="450px"
-						class="object-cover lg:object-fill object-center h-full w-full"
+						class="object-cover lg:object-fill object-center h-full w-full hidden"
 						src="assets/images/reveal-meme.webp"
 					/>
 				</div>
 				<div class="flex border-b-1 border-brand-200 p-2">
-					<div class="w-1/3 ">pricefeeds implemented here</div>
-					<div class=" w-2/3">
-						$KSM: /USD /BTC /ETH /DOT staked bonded
-					</div>
+					<div class="mx-auto">pricefeeds implemented here</div>
 				</div>
 				<div class="flex flex-col sm:flex-row">
 					<div class="sm:w-1/3 text-center sm:pr-8 py-8 px-8 mx-auto">
@@ -46,33 +57,69 @@
 								class="w-12 h-1 bg-brand-500 rounded mt-2 mb-4"
 							/>
 							<p class="text-base">
-								Will be publishing here 11 steps to take on the
-								road to Kusama Maximalism, talking about best
-								staking and PLO strategy.
+								Will be publishing here 11 reasons why to take
+								the road to Kusama Maximalism.
 							</p>
 						</div>
 					</div>
 					<div
 						class="sm:w-2/3 sm:px-8 sm:py-8 sm:border-l border-brand-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-left"
 					>
-						<div class="">
+						<div class="testnetwork pb-5">
+							<h2 class="text-center">
+								Isn't Kusama just a test/canary network for
+								Polkadot?
+							</h2>
+							<p>
+								Wake up. Being a test network is an oxymoron for
+								interoperable networks. Nothing can stop the
+								markets from the network that is interoperable
+								with other blockchains. It is probably best idea
+								for you right now to head out to <a
+									href="https://app.element.io/#/room/#westend_faucet:matrix.org"
+								>
+									#westend-faucet@matrix</a
+								> channel and began dripping and staking $WND before
+								it hits the markets.
+							</p>
+							<a
+								href="https://polkadot.network/westend-introducing-a-new-testnet-for-polkadot-and-kusama/"
+								class="inline-flex items-center"
+								>Learn More
+								<svg
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									class="w-4 h-4 ml-0.5"
+									viewBox="0 0 24 24"
+								>
+									<path d="M5 12h14M12 5l7 7-7 7" />
+								</svg>
+							</a>
+						</div>
+						<div class="flippening pb-5">
 							<h2 class="text-center">
 								Why is $KSM likely to become more valuable than
 								$DOT?
 							</h2>
 							<p>
 								First mover advantage in cryptocurrencies is
-								huge. $KSM will be first interoperable blockchain
-								in the world with well thought out sharding in 
-								form of parachains. Projects need to auction for the
-								parachain slots they want to obtain in kusama.network
-								Most projects are going to do Parachain Lease Offering(PLO)
-								to lock borrowed $KSM for certain period of time in exchange
-								of their project tokens. This will be one of the only
-								ways to obtain tokens in the parachain projects meaning
-								that a lot of $KSM will get unstaked to be locked in PLO.
-								Less staked KSM will mean that staking reward will get in
-								higher levels that will drive new adaption even more.
+								huge. $KSM will be first interoperable
+								blockchain in the world with well thought out
+								sharding in form of parachains. Projects need to
+								auction for the parachain slots they want to
+								obtain in kusama.network Most projects are going
+								to do Parachain Lease Offering(PLO) to lock
+								borrowed $KSM for certain period of time in
+								exchange of their project tokens. This will be
+								one of the only ways to obtain tokens in the
+								parachain projects meaning that a lot of $KSM
+								will get unstaked to be locked in PLO. Less
+								staked KSM will mean that staking reward will
+								get in higher levels that will drive new
+								adaption even more.
 							</p>
 							<p>
 								$KSM has much stronger fundamentals as a network
@@ -96,38 +143,41 @@
 								the solution set, and due to the fact that the
 								solution set must fit in a single block, there
 								is a minimum number of DOT you must nominate
-								with in order to receive staking rewards. 
-								You need <a href="https://polkaview.network/dot">at least 200 DOTs</a> to 
-								nominate/stake DOT and million DOTs to validate onchain.
+								with in order to receive staking rewards. You
+								need <a href="https://polkaview.network/dot"
+									>at least 200 DOTs</a
+								> to nominate/stake DOT and million DOTs to validate
+								onchain.
 							</p>
 							<p>
 								Setting these values so high means that there
 								will be barely adaption from community onchain
-								and ethereans are less likely to change over 
-								from expensive to another expensive chain. 
-								Existensial deposit on Polkadot means that
-								if you hold under 40$(({ksmusd}) on your wallet,
-								it will be reaped and deleted. Theoreticly if $DOT
-								reaches marketcap of Bitcoin wallets under 1200$
-								are in danger to be reaped...
+								and ethereans are less likely to change over
+								from expensive to another expensive chain.
+								Existensial deposit on Polkadot means that if
+								you hold under 40$ on your wallet, it will be
+								reaped and deleted. Theoreticly if $DOT reaches
+								marketcap of Bitcoin wallets under 1200$ are in
+								danger to be reaped...
 							</p>
+
+							<a
+								href="https://polkaview.network/dot"
+								class="inline-flex items-center"
+								>Learn More
+								<svg
+									fill="none"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									class="w-4 h-4 ml-0.5"
+									viewBox="0 0 24 24"
+								>
+									<path d="M5 12h14M12 5l7 7-7 7" />
+								</svg>
+							</a>
 						</div>
-						<a
-							href="https://polkaview.network/dot"
-							class="inline-flex items-center"
-							>Learn More
-							<svg
-								fill="none"
-								stroke="currentColor"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								class="w-4 h-4 ml-0.5"
-								viewBox="0 0 24 24"
-							>
-								<path d="M5 12h14M12 5l7 7-7 7" />
-							</svg>
-						</a>
 					</div>
 				</div>
 			</div>
