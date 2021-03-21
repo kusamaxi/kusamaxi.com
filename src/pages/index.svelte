@@ -19,7 +19,9 @@
 <main class="mx-auto">
 	<section class="text-brand-500 absolute top-0 right-0 left-0 mx-auto z-2">
 		<div class="container px-5 py-10 mx-auto flex flex-col">
-			<div class="lg:w-9/12 mx-auto bg-black opacity-85">
+			<div
+				class="w-10/12 sm:w-11/12 lg:w-9/12 mx-auto bg-black rounded-3xl opacity-85 sm:opacity-0 sm:hover:opacity-95 sm:transition sm:duration-900 sm:ease-in-out"
+			>
 				<div class="rounded-lg overflow-hidden">
 					<img
 						alt="content"
@@ -30,10 +32,10 @@
 					/>
 				</div>
 				<div class="flex border-b-1 border-brand-200 p-2">
-					<div class="mx-auto">pricefeeds implemented here</div>
+					<div class="mx-auto">$KSM:</div>
 				</div>
 				<div class="flex flex-col sm:flex-row">
-					<div class="sm:w-1/3 text-center sm:pr-8 py-8 px-8 mx-auto">
+					<div class="sm:w-1/3 text-center sm:pr-8 pt-8 px-8 mx-auto">
 						<div
 							class="w-36 h-36 rounded-full inline-flex items-center justify-center bg-brand-600 text-brand-100"
 						>
@@ -57,13 +59,13 @@
 								class="w-12 h-1 bg-brand-500 rounded mt-2 mb-4"
 							/>
 							<p class="text-base">
-								Will be publishing here 11 reasons why to take
-								the road to Kusama Maximalism.
+								Will be publishing here 11 key secrets to toxic
+								Kusama maximalism.
 							</p>
 						</div>
 					</div>
 					<div
-						class="sm:w-2/3 sm:px-8 sm:py-8 sm:border-l border-brand-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-left"
+						class="sm:w-2/3 px-4 py-4 sm:px-8 sm:py-8 sm:border-l border-brand-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-left"
 					>
 						<div class="testnetwork pb-5">
 							<h2 class="text-center">
@@ -187,7 +189,7 @@
 
 <style>
 	p {
-		@apply my-4;
+		@apply my-4 px-1;
 	}
 
 	a {
