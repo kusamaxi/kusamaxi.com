@@ -1,21 +1,3 @@
-<script>
-	var ccStreamer = new WebSocket(
-		"wss://streamer.cryptocompare.com/v2?api_key=d0f1cfbfbcf3b4868cef28e5eed939705f5247ce336e65f167d2f8f5181f7a85"
-	);
-	ccStreamer.onopen = function onStreamOpen() {
-		var subRequest = {
-			action: "SubAdd",
-			subs: ["21~BTC"],
-		};
-		ccStreamer.send(JSON.stringify(subRequest));
-	};
-
-	ccStreamer.onmessage = function onStreamMessage(message) {
-		var message = event.data;
-		console.log("Received from Cryptocompare: " + message);
-	};
-</script>
-
 <main class="mx-auto">
 	<section class="text-brand-500 absolute top-0 right-0 left-0 mx-auto z-2">
 		<div class="container px-5 py-10 mx-auto flex flex-col">
