@@ -1,6 +1,7 @@
-/node_modules/
-/dist/
 .DS_Store
-.routify/
-package-lock.json
-.env
+node_modules
+/build
+/.svelte-kit
+/package
+/static/optimized-images
+/.vercel_build_output

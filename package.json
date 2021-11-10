@@ -9,10 +9,10 @@
   "devDependencies": {
     "@sveltejs/adapter-vercel": "next",
     "@sveltejs/kit": "next",
-    "@unocss/preset-icons": "^0.7.2",
+    "@unocss/preset-icons": "^0.7.4",
     "svelte": "^3.44.1",
     "svimg": "^1.1.0",
-    "unocss": "^0.7.2"
+    "unocss": "^0.7.4"
   },
   "type": "module",
   "dependencies": {
