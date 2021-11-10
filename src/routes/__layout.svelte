@@ -1,7 +1,6 @@
 <script>
 	import "uno.css";
 	import Header from "$lib/header/Header.svelte";
-	import "../app.css";
 
 	import { onMount } from "svelte";
 	export let chars = "ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍKSM".split("");
@@ -63,7 +62,7 @@
 	<div class="z-5">
 		<Header class="bg-white opacity-40" />
 
-		<main>
+		<main class="text-white">
 			<slot />
 		</main>
 
