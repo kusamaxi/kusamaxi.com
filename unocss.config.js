@@ -1,142 +1,217 @@
-// tailwind.config.js for Kusamaxi.com
-module.exports = {
-  theme: {
-    extend: {
-      colors: {
-      'brand': {
-          DEFAULT: '#CE206F',
-          '50': '#F6C6DC',
-          '100': '#F3B2D0',
-          '200': '#ED8BB7',
-          '300': '#E7639F',
-          '400': '#E13B86',
-          '500': '#CE206F',
-          '600': '#A61A5A',
-          '700': '#7F1444',
-          '800': '#570D2F',
-          '900': '#2F0719'
-        },
-        cerise: {
-          '50':  '#fdf9f9',
-          '100': '#fdeef5',
-          '200': '#fbcdea',
-          '300': '#fba2d8',
-          '400': '#fc67ba',
-          '500': '#fc3d97',
-          '600': '#f8236f',
-          '700': '#df1b56',
-          '800': '#b31741',
-          '900': '#8e1433',
-        },
-        tomato: {
-          '50':  '#fcf8f6',
-          '100': '#fcf1ec',
-          '200': '#f9dad5',
-          '300': '#f8baaf',
-          '400': '#f78774',
-          '500': '#f75c45',
-          '600': '#ed3a2d',
-          '700': '#cb2c2a',
-          '800': '#9e2327',
-          '900': '#7b1d22',
-        },
-        mango: {
-          '50':  '#fbf8f3',
-          '100': '#fbf1e4',
-          '200': '#f8e0c0',
-          '300': '#f6c58a',
-          '400': '#f39a48',
-          '500': '#f27122',
-          '600': '#e34c16',
-          '700': '#bd3918',
-          '800': '#922d1c',
-          '900': '#72251a',
-        },
-        carrot: {
-          '50':  '#fbf9f4',
-          '100': '#fbf5e2',
-          '200': '#f6e8b7',
-          '300': '#f1d379',
-          '400': '#eaad37',
-          '500': '#e18617',
-          '600': '#c8600e',
-          '700': '#9b4811',
-          '800': '#733715',
-          '900': '#582c15',
-        },
-        sunglow: {
-          '50':  '#fbfaf5',
-          '100': '#faf7e3',
-          '200': '#f4eeb4',
-          '300': '#ebdc74',
-          '400': '#dabb31',
-          '500': '#c49813',
-          '600': '#9f720b',
-          '700': '#76570e',
-          '800': '#564112',
-          '900': '#413312',
-        },
-        seagreen: {
-          '50':  '#f5faf9',
-          '100': '#ebf7f3',
-          '200': '#d2efe3',
-          '300': '#ace0cf',
-          '400': '#67c6ab',
-          '500': '#33a680',
-          '600': '#25845e',
-          '700': '#25674c',
-          '800': '#214e3e',
-          '900': '#1c3e34',
-        },
-        steel: {
-          '50':  '#f3fafb',
-          '100': '#e2f6fa',
-          '200': '#bdebf5',
-          '300': '#8edaf1',
-          '400': '#4cbbec',
-          '500': '#2295e4',
-          '600': '#1972d2',
-          '700': '#1b5aae',
-          '800': '#19457f',
-          '900': '#163862',
-        },
-        royalblue: {
-          '50':  '#f5fafd',
-          '100': '#e6f6fc',
-          '200': '#c3e6fa',
-          '300': '#9bd0f9',
-          '400': '#63a8f8',
-          '500': '#347cf6',
-          '600': '#2458ef',
-          '700': '#2146d5',
-          '800': '#1c36a3',
-          '900': '#172c7d',
-        },
-        denim: {
-          '50':  '#f5f9fc',
-          '100': '#e9f2fc',
-          '200': '#cedefa',
-          '300': '#b0c3fa',
-          '400': '#8797f9',
-          '500': '#5d6af9',
-          '600': '#4448f4',
-          '700': '#3739df',
-          '800': '#2c2db1',
-          '900': '#24268a',
-        },
-        flamingo: {
-          '50':  '#f5f7fb',
-          '100': '#edeefb',
-          '200': '#d9d5f9',
-          '300': '#c4b8f8',
-          '400': '#ad8af8',
-          '500': '#925df7',
-          '600': '#733df2',
-          '700': '#5831dd',
-          '800': '#4328b1',
-          '900': '#36228b',
-        },
-      }
-    }
-  }
-}
+import { transformerVariantGroup, presetTypography } from "unocss";
+import { defineConfig } from "unocss/vite";
+import { colors, presetWind } from "@unocss/preset-wind";
+
+export default defineConfig({
+	presets: [
+		presetWind(),
+		presetTypography({
+			cssExtend: {
+				a: {
+					"text-decoration": "none",
+				},
+				"p > a, li > a": {
+					position: "relative",
+					display: "inline-block",
+					"z-index": 5,
+					"background-image":
+						"linear-gradient(var(--c-prose-accent), var(--c-prose-accent))",
+					"background-size": "0 2px",
+					"background-repeat": "no-repeat",
+					"background-position": "bottom left",
+					transition: "background-size ease-out 200ms",
+				},
+				"p > a:hover, li > a:hover": {
+					"background-size": "100% 2px",
+				},
+				strong: {
+					color: "var(--un-prose-headings)",
+				},
+				p: {
+					"font-family": "var(--font-serif)",
+					"line-height": "1.625",
+				},
+				h1: {
+					"text-transform": "uppercase",
+					"font-weight": 700,
+					"font-size": "1.875rem",
+					"background-image": `linear-gradient(to right, var(--c-prose-accent), rgba(0, 0, 0, 0))`,
+					"background-size": "100% 0.125rem",
+					"background-repeat": "no-repeat",
+					"background-position": "bottom",
+					"padding-bottom": "0.5rem",
+				},
+				h2: {
+					"font-size": "1.5rem",
+				},
+				h3: {
+					"font-size": "1.25rem",
+				},
+				h4: {
+					"font-size": "1.125rem",
+				},
+				"h1, h2, h3, h4, h5, h6": {
+					"font-family": "var(--font-heading)",
+					position: "relative",
+				},
+				"h1 a, h2 a, h3 a, h4 a, h5 a": {
+					"font-weight": 600,
+				},
+				"p > code": {
+					color: "var(--un-prose-headings)",
+					"font-family": "var(--font-monospace)",
+					"background-color": "var(--c-prose-alt-bg)",
+					"font-weight": 500,
+					border: "none",
+				},
+				pre: {
+					"font-family": "var(--font-monospace)",
+					padding: "1rem",
+					"margin-top": "1.25rem",
+					"overflow-x": "auto",
+					"scrollbar-color": "var(--un-font-)",
+					"border-radius": "0.375rem",
+				},
+				"pre::-webkit-scrollbar": {
+					"background-color": "var(--c-prose-alt-bg)",
+					height: "0.5rem",
+					"border-bottom-right-radius": "0.375rem",
+					"border-bottom-left-radius": "0.375rem",
+					cursor: "pointer",
+				},
+				"pre:hover::-webkit-scrollbar": {
+					"background-color": "var(--c-prose-scrollbar-bg)",
+					height: "0.5rem",
+				},
+				"pre::-webkit-scrollbar-thumb": {
+					"border-radius": "0.375rem",
+					cursor: "pointer",
+				},
+				"pre:hover::-webkit-scrollbar-thumb": {
+					"background-color": "var(--c-prose-thumb-bg)",
+				},
+				"del, del *": {
+					"font-style": "italic",
+					"text-decoration": "line-through",
+				},
+				table: {
+					width: "100%",
+					"border-radius": "0.375rem",
+					"background-color": "var(--c-prose-alt-bg)",
+				},
+				"table a": {
+					transition: "all ease-out 200ms",
+					"font-weight": "semibold",
+					"line-height": "1.625",
+					"font-style": "italic",
+				},
+				"table th": {
+					color: "var(--un-prose-links)",
+					"font-size": "1.125rem",
+					"text-transform": "uppercase",
+				},
+				"table td": {
+					"text-align": "left",
+				},
+			},
+		}),
+	],
+	transformers: [transformerVariantGroup()],
+	rules: [
+		[
+			/^content-\[(.*)\]$/,
+			([, content]) => ({ content: JSON.stringify(content) }),
+		],
+		[
+			/^prose-custom$/,
+			(_, { theme }) => ({
+				"--font-heading": '"Space Grotesk", sans-serif',
+				"--font-serif": '"IBM Plex Serif", serif',
+				"--font-monospace": '"IBM Plex Mono", monospace',
+				"--un-prose-body": theme.colors.zinc[800],
+				"--un-prose-links": theme.colors.rose[700],
+				"--un-prose-headings": theme.colors.zinc[800],
+				"--c-prose-accent": theme.colors.rose[600],
+				"--c-prose-alt-bg": theme.colors.rose[100],
+				"--c-prose-scrollbar-bg": theme.colors.gray[200],
+				"--c-prose-thumb-bg": theme.colors.gray[300],
+			}),
+			{ layer: "typography" },
+		],
+		[
+			/^custom-scrollbar$/,
+			(_, { theme }) =>
+				`
+				html {
+					color: ${theme.colors.rose[200]} ${theme.colors.rose[600]};
+					scroll-padding-top: 2rem;
+				}
+
+				html::-webkit-scrollbar-thumb {
+					background-color: ${theme.colors.rose[600]};
+				}
+
+				html::-webkit-scrollbar {
+					background-color: ${theme.colors.rose[200]};
+					width: 0.5rem;
+				}`.replace(/(\s)/g, ""),
+			{ layer: "default" },
+		],
+	],
+	shortcuts: [
+		[
+			/^btn-lg-(.*)$/,
+			([, c]) => {
+				return `bg-${c} inline-block
+					mt-8 px-5 py-2
+					text-white font-semibold no-underline font-heading text-lg tracking-wide
+					transition-property-transform ease-out duration-200 transform-gpu
+					shadow-sharp border-2 border-rose-900
+					hover:(-translate-y-1.5)
+				`;
+			},
+		],
+		[
+			/^btn-(source|demo)$/,
+			([, kind]) => {
+				const colour =
+					kind === "demo" ? "bg-rose-600 text-white" : "bg-white text-zinc-900";
+				return `${colour} border-2 border-rose-900 shadow-sharp font-heading no-underline flex items-center gap-2 py-1 px-3 transition-property-filter ease-out duration-200 hover:brightness-90`;
+			},
+		],
+	],
+	theme: {
+		fontFamily: {
+			heading: ["Space Grotesk", "sans-serif"],
+			serif: ["IBM Plex Serif", "serif"],
+			monospace: ["IBM Plex Mono", "monospace"],
+		},
+		fontSize: {
+			"clamped-lg": "clamp(1.25rem, calc(5vw + 1.25rem), 3rem)",
+			"clamped-md": "clamp(1rem, calc(5vw + 0.5rem), 1.625rem)",
+			"clamped-sm": "clamp(0.8rem, calc(2vw + 0.5rem), 1.125rem)",
+		},
+		width: {
+			clamped: "clamp(12rem, calc(20vw + 4rem), 16rem)",
+		},
+		height: {
+			clamped: "clamp(12rem, calc(20vw + 4rem), 16rem)",
+		},
+		boxShadow: {
+			sharp: `0.25rem 0.25rem 0 0 ${colors.rose[900]}`,
+		},
+		backgroundImage: {
+			"red-fading-line": `linear-gradient(to right, ${colors.red[500]}, rgba(0, 0, 0, 0))`,
+			"blue-fading-line": `linear-gradient(to right, ${colors.rose[600]}, rgba(0, 0, 0, 0))`,
+		},
+	},
+	preflights: [
+		{
+			getCSS: ({ theme }) => `
+			*::selection {
+				background-color: ${theme.colors.zinc[800]};
+				color: ${theme.colors.white};
+			}`,
+		},
+	],
+});
