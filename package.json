@@ -1,7 +1,7 @@
 {
-  "name": "elianiva.my.id",
-  "description": "Elianiva's personal site",
-  "version": "3.0.0",
+  "name": "kusamaxi.com",
+  "description": "kusama community website",
+  "version": "3.0.1",
   "license": "MIT",
   "type": "module",
   "private": true,
