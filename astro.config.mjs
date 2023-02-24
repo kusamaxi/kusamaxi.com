@@ -7,21 +7,21 @@ import image from "@astrojs/image";
 
 // https://astro.build/config
 export default defineConfig({
-	integrations: [
-		Unocss(),
-		svelte(),
-		mdx(),
-		image({ serviceEntryPoint: "@astrojs/image/sharp" }),
-	],
-	site: "https://kusamaxi.com",
-	vite: {
-		resolve: {
-			alias: {
-				"~/*": path.resolve("src"),
-			},
-		},
-		ssr: {
-			external: ["svgo"],
-		},
-	},
+  integrations: [
+    Unocss(),
+    svelte(),
+    mdx(),
+    image({ serviceEntryPoint: "@astrojs/image/sharp" }),
+  ],
+  site: "https://kusamaxi.com",
+  vite: {
+    resolve: {
+      alias: {
+        "~/*": path.resolve("src"),
+      },
+    },
+    ssr: {
+      external: ["svgo"],
+    },
+  },
 });
