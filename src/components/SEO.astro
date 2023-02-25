@@ -20,7 +20,7 @@ const { siteName, siteUrl } = data;
 ---
 
 <title>{props.title} | {siteName}</title>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <meta name="theme-color" content="#fff1f2" />
 <link rel="canonical" href={`${siteUrl}${Astro.url.pathname}`} />
@@ -29,7 +29,7 @@ const { siteName, siteUrl } = data;
 
 <!-- favicon -->
 <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
-<link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="icon" type="image/png" href="/favicon-32x32.png" />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={isPost ? "blog" : "website"} />
