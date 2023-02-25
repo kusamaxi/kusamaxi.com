@@ -6,22 +6,22 @@ import mdx from "@astrojs/mdx";
 import image from "@astrojs/image";
 
 // https://astro.build/config
+import sitemap from "@astrojs/sitemap";
+
+// https://astro.build/config
 export default defineConfig({
-  integrations: [
-    Unocss(),
-    svelte(),
-    mdx(),
-    image({ serviceEntryPoint: "@astrojs/image/sharp" }),
-  ],
+  integrations: [Unocss(), svelte(), mdx(), image({
+    serviceEntryPoint: "@astrojs/image/sharp"
+  }), sitemap()],
   site: "https://kusamaxi.com",
   vite: {
     resolve: {
       alias: {
-        "~/*": path.resolve("src"),
-      },
+        "~/*": path.resolve("src")
+      }
     },
     ssr: {
-      external: ["svgo"],
-    },
-  },
+      external: ["svgo"]
+    }
+  }
 });

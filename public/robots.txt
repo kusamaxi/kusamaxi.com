@@ -1,3 +1,2 @@
 User-agent: *
-
-sitemap: https://elianiva.my.id/sitemap.xml
+sitemap: https://kusamaxi.com/sitemap-index.xml
