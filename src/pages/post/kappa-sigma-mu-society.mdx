@@ -12,7 +12,7 @@ tags:
   - Web3alert
   - blockchain
 ---
-import ImageOverlay from '~/components/ImageOverlay.svelte';
+import CompareImages from '~/components/CompareImages.svelte'
 
 # Kappa Sigma Mu Society
 
@@ -33,7 +33,11 @@ It is even possible to generate QR code to be tattood on your body. We did [rese
 it takes 29x29 pixels to include kusama:index of the current head in the QR code and 41x41 if kusama:SS58 is used. Generator used for this 
 is available in our [github repository](https://github.com/kusamaxi/ksmqr).
 
-<ImageOverlay image1Src="/assets/post/kappa-sigma-mu-society/ksm-layer-1.webp" image2Src="/assets/post/kappa-sigma-mu-society/ksm-layer-1.webp" />
+<CompareImages
+  imageLeftSrc="/assets/post/kappa-sigma-mu-society/ksm-layer-1.webp" 
+  imageRightSrc="/assets/post/kappa-sigma-mu-society/ksm-layer-2.webp" 
+  />
+
 Our core contributor created customized tattoo based on Gavin's code that is used for examples available in polkadot.js.org.
 We are currently working more complete generator that epxlains you how SS58 address is encoded in the tattoo and lets
 you generate your own custom tattoo using the latest head of society. Same tool can be used to attestation of the tattoos too.

@@ -26,7 +26,8 @@
     "astro": "^2.0.10",
     "gray-matter": "^4.0.3",
     "sharp": "^0.31.3",
-    "svelte": "^3.55.1"
+    "svelte": "^3.55.1",
+    "svelte-compare-image": "^1.0.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.51.0",

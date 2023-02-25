@@ -1,0 +1,87 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: Building and selfhosting Kusama validator
+date: 2023-02-26
+description: How to build and host Kusama validator at your home.
+tags:
+  - Kusama
+  - blockchain
+  - validator
+  - selfhosting
+  - nftables
+  - firewall
+  - linux
+  - hardware
+---
+
+# Building and selfhosting Kusama validator
+
+## Introduction
+Kusama network is a canary network for Polkadot and thanks to its 1000 validator program, it is by far the most decentralized smart contract capable cryptocurrency network
+geographically and growingly outside of datacenters. This article will guide you through the process of building and hosting your own Kusama validator.
+
+## Hardware
+Kusama network has quite high system requirements for a validator. It is recommended to have at least 16GB of RAM, 1TB NVME and 4 CPU cores.
+I have decided to build two validators both a being bit over the specs for the task but capable to run other services as well.
+### kusamaxi01 validator
+- CPU: AMD RYZEN 5 5600G 6-Core 3.7 GHz (4.6 GHz Max Boost) Socket AM4 65W
+- RAM: 64GB DDR4 3600MHz
+- Motherboard: MSI A550M-ITX/ac
+- SSD: 2TB NVME 7200Mb/s
+- PSU: 160W PicoPSU with 12V 10A AC/DC adapter
+- Case: Rgeek 200mm x 200mm x 80mm
+
+### kusamaxi02 validator
+- CPU: AMD RYZEN 5 5600G 6-Core 3.7 GHz (4.6 GHz Max Boost) Socket AM4 65W
+- RAM: 8GB DDR4 3200MHz (to be upgraded to 64GB)
+- Motherboard: MSI A520M-ITX/ac
+- SSD: 2TB NVME 7200Mb/s
+- PSU: 160W PicoPSU with 12V 10A AC/DC adapter
+- CASE: Currently using a cardboard box waiting for RGeek case to arrive
+
+## Operating system
+I have decided to use Arch Linux tamed with 6.1 LTS kernel. Exact distro in use is [Endeavouros_Cassini_neo_22_12.iso](https://endeavouros.com/latest-release/).
+It is a rolling release distro based on Arch Linux with a lot of preinstalled software and a lot of preconfigured settings.
+Bootloader is systemd-boot that is run from USB disk booting root in the NVME drive to have a always possibility to remotely
+reinstall the system. mkinitcpio is replaced with dracut compared to default Arch linux installation. 
+
+## Software
+We use systemd services to run the validator and polkacli helper to manage the validator. Polkacli is a simple cli tool to manage
+the validator. It is written in bash and can be found [here](https://kusamaxi.com/projects/polkacli/).
+
+
+## Firewall rules
+Modern way of setting up firewall in linux is to use nftables. It might seem a bit more complicated than iptables first,
+but it is much more flexible and powerful. It is also the default firewall in Arch Linux.
+
+$ cat /etc/nftables.conf
+```bash 
+#!/usr/bin/nft -f
+# vim:set ts=2 sw=2 et:
+
+# IPv4/IPv6 Simple & Safe firewall ruleset.
+# More examples in /usr/share/nftables/ and /usr/share/doc/nftables/examples/.
+
+table inet filter
+delete table inet filter
+table inet filter {
+  chain input {
+    type filter hook input priority filter
+    policy drop
+
+    ct state invalid drop comment "early drop of invalid connections"
+    ct state {established, related} accept comment "allow tracked connections"
+    iifname lo accept comment "allow from loopback"
+    ip protocol icmp accept comment "allow icmp"
+    meta l4proto ipv6-icmp accept comment "allow icmp v6"
+    tcp dport 20666 accept comment "allow sshd on port 20666"
+    pkttype host limit rate 5/second counter reject with icmpx type admin-prohibited
+    counter
+  }
+  chain forward {
+    type filter hook forward priority filter
+    policy drop
+  }
+}
+```
