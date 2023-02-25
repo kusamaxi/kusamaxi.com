@@ -56,7 +56,9 @@ const currentSlug = props.url?.split("/").at(-1);
 		<div
 			class="col-start-1 md:col-start-2 col-end-3 row-start-2 md:row-start-1 row-end-3 md:-row-end-1 w-full p-4 border-2 border-rose-900 shadow-sharp"
 		>
-			<span class="block text-zinc-800 font-semibold font-heading text-2xl border-b-2 border-rose-900 pb-3">Tech Stack</span>
+			<span class="block text-zinc-800 font-semibold font-heading text-2xl border-b-2 border-rose-900 pb-3"
+				>Tech Stack</span
+			>
 			{
 				frontmatter.stack.map(([stackName, stackHomepage]) => (
 					<div class="grid grid-cols-[3.5rem_1fr] gap-4 items-center py-4 border-b-2 border-rose-900">

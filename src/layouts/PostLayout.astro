@@ -47,6 +47,16 @@ const commentOptions = {
 
 <MainLayout seo={{ title: frontmatter.title }}>
 	<section class="max-w-screen-lg py-4 px-8 mx-auto text-center text-zinc-600">
+		<div class="col-start-1 col-end-3 md:col-start-1 md:col-end-2 w-full">
+			<div class="overflow-hidden border-2 border-rose-900 shadow-sharp">
+				<img
+					src={`/assets/post/${currentSlug}/cover.webp`}
+					alt={frontmatter.title}
+					class="block w-full h-full"
+					loading="lazy"
+				/>
+			</div>
+		</div>
 		<h1
 			class="font-heading text-5xl uppercase max-w-[30ch] mt-12 mx-auto mb-0 font-semibold text-zinc-800 leading-snug"
 		>
@@ -65,20 +75,14 @@ const commentOptions = {
 		</span>
 		<a
 			class="relative block font-heading text-center text-lg leading-loose no-underline text-rose-600 hover:underline"
-			href={`https://github.com/kusamaxi/kusamaxi.com/blob/master/src/pages/post/${currentSlug}.mdx`}
+			href={`https://github.com/kusamaxi/kusamaxi.com/blob/main/src/pages/post/${currentSlug}.mdx`}
 			target="_blank"
 			rel="norel noreferrer">Suggest An Edit</a
 		>
 		<div class="flex gap-2 justify-center mb-6">
-			{
-				frontmatter.tags.map((tag) => (
-					<Tag># {tag}</Tag>
-				))
-			}
+			{frontmatter.tags.map((tag) => <Tag># {tag}</Tag>)}
 		</div>
-		<main
-			class="font-serif mx-auto text-base text-justify text-lg max-w-screen-md prose prose-custom"
-		>
+		<main class="font-serif mx-auto text-base text-justify text-lg max-w-screen-md prose prose-custom">
 			<div class="text-left">
 				<h1>Table of Contents</h1>
 				<ul class="!pl-0">
