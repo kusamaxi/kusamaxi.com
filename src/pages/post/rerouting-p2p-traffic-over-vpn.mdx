@@ -1,0 +1,126 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: How to reroute traffic through a VPN tunnel
+date: 2023-03-05
+description:  Sometimes selfhosting has issue of not being able to expose your ports to the internet behind modem or router. 
+              In this article we will learn how to reroute traffic for polkadot p2p port through a VPN tunnel using WireGuard.
+tags:
+  - WireGuard
+  - VPN
+---
+
+# How to reroute traffic through a VPN tunnel
+
+## Introduction
+We have been facing issue of not being able to expose our ports to WAN behind Japanese modem/router combo and language barrier is making
+it hard to get help from ISP. So we decided to try WireGuard to reroute traffic through a VPN tunnel in close by Linode dedicated server
+to see if we can get around the issue. WireGuard is a modern VPN protocol with state-of-the-art cryptography. It aims to be faster, simpler,
+more useful, and more useful than IPsec, while avoiding the massive headache. It intends to be considerably more performant than OpenVPN.
+
+## Setting up Dedicated Server with WireGuard
+Purchased a Linode dedicated server with Arch linux on it due to its close by geolocation to our homenodes. We setup WireGuard on it
+following the [official guide](https://www.wireguard.com/install/). We also setup a simple webserver on it to test the tunnel.
+
+wg.sh
+```bash
+#!/bin/bash
+
+# Set the names of the nodes
+node1_name="xi01"
+node2_name="xi02"
+server_ip=$(curl -s https://api.ipify.org)
+
+# Create the network namespaces
+sudo ip netns add $node1_name
+sudo ip netns add $node2_name
+
+# Create the directory for the WireGuard configuration files if it does not exist
+if [ ! -d "/etc/wireguard" ]; then
+  sudo mkdir /etc/wireguard
+fi
+
+# Generate the WireGuard keys and save them in variables
+node1_private_key=$(sudo wg genkey)
+node1_public_key=$(echo "$node1_private_key" | sudo wg pubkey)
+node2_private_key=$(sudo wg genkey)
+node2_public_key=$(echo "$node2_private_key" | sudo wg pubkey)
+
+# Save the keys to files
+echo "$node1_private_key" | sudo tee /etc/wireguard/$node1_name.private
+echo "$node1_public_key" | sudo tee /etc/wireguard/$node1_name.public
+echo "$node2_private_key" | sudo tee /etc/wireguard/$node2_name.private
+echo "$node2_public_key" | sudo tee /etc/wireguard/$node2_name.public
+
+sudo sh -c "cat > /etc/wireguard/wg0-$node1_name.conf" << EOF
+[Interface]
+PrivateKey = $(cat /etc/wireguard/$node1_name.private)
+Address = 10.10.0.1/24
+ListenPort = 51820
+PostUp = ip netns exec $node1_name wg set %i private-key /etc/wireguard/$node1_name.private listen-port 51820
+PostDown = ip netns exec $node1_name wg-quick down %i
+
+[Peer]
+PublicKey = $(cat /etc/wireguard/$node2_name.public)
+AllowedIPs = 10.10.0.2/32
+Endpoint = $server_ip:51820
+EOF
+
+sudo sh -c "cat > /etc/wireguard/wg0-$node2_name.conf" << EOF
+[Interface]
+PrivateKey = $(cat /etc/wireguard/$node2_name.private)
+Address = 10.10.0.2/24
+ListenPort = 51820
+PostUp = ip netns exec $node2_name wg set %i private-key /etc/wireguard/$node2_name.private listen-port 51820
+PostDown = ip netns exec $node2_name wg-quick down %i
+
+[Peer]
+PublicKey = $(cat /etc/wireguard/$node1_name.public)
+AllowedIPs = 10.10.0.1/32
+Endpoint = $server_ip:51820
+EOF
+
+# Set permissions for the private key files
+sudo chmod 600 /etc/wireguard/*.private
+
+# Start the WireGuard VPN connections
+sudo ip netns exec $node1_name wg-quick up /etc/wireguard/wg0-$node1_name.conf
+sudo ip netns exec $node2_name wg-quick up /etc/wireguard/wg0-$node2_name.conf
+
+# Enable IP forwarding on the server
+sudo sysctl -w net.ipv4.ip_forward=1
+```
+
+nftables.conf
+```nft
+#!/usr/bin/nft -f
+# vim:set ts=2 sw=2 et:
+
+# IPv4/IPv6 Simple & Safe firewall ruleset.
+# More examples in /usr/share/nftables/ and /usr/share/doc/nftables/examples/.
+
+table inet filter
+delete table inet filter
+table inet filter {
+  chain input {
+    type filter hook input priority filter
+    policy drop
+
+    ct state invalid drop comment "early drop of invalid connections"
+    ct state {established, related} accept comment "allow tracked connections"
+    iifname lo accept comment "allow from loopback"
+    ip protocol icmp accept comment "allow icmp"
+    meta l4proto ipv6-icmp accept comment "allow icmp v6"
+    tcp dport ssh accept comment "allow sshd"
+    pkttype host limit rate 5/second counter reject with icmpx type admin-prohibited
+    counter
+  }
+  chain forward {
+    # Allow forwarding between the namespaces
+    type filter hook forward priority 0; policy accept;
+    iifname "wg0-xi01" oifname "wg0-xi02" accept
+    iifname "wg0-xi02" oifname "wg0-xi01" accept
+  }
+}
+```
+

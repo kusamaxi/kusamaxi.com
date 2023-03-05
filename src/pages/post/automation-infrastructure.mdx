@@ -1,0 +1,44 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: Automation infrastructure for running blockchain endpoints
+date: 2023-02-26
+description: DotInfra is a powerful automation tool designed to simplify the process of setting up and managing blockchain endpoints.
+In this article, we will explore the features of DotInfra and how it can help you to streamline your infrastructure management.
+tags:
+  - Kusama
+  - rpc
+  - endpoint
+  - Polkadot
+  - automation
+  - selfhosting
+  - blockchain
+  - linux
+  - hardware
+---
+
+# Designing automation infrastructure for running blockchain endpoints
+
+## Introduction
+DotInfra is a powerful automation tool designed to simplify the process of setting up and managing blockchain endpoints.
+In this article, we will explore the features of DotInfra and how it can help you to streamline your infrastructure management.
+DotInfra uses ansible to provision and manage your infrastructure.
+
+## Features
+DotInfra is a comprehensive infrastructure automation tool that offers a range of powerful features to help you manage your blockchain endpoints with ease. Some of its key features include:
+
+- **Frontend**** - DotInfra also comes with a frontend for deploying and managing your infrastructure, providing you with a user-friendly interface that simplifies the process of managing your blockchain endpoints.
+- **Image Building** - DotInfra can also build custom images using Packer, providing you with a streamlined process for creating and deploying images across your infrastructure.
+- **Installer** - Easy to execute installer that creates virtual environment, install dependencies, and setup SSH-configs and agentforwarding.
+- **PAM-Auth** - Enable passwordless authentication using u2fpam with u2f-key.
+- **LXC-Containers** - DotInfra supports the installation of host machines with multiple LXC-Containers, making it easy to run multiple RPC endpoints.
+- **Monitoring** - With DotInfra, you can easily monitor your infrastructure using a range of powerful tools, including Zabbix, Prometheus, and Grafana.
+- **Polkacli** - DotInfra includes Polkacli, a CLI tool for managing Polkadot and Kusama nodes, making it easy to manage and monitor your blockchain endpoints.
+- **Port Forwarding** - You can enable port forwarding for your LXC-Containers using DotInfra, allowing you to easily access your endpoints from other machines.
+- **Provisioning** - With DotInfra, you can quickly provision your infrastructure based on your inventory, ensuring that your resources are allocated efficiently and effectively.
+- **Reverse Proxy** - To provide a seamless user experience, DotInfra can enable reverse proxy for your LXC-Containers endpoints, ensuring that your users can access your blockchain endpoints easily and securely.
+- **Seamless updates** - Updating your blockchain should be a seamless process where another container is created with the new client version and migration is done by changing sessionkey().
+- **SSH Configs** - DotInfra can generate SSH configs based on your inventory, as well as add SSH agent service for agentforwarding to enable easy rsyncing between machines.
+- **Snapshots**** - DotInfra enables you to take snapshots of your LXC-Containers and make those snapshots publicly available through Nginx, providing you with a reliable backup solution.
+
+```
