@@ -1,0 +1,29 @@
+---
+layout: ~/layouts/ProjectLayout.astro
+title: kintcli
+date: 2023-03-10
+description: bash script for running bitcoin vault for kintsugi and interlay
+demo: https://github.com/kusamaxi/kintcli
+source: https://github.com/kusamaxi/kintcli
+type: kusama
+stack:
+  - ['bash', 'https://gnu.org/software/bash']
+---
+
+# kintcli
+
+Command line tool for installing latest bitcoin node and running bitcoin vault for kintsugi and interlay.  
+Current vault running process is complicated and requires a lot of manual work. This tool aims to automate the process.  
+
+## Installation
+
+```bash
+git clone https://github.com/kusamaxi/kintcli && sudo chmod +x kintcli/kintcli && sudo cp kintcli/kintcli /usr/local/bin/
+```
+
+## Usage
+kintcli <command> [options]
+  install: Install a client on a network
+  service: Start, stop, or restart a client service on a network
+  update: Update a client to a specified version
+  version: Print version information for a client
