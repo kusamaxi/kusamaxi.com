@@ -38,7 +38,7 @@ const { siteName, siteUrl } = data;
 <meta property="og:description" content={description} />
 <meta
 	property="og:image"
-	content={thumbnail ? thumbnail.toString() : "https://avatars3.githubusercontent.com/u/51877647?s=240&v=4"}
+	content={thumbnail ? thumbnail.toString() : "https://kusamaxi.com/android-chrome-192x192.png"}
 />
 
 <!-- Twitter -->
@@ -46,4 +46,4 @@ const { siteName, siteUrl } = data;
 <meta property="twitter:url" content={`${siteUrl}${Astro.url.pathname}`} />
 <meta property="twitter:title" content={props.title || siteName} />
 <meta property="twitter:description" content={description} />
-{thumbnail !== "" && <meta property="twitter:image" content={thumbnail ? thumbnail.toString() : ""} />}
+{thumbnail !== "" && <meta property="twitter:image" content={thumbnail ? thumbnail.toString() : "https://kusamaxi.com/android-chrome-192x192.png"} />}
