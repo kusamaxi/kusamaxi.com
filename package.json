@@ -24,6 +24,7 @@
     "@fontsource/poppins": "^4.5.10",
     "@fontsource/space-grotesk": "^4.5.13",
     "astro": "^2.0.10",
+    "nanostores": "^0.7.4",
     "gray-matter": "^4.0.3",
     "sharp": "^0.31.3",
     "svelte": "^3.55.1",
