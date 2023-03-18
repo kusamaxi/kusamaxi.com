@@ -1,0 +1,67 @@
+---
+layout: post
+title: Building a RISC-V KVM (rvKVM) from Scratch - Part 1
+date: 2023-03-18
+description: Join us on our journey to construct a RISC-V KVM (RVKVM) from the ground up, using the VisionFive 2 development board and the Geekworm Pikvm-A8 HAT.
+tags:
+  - rvkvm
+  - riscv
+  - pikvm
+---
+
+## Introduction
+
+Embarking on a journey to construct a RISC-V KVM (RVKVM) from the ground up, we find ourselves
+venturing into the captivating realms of computer science and RISC-V architecture. Our ultimate
+goal is to craft a KVM (Keyboard, Video, and Mouse) solution based on the VisionFive 2 development
+board. As we progress, we'll chronicle our experiences and share the knowledge we acquire while
+delving into the intricacies of hardware and software.
+
+## Hardware Components
+
+We've handpicked the following essential components for our project:
+
+- VisionFive 2 development board: A potent RISC-V based single-board computer, sporting the 64-bit RISC-V SoC SiFive FU740. 
+  This versatile board brims with a plethora of peripherals and interfaces, making it ideal for AI and edge computing applications.
+- Geekworm Pikvm-A8: A HAT (Hardware Attached on Top) fashioned for the Raspberry Pi, enabling the creation of a Pi-KVM system. 
+  Although primarily designed for Raspberry Pi, we've ascertained its physical compatibility with the VisionFive 2 development board. 
+  The HAT fits perfectly on the VisionFive 2 board, requiring only a longer FFC cable to establish a connection.
+
+## Initial Hardware Setup
+
+Armed with these components, we've married the Geekworm Pikvm-A8 HAT to the VisionFive 2 development board,
+laying the cornerstone for our RVKVM system. Our assembly consists of placing the HAT on top of the
+VisionFive 2 board, then positioning the x630 board on the HAT, on the same side as the RISC-V board. Next,
+we attach the x630-A8-CAB adapter on top and connect the extended FPC cable. This creates a solid hardware
+foundation to build our KVM solution.
+
+## KVM Functionality and Connections
+
+A KVM (Keyboard, Video, and Mouse) switch allows users to control multiple computers using a single set of
+input devices and display(s). In our case, the Geekworm Pikvm-A8 HAT serves as the KVM component that
+interfaces with the VisionFive 2 development board. The HAT facilitates the transmission of video signals,
+keyboard and mouse input, and virtual media over IP, enabling remote control of the connected systems.
+
+The ATX control cables are responsible for remotely managing the power state of the target computer,
+allowing you to turn it on, off, or reset it as needed. These cables connect to the motherboard's power
+switch and reset headers.
+
+For video capture, the HDMI camera bridging mechanism captures the video output from the target computer
+and transmits it to the KVM server. This allows you to remotely view and interact with the target
+computer's display, creating a seamless remote control experience.
+
+## Project Goals and Expectations
+
+Our ambitious project revolves around these key objectives:
+
+- Install a bootloader on the VisionFive 2 development board.
+- Deploy Arch Linux on the board, laying a firm foundation for our KVM setup.
+- Configure the board as a KVM server utilizing KVM and QEMU.
+- Adapt and compile the Pi-KVM software for smooth operation on the RISC-V platform.
+- Set up and calibrate the Geekworm Pikvm-A8 HAT for integration with the VisionFive 2 development board.
+
+In this inaugural installment of our RVKVM project, we've presented the hardware components, initial setup,
+and objectives driving our enterprise. As we forge ahead, expect a wealth of insights and experiences as we
+wrestle with the software elements – from bootloader and OS installation to tailoring the Pi-KVM software for
+the RISC-V platform. Keep an eye out for updates chronicling our progress and revelations in this exhilarating
+learning odyssey!
