@@ -10,6 +10,7 @@ tags:
   - pikvm
 ---
 
+![Hardware Components](/assets/post/building-rvkvm-1/rvkvm_parts.webp)
 ## Introduction
 
 Embarking on a journey to construct a RISC-V KVM (RVKVM) from the ground up, we find ourselves
@@ -18,20 +19,45 @@ goal is to craft a KVM (Keyboard, Video, and Mouse) solution based on the Vision
 board. As we progress, we'll chronicle our experiences and share the knowledge we acquire while
 delving into the intricacies of hardware and software.
 
-![Hardware Components](/assets/post/building-rvkvm-1/rvkvm_parts.webp)
 ## Hardware Components
 
-We've handpicked the following essential components for our project:
-
-
 ![rvkvm-no-cables](/assets/post/building-rvkvm-1/rvkvm_no_cables.webp)
-- VisionFive 2 development board: A potent RISC-V based single-board computer, sporting the 64-bit RISC-V SoC SiFive FU740. 
-  This versatile board brims with a plethora of peripherals and interfaces, making it ideal for AI and edge computing applications.
+### StarFive VisionFive 2 development board
+A potent RISC-V based single-board computer, sporting the StarFive JH7110 RISC-V quad-core CPU,
+clocking in at 1.5 GHz with 2 MB of L2 cache and a monitor core. This versatile board brims with a plethora of peripherals and interfaces,
+making it ideal for AI and edge computing applications. It also features the IMG BXE-4-32 MC1 GPU with a frequency of up to 600 MHz,
+offering powerful video processing capabilities.
+
+This hardware packs a punch in terms of memory as well, offering 2 GB, 4 GB, or 8 GB of LPDDR4 SDRAM, reaching speeds up to 2,800 Mbps.
+With its onboard TF card slot, the VisionFive 2 can even boot from the TF card.
+
+![visionfive-2-top](/assets/post/building-rvkvm-1/visionfive_2_top.webp)
+| Number 	| Object             	| Number 	| Object                    	|
+|--------	|--------------------	|--------	|---------------------------	|
+| 1      	| StarFive JH7110    	| 14     	| 2 × Ethernet Ports (RJ45) 	|
+| 2      	| PoE Header         	| 15     	| HDMI 2.0 Port             	|
+| 3      	| Boot Mode Pins     	| 16     	| 3.5 mm Audio Jack         	|
+| 4      	| 40-Pin GPIO Header 	| 17     	| 2 × USB 3.0 Port          	|
+| 5      	| LPDDR4 SDRAM       	| 18     	| 2 × USB 3.0 Port          	|
+| 6      	| Reset Button       	| 19     	| 4-Lane MIPI DSI           	|
+| 7      	| EEPROM             	| 20     	| USB 3.0 Host Controller   	|
+| 8      	| USB-C Port         	| 21     	| 2-Lane MIPI DSI           	|
+| 9      	| 2-Lane MIPI CSI    	| 22     	| eMMC Socket               	|
+| 10     	| PMIC               	| 23     	| TF Card Slot              	|
+| 11     	| 2-Pin Fan Header   	| 24     	| QSPI Flash                	|
+| 12     	| GMAC0 PHY          	| 25     	| M.2 M-Key                 	|
+| 13     	| GMAC1 PHY          	|        	|                           	|
+
+![visionfive-2-bottom](/assets/post/building-rvkvm-1/visionfive_2_bottom.webp)
+In terms of interfaces, the VisionFive 2 boasts a 2-lane MIPI DSI, 4-lane MIPI DSI, 2-lane MIPI CSI, 3.5 mm audio jack,
+USB-C port for charging, USB device port, 4 USB 3.0 ports, HDMI 2.0, 2 RJ45 Ethernet ports, 4-pin PoE header, 2-pin fan header, 
+reset button, and a 40-pin GPIO header with various options such as 3.3 V, 5 V, Ground, GPIO, CAN bus, DMIC, I2C, I2S, PWM, SPI, UART, and more!
 
 ![Packing list for A8](/assets/post/building-rvkvm-1/rvkvm_packing_list.webp)
-- Geekworm Pikvm-A8: A HAT (Hardware Attached on Top) fashioned for the Raspberry Pi, enabling the creation of a Pi-KVM system. 
-  Although primarily designed for Raspberry Pi, we've ascertained its physical compatibility with the VisionFive 2 development board. 
-  The HAT fits perfectly on the VisionFive 2 board, requiring only a longer FFC cable to establish a connection.
+### Geekworm Pikvm-A8:
+A HAT (Hardware Attached on Top) fashioned for the Raspberry Pi, enabling the creation of a Pi-KVM system.
+Although primarily designed for Raspberry Pi, we've ascertained its physical compatibility with the VisionFive 2 development board.
+The HAT fits perfectly on the VisionFive 2 board, requiring only a longer FFC cable to establish a connection.
 
 ![Hardware assembly](/assets/post/building-rvkvm-1/rvkvm_assembly.webp)
 ## Initial Hardware Setup
@@ -76,3 +102,8 @@ and objectives driving our enterprise. As we forge ahead, expect a wealth of ins
 wrestle with the software elements – from bootloader and OS installation to tailoring the Pi-KVM software for
 the RISC-V platform. Keep an eye out for updates chronicling our progress and revelations in this exhilarating
 learning odyssey!
+
+## Resources
+- [RVspace docs](https://rvspace.org/en/project/Document_Publish_Status)
+- [StarFive kickstarter](https://www.kickstarter.com/projects/starfive/visionfive-2/description%20)
+- [RVSpace forums](https://rvspace.org/en/forum)
