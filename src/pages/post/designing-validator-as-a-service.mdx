@@ -10,8 +10,35 @@ tags:
   - kusama
 ---
 
-For true decentralization to happen becoming validator should be technically trivial.
-In this article we design validator as a service that is able to be run in a bare metal
-or deployed to polkadot infrastructure providers servers as GCP like zones.
+## Introduction
+
+In an era marked by rapid technological change, we find ourselves on the quest for true decentralization. The secret to achieving this lies in a unique fusion of technology, subtle wit, and a touch of ingenuity. So, join us as we unveil our elegant Validator-as-a-Service (VaaS) design that requires users only to wield a GUI and have some crypto at stake. Our goal is to make becoming a validator as technically trivial as solving a cryptic puzzle.
 
 ![validator as a service](/assets/post/designing-validator-as-a-service/designing-validator-as-a-service.drawio.svg)
+## Validator as a Service
+
+### Architecture Overview: The Backend API & The Validator Node
+
+In our quest for VaaS, we shall embark on a journey through two main components: a backend API and a validator node.
+
+Our backend API will act as a translator, bridging the gap between human users and the complex world of crypto staking and validator nodes. To create this marvel, we'll be harnessing the power of Deno and Oak.
+
+The validator node, the cornerstone of our design, will be propelled by the Polkadot client, boldly participating in the consensus process. Rest assured, we shall utilize the upgrade logic provided in the Polkadot wiki posting to ensure our validator node remains up-to-date and efficient.
+
+### Key Features: A Delightful Blend of Functionality and Subtle Wit
+
+Our VaaS design will boast an array of key features that interweave the brilliance of certain individuals, the understated wit, and the technical prowess of contemporary innovators:
+
+- An easy-to-use GUI for users to stake their crypto and initiate their validator node without breaking a sweat.
+- Automatic client software upgrades, courtesy of the upgrade logic provided in the Polkadot wiki posting, ensuring your validator node remains cutting-edge and reliable.
+- Backup and disaster recovery solutions that guarantee the validator node's uptime against all odds.
+- A high availability architecture to minimize downtime, because time is a precious resource, and downtime even more so.
+- A secure and scalable infrastructure, prepared to manage the influx of traffic and staked crypto, as vast and diverse as the digital landscape.
+
+To streamline our design, we'll rely on the sleekness of UnoCSS for styling and the efficiency of SolidJS for constructing the frontend interface.
+
+## Conclusion: Paving the Way for a Decentralized Future
+
+In the end, our VaaS design aims to make becoming a validator as technically trivial as decrypting a well-crafted cipher. With a user-friendly GUI and automatic client software upgrades, users will stake their crypto and launch their validator nodes effortlessly. Our backup and disaster recovery solutions, high availability architecture, and secure infrastructure will guarantee the validator node's uptime and gracefully handle the enormity of traffic and staked crypto.
+
+By democratizing access to validator nodes, we aspire to forge a more decentralized and equitable future, leaving behind a legacy as enduring and significant as the innovations that came before us.
