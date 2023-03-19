@@ -1,61 +1,75 @@
 ---
 layout: ~/layouts/PostLayout.astro
 draft: false
-title: Building and selfhosting Kusama validator
+title: Building and Self-Hosting a Kusama Validator
 date: 2023-02-26
-description: How to build and host Kusama validator at your home.
+description: Break the chains of centralization by building and self-hosting your own Kusama validator, a beacon of hope for decentralized networks.
 tags:
   - Kusama
   - blockchain
   - validator
-  - selfhosting
-  - nftables
-  - firewall
-  - linux
+  - self-hosting
+  - decentralization
   - hardware
+  - performance
 ---
 
-# Building and selfhosting Kusama validator
-
 ## Introduction
-Kusama network is a canary network for Polkadot and thanks to its 1000 validator program, it is by far the most decentralized smart contract capable cryptocurrency network
-geographically and growingly outside of datacenters. This article will guide you through the process of building and hosting your own Kusama validator.
 
-## Hardware
-Kusama network has quite high system requirements for a validator. It is recommended to have at least 16GB of RAM, 1TB NVME and 4 CPU cores.
-I have decided to build two validators both a being bit over the specs for the task but capable to run other services as well.
+In a world shackled by centralized control, the Kusama network rises as a beacon of hope, a canary network for Polkadot that challenges the status quo. With its increasing presence beyond the confines of traditional data centers, Kusama has become an emblem of decentralization and autonomy. In this guide, I'll share how to build and self-host a Kusama validator that not only resists the oppressive chains of centralization but also meets the performance demands of a cutting-edge blockchain network.
 
-![Hardware components in mITX motherboard](/assets/post/building-hosting-validator/mitx-hardware.webp)
-### kusamaxi01 validator
-##### Hardware
-- CPU: AMD RYZEN 5 5600G 6-Core 3.7 GHz (4.6 GHz Max Boost) Socket AM4 65W
-- RAM: 64GB DDR4 3600MHz
-- Motherboard: MSI A550M-ITX/ac
-- SSD: 2TB NVME 7200Mb/s
-- PSU: 160W PicoPSU with 12V 10A AC/DC adapter
-- Case: Rgeek 200mm x 200mm x 80mm
-#### Performance
-![Hardware performance](/assets/post/building-hosting-validator/hw-performance.webp)
+## Hardware: Fighting Centralization with Every Component
 
-![Hardware performance](/assets/post/building-hosting-validator/mitx-hardware-cardboard.webp)
-### kusamaxi02 validator
-- CPU: AMD RYZEN 5 5600G 6-Core 3.7 GHz (4.6 GHz Max Boost) Socket AM4 65W
-- RAM: 8GB DDR4 3200MHz (to be upgraded to 64GB)
-- Motherboard: MSI A520M-ITX/ac
-- SSD: 2TB NVME 7200Mb/s
-- PSU: 160W PicoPSU with 12V 10A AC/DC adapter
-- CASE: Currently using a cardboard box waiting for RGeek case to arrive
+Kusama validators demand powerful resources, calling for at least 16GB of RAM, 1TB NVME, and 4 CPU cores. Our setup exceeds these requirements, creating a system capable of not only validating Kusama transactions but also running other decentralized services, empowering users to break free from the centralized control of Big Tech.
 
-## Operating system
-I have decided to use Arch Linux tamed with 6.1 LTS kernel. Exact distro in use is [Endeavouros_Cassini_neo_22_12.iso](https://endeavouros.com/latest-release/).
-It is a rolling release distro based on Arch Linux with a lot of preinstalled software and a lot of preconfigured settings.
-Bootloader is systemd-boot that is run from USB disk booting root in the NVME drive to have a always possibility to remotely
-reinstall the system. mkinitcpio is replaced with dracut compared to default Arch linux installation. 
+### Components
+![components inside](/assets/post/building-hosting-validator/xi02_inner.webp)
+- ***CPU***: AMD RYZEN 5 5600G 6-Core 3.7 GHz (4.6 GHz Max Boost) Socket AM4 65W
+- ***RAM***: 2x32GB Hynix DDR4 3200MHz
+- ***Motherboard***: MSI A550M-ITX/ac
+- ***SSD***: 2x 2TB NVME Hanye ME70 7200Mb/s
+- ***PSU***: 160W PicoPSU with 12V 10A AC/DC adapter
+- ***Case***: Rgeek 200mm x 200mm x 80mm
 
-## Software
-We use systemd services to run the validator and polkacli helper to manage the validator. Polkacli is a simple cli tool to manage
-the validator. It is written in bash and can be found [here](https://kusamaxi.com/projects/polkacli/).
+### Validator Nodes: A Testament to Decentralization
 
-## Benchmarking
-For benchmarking we recommend 'polkadot benchmark machine -d .' command. It will run a benchmarking process and create a file
-and our inhouse product [nvme.sh](https://gist.github.com/hitchhooker/cd4d32b34f8dd7840fdbdc4ad420986c)
+Our hardware configuration enables us to run up to four validator nodes per machine, showcasing the sheer power of our components. Both machines are equipped with 2x Hanye ME70 2TB 7200MB/s 800k IOPS NVME, providing ample storage and speed for the demanding tasks of a Kusama validator.
+![mitx-hardware](/assets/post/building-hosting-validator/mitx-hardware.webp)
+#### Performance and Benchmarking: The Metrics of Rebellion
+
+Using IOPS/latency measuring fio-([tool](https://gist.github.com/hitchhooker/cd4d32b34f8dd7840fdbdc4ad420986c)) and Polkadot benchmarking tools, we tested our hardware's mettle against the oppressive demands of centralized systems. The results proved our machines were more than capable of resisting the chains of centralization, thanks to their high clock speeds and single-thread performance.
+
+### Benchmarking
+
+
+#### Overall
+![XI01](/assets/post/building-hosting-validator/xi01-performance.webp)
+***xi02***
+| Category | Function | Score | Minimum | Result |
+|----------|----------|-------|---------|--------|
+| CPU      | BLAKE2-256      | 1.04 GiBs | 1.00 GiBs | ✅ Pass (103.1 %) |
+| CPU      | SR25519-Verify   | 655.02 KiBs | 666.00 KiBs | ✅ Pass ( 98.4 %) |
+| Memory   | Copy     | 16.47 GiBs | 14.32 GiBs | ✅ Pass (115.0 %) |
+| Disk     | Seq Write   | 2.02 GiBs | 450.00 MiBs | ✅ Pass (458.5 %) |
+| Disk     | Rnd Write   | 640.59 MiBs | 200.00 MiBs | ✅ Pass (320.3 %) |
+
+![NVME memories used](/assets/post/building-hosting-validator/hanye-nvme.webp)
+#### Latency
+Minimum: 601 ns
+Maximum: 40637 ns
+Mean: 1213.183773 ns
+Standard Deviation: 579.654872 ns
+99.99th Percentile Read Latency: 302 ns
+The read latency meets the 2microseconds and lower QoS requirement.
+
+## Software: Crafting the Perfect Ecosystem for Decentralization
+### Boot Partition and Storage
+To maximize reliability and performance, we run the boot partition on a USB stick while the host machine's root is stored on a 100GB mdraid level1 RAID between 2x 2TB Hanye NVMEs on both machines. The blockchain databases and LXC-container root sections are installed in ZFS storage in RAID0 between the leftover space from mdraid roots (~1.9TB -> 3.8TB together).
+
+![Both validators](/assets/post/building-hosting-validator/xi01_xi02.webp)
+## Security and Sustainability
+We take additional steps to secure and optimize the validator nodes, including disabling SMT, disabling automatic NUMA balancing, and configuring Spectre/Meltdown mitigations. The BIOS is set to auto-start the machine, and we use a smart switch to measure power consumption, enabling CO2 emission compensation and supporting a more sustainable future.
+
+By following this guide, you too can break the chains of centralization and build your own Kusama validator, joining the ranks of those fighting for a more decentralized and equitable world. Together, we can resist the oppressive power of centralization and create a more just, open, and free digital landscape.
+
+
