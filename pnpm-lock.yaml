@@ -15,6 +15,7 @@ specifiers:
   '@typescript-eslint/parser': ^5.51.0
   '@unocss/preset-wind': ^0.49.4
   '@unocss/reset': ^0.49.4
+  '@vercel/analytics': ^0.1.11
   astro: ^2.0.10
   astro-icon: ^0.8.0
   eslint: ^8.34.0
@@ -42,6 +43,7 @@ dependencies:
   '@fontsource/open-sans': 4.5.14
   '@fontsource/poppins': 4.5.10
   '@fontsource/space-grotesk': 4.5.13
+  '@vercel/analytics': 0.1.11
   astro: 2.0.10
   gray-matter: 4.0.3
   nanostores: 0.7.4
@@ -1313,6 +1315,12 @@ packages:
     transitivePeerDependencies:
       - rollup
     dev: true
+
+  /@vercel/analytics/0.1.11:
+    resolution: {integrity: sha512-mj5CPR02y0BRs1tN3oZcBNAX9a8NxsIUl9vElDPcqxnMfP0RbRc9fI9Ud7+QDg/1Izvt5uMumsr+6YsmVHcyuw==}
+    peerDependencies:
+      react: ^16.8||^17||^18
+    dev: false
 
   /@vscode/emmet-helper/2.8.6:
     resolution: {integrity: sha512-IIB8jbiKy37zN8bAIHx59YmnIelY78CGHtThnibD/d3tQOKRY83bYVi9blwmZVUZh6l9nfkYH3tvReaiNxY9EQ==}

@@ -4,6 +4,8 @@ import Section from "~/components/Section.astro";
 import Header from "~/components/Header.astro";
 import { Post } from "~/models/post";
 import { Project } from "~/models/project";
+import { inject } from "@vercel/analytics";
+inject();
 
 const posts = await Post.fromGlob(Astro.glob("./post/*.mdx"), 3);
 const projects = await Project.fromGlob(Astro.glob("./project/*.mdx"), 3);
