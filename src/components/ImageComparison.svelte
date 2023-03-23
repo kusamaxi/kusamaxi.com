@@ -17,9 +17,9 @@
 </script>
 
 <div class="relative overflow-hidden border-gray-300 rounded">
-  <img class="w-full block" src="{bottomImageUrl}" alt="Bottom Image" />
+  <img class="w-full block" src="{bottomImageUrl}" alt="Bottom" />
   <div bind:this="{imageComparisonTop}" class="absolute top-0 left-0 overflow-hidden image-comparison-top">
-    <img class="w-full block" src="{topImageUrl}" alt="Top Image" />
+    <img class="w-full block" src="{topImageUrl}" alt="Top" />
   </div>
   <input
     type="range"
