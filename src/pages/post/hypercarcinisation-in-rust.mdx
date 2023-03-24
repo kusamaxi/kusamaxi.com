@@ -1,0 +1,71 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: The Hypercarcinisation of Developers
+date: 2023-03-24
+description: 
+tags:
+  - rust
+  - hypercarcinisation
+---
+![Hypercarcinisation](/assets/post/hypercarcinisation-in-rust/rustacean2.webp)
+  
+## From Crabs to Rust Programmers
+In the depths of the ocean, there's a fascinating evolutionary phenomenon known as hypercarcinisation. It's a process where crustaceans - a group of animals that includes crabs, lobsters, and shrimp - independently evolve to adopt a crab-like form multiple times. Much like the crabs scuttling on the ocean floor, an analogous transformation is taking place in the world of software development, as programmers gravitate toward Rust, a programming language steadily gaining in popularity.
+  
+On the surface, it might seem odd to draw parallels between the evolutionary pathways of crabs and the career trajectories of developers. But as we dive deeper, it becomes apparent that the same factors that drive hypercarcinisation in crustaceans are also pushing programmers to embrace Rust. Much like the crab's compact, protected body and efficient locomotion, Rust offers developers a set of features that make it an increasingly attractive choice in the face of the challenges posed by modern computing.
+  
+In the realm of crustaceans, the crab-like form has emerged as a winning design. Its hard exoskeleton offers protection from predators, while its versatile limbs enable it to explore and thrive in a wide range of environments. It's no coincidence that, through the pressures of natural selection, a diverse array of crustacean species have independently converged on this remarkably successful body plan.
+  
+![Rust developer](/assets/post/hypercarcinisation-in-rust/rustacean.webp)
+  
+Similarly, Rust's design principles address many of the issues that have long plagued developers in other programming languages. Its focus on safety, performance, and concurrency make it an appealing choice for those grappling with complex, large-scale software projects. In many ways, Rust can be seen as the crab-like form of the programming world, offering developers the tools they need to navigate the ever-evolving landscape of modern software development.
+  
+The transition to Rust is not without its challenges. Learning a new language can be a daunting task, and the Rust community is still growing. However, much like the crustaceans that found success in their crab-like forms, developers who embrace Rust stand to reap the rewards of its unique features. As they do so, they contribute to a convergent evolution in the software development ecosystem - a hypercarcinisation of developers, if you will.
+  
+Let's take a look at a Rust code example that demonstrates the power of its async/futures features by creating a simple HTTP server that handles multiple requests concurrently. This example showcases Rust's superior safety, performance, and ease of use.  
+```rust
+use hyper::{Body, Request, Response, Server};
+use hyper::service::{make_service_fn, service_fn};
+use hyper::Error;
+use tokio::runtime::Runtime;
+use std::convert::Infallible;
+
+async fn handle_request(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
+    // Simulate some asynchronous work.
+    tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+
+    Ok(Response::new(Body::from("Hello, world!")))
+}
+
+fn main() {
+    // Create a Tokio runtime to execute asynchronous tasks.
+    let rt = Runtime::new().unwrap();
+
+    // Bind the server to an address.
+    let addr = ([127, 0, 0, 1], 8080).into();
+
+    // Create a service function that handles incoming requests.
+    let make_svc = make_service_fn(|_conn| {
+        // Clone the service function for each connection.
+        let service = service_fn(handle_request);
+        async { Ok::<_, Error>(service) }
+    });
+
+    // Create the server.
+    let server = Server::bind(&addr).serve(make_svc);
+
+    // Run the server using the runtime.
+    rt.block_on(server).unwrap();
+}
+```
+### Safety
+Rust's strong typing and ownership system prevent data races and other concurrency-related bugs, ensuring that the code remains safe even when handling multiple requests simultaneously.  
+### Performance
+Rust's zero-cost abstractions and efficient async runtime allow for excellent performance, enabling the server to handle a high number of concurrent connections without sacrificing speed.  
+### Ease of use
+Rust's async/await syntax makes it easy to write and understand asynchronous code. The example showcases how simple it is to create an HTTP server that handles multiple requests concurrently, without the need for callbacks or complex error handling.  
+  
+![Rustacean moprhing](/assets/post/hypercarcinisation-in-rust/rustacean3.webp)
+  
+It's a brave new world out there, both beneath the waves and above the keyboard. As the tendrils of technology continue to intertwine with our lives, developers must adapt and evolve. By taking inspiration from the crabs' remarkable story of hypercarcinisation, we can appreciate the forces that drive the Rust revolution and embrace the opportunities it presents. So, as you ponder the future of your programming career, consider following in the footsteps (or should I say, pincers) of the crustaceans, and explore the uncharted waters of Rust. Who knows what evolutionary advantages await you in this new, crab-like programming world?
