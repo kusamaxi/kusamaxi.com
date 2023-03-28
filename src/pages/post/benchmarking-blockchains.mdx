@@ -15,8 +15,8 @@ tags:
 ## Benchmarking blockchains
 In pursuit of optimal performance, we benchmarked Epyc 7003 series C2D Milan processors using Polkadot client and Fio.  
 These tests indicate that cloud providers current hardware may not be ideal for running next-gen blockchains.  
-Best option for running blockchains seems to be bare metal servers running on latest AMD mobile processors like 7045HX
-unfortunately only available to OEMs. For the comparison we recommend you to read our article on [building 1000$ validator](https://kusamaxi.com/post/building-hosting-validator).
+Best option for running blockchains to be bare metal lxc containers running on latest AMD mobile processors like 7045HX,
+unfortunately only available to OEMs. For the comparison we recommend good read article [building and self-hosting 1000$ validator](https://kusamaxi.com/post/building-hosting-validator).
     
 ### Test Results
 Using Epyc 7003 series C2D Milan processors, we found the following results:  
@@ -41,6 +41,7 @@ Standard Deviation: 823.241338 ns
 The read latency does not meet the 2000 ns and lower QoS requirement
 The results show that Epyc 7003 series C2D Milan processors fail to meet some key requirements, making them less suitable for running next-gen blockchains.
 ```
+![Oilblocks](/assets/post/benchmarking-blockchains/oilblocks.webp)
 ### Benchmark methods
 ```
 curl -s https://api.github.com/gists/868fac581cf66af7780a1ccfd02c7b1b | jq -r '.files | first(.[]).content' > chainbench.sh && chmod +x chainbench.sh && ./chainbench.sh
