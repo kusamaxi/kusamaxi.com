@@ -1,0 +1,50 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: Benchmarking Blockchains
+date: 2023-03-28
+description: Assessing Google Epyc 7003 C2D Milan processors using Polkadot client and Fio for high single-thread performance in blockchains.
+tags:
+- benchmark
+- blockchain
+- latency
+- IOPS
+- c2d-standard-4
+---
+
+## Benchmarking blockchains
+In pursuit of optimal performance, we benchmarked Epyc 7003 series C2D Milan processors using Polkadot client and Fio.  
+These tests indicate that cloud providers current hardware may not be ideal for running next-gen blockchains.  
+Best option for running blockchains seems to be bare metal servers running on latest AMD mobile processors like 7045HX
+unfortunately only available to OEMs.
+    
+### Test Results
+Using Epyc 7003 series C2D Milan processors, we found the following results:  
+
+```
+| Category | Function       | Score       | Minimum     | Result            |
+|==========|================|=============|=============|===================|
+| CPU      | BLAKE2-256     | 952.02 MiBs | 1.00 GiBs   | ✅ Pass ( 92.5 %) |
+| CPU      | SR25519-Verify | 487.97 KiBs | 666.00 KiBs | ❌ Fail ( 73.3 %) |
+| Memory   | Copy           | 18.07 GiBs  | 14.32 GiBs  | ✅ Pass (126.1 %) |
+| Disk     | Seq Write      | 239.93 MiBs | 450.00 MiBs | ❌ Fail ( 53.3 %) |
+| Disk     | Rnd Write      | 119.98 MiBs | 200.00 MiBs | ❌ Fail ( 60.0 %) |
+```
+```
+Minimum: 790 ns
+Maximum: 1668781 ns
+Mean: 1666.980091 ns
+Standard Deviation: 823.241338 ns
+
+99.99th Percentile Read Latency: 4960 ns
+
+The read latency does not meet the 2000 ns and lower QoS requirement
+The results show that Epyc 7003 series C2D Milan processors fail to meet some key requirements, making them less suitable for running next-gen blockchains.
+```
+### Benchmark methods
+```
+curl -s https://api.github.com/gists/868fac581cf66af7780a1ccfd02c7b1b | jq -r '.files | first(.[]).content' > chainbench.sh && chmod +x chainbench.sh && ./chainbench.sh
+```  
+Testing methodology consisted of Polkadot benchmark && 10G fio for IOPS and latency to separate SSD disk where chaindata is hold.
+### Source code  
+<script src="https://gist.github.com/hitchhooker/868fac581cf66af7780a1ccfd02c7b1b.js"></script>
