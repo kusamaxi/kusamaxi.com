@@ -1,0 +1,80 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: Hybrid storage for blockchains
+date: 2023-05-15
+description: This article dives into the details of how to combine slower and faster storage to archieve optimal performance for blockchains.
+tags:
+- ZFS
+- filesystem
+---
+
+ZFS isn't a mystical entity intuitively moving data around. Instead, it's a
+well-orchestrated hybrid storage pool, a strategic integration of speedy
+storage (like NVMe disks) for caching and slower, larger disks (like HDDs) for
+primary storage. This configuration ensures readily available frequently
+accessed data on faster storage, while the less accessed data is tucked away in
+the slower, bulk storage. The maestro? That's you, the system administrator,
+making strategic decisions based on the unique requirements of your
+application.
+
+## Symphony of storage
+To optimize a blockchain application, a ZFS pool is created with an HDD, with
+NVMe disks introduced as specialized caches. These caches, the ZFS Intent Log
+(ZIL) and the Level 2 Adaptive Replacement Cache (L2ARC), are the heart and
+soul of this performance symphony.
+
+The ZIL, secured on fast NVMe disks, holds data writes in case of a system
+crash or power loss, giving the application the assurance of data safety. The
+L2ARC, on the other hand, is the speed demon for data reads. Data fetched from
+slower HDDs is stored here, making future requests for the same data
+lightning-fast.
+
+But we're not stopping there. For blockchain applications, we're flipping the
+script, moving away from mirrored disks to constant snapshotting, with these
+snapshots stored on the HDDs. Couple that with ZFS's built-in compression
+capabilities, and you've got a solution that can expand existing data without
+the need for a total database rewrite when sharing a snapshot.
+
+Here's how you can achieve this:
+```bash
+# Create a ZFS pool with your HDDs
+sudo zpool create tank /dev/disk1 /dev/disk2
+
+# Add an NVMe device as an L2ARC
+sudo zpool add tank cache /dev/nvme1n1
+
+# Enable compression
+sudo zfs set compression=on tank
+```
+
+Remember, using L2ARC should be a strategic decision as it consumes system RAM,
+which could otherwise be used for the ARC (primary cache). It's best employed
+when the working set of data is too large for RAM but would fit on an SSD.
+Regularly scheduled snapshots stored on the HDD complete the picture, offering
+a robust backup strategy.
+
+## A Balancing Act for Blockchain
+Perfecting your ZFS configuration is an art,
+ever-dynamic and dependent on various factors, from your specific use case and
+hardware characteristics to unique workload patterns. It's about observing,
+tweaking, and adjusting.
+
+Performance trade-offs are part of this balancing act. While NVMe SSDs offer
+speed that HDDs can't match, a well-configured hybrid setup can give you the
+best of both worlds: cost-effectiveness and performance. By serving frequently
+accessed data at NVMe speeds from the L2ARC, the performance can rival an
+all-NVMe setup. But remember, if your working set outgrows the cache or your
+workload isn't cache-friendly, performance may veer more towards the HDD end of
+the spectrum.
+
+And let's not forget - even the most sophisticated ZFS setup cannot replace a
+comprehensive backup strategy. Always prioritize the integrity and security of
+your data.
+
+ZFS, with its hybrid storage capabilities, presents a powerful tool for system
+administrators, particularly when managing data-intensive applications like
+blockchain. It's about striking the right balance between performance and
+storage efficiency, providing a flexible platform to meet the ever-evolving
+demands of our digital world. ZFS truly empowers us to tune our symphony of
+data to perfection.
