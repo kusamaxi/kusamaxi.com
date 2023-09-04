@@ -1,0 +1,90 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: Secure Polkadot wallet setup
+date: 2023-05-15
+description: In this article, we'll establish a high-security air-gapped Polkadot wallet on devices running GrapheneOS.
+tags:
+- offline
+- wallet
+- polkadot
+- pureproxy
+---
+
+## Securing Your Assets with Parity Vault
+
+
+In today's rapidly changing world of cryptocurrencies and blockchain, the
+security of digital assets is critical. Wallets, which bridge the gap between
+users and their funds, are essential to this security framework. While many
+wallets offer a range of features, sometimes less is more. Focusing on a single
+core function can actually boost security. That's where the Parity Wallet
+stands out — it has one main job: to protect your assets. This article provides
+a detailed guide on how to best secure your cryptocurrency using a
+security-centric approach.
+
+1. **Hardware Preparations:** 
+   - Acquire a Google Pixel 4a or a subsequent model. Pixel devices with
+	 GrapheneOS have been designed with an array of [security
+	 features](https://grapheneos.org/features), including hardware-backed
+	 keystores and a hardened memory allocator.
+   - On your Pixel device, install
+	 [GrapheneOS](https://grapheneos.org/install). It's an open-source mobile
+	 OS optimized for security and privacy, with features like the hardened
+	 malloc implementation and extensive hardening of the base system and
+	 bundled apps.
+
+2. **Parity Wallet Deployment:**
+   - Utilizing the sandboxed environment of the Google Play Store on
+	 GrapheneOS, download the Parity Wallet. This isolation ensures minimal
+	 risk to the primary OS.
+   - Remember, the wallet's primary function is security, which requires a
+	 stripped-down, laser-focused environment.
+
+3. **Communication Lockdown:** 
+   - Enable airplane mode, severing all communication, including Wi-Fi,
+	 Bluetooth, and cellular.
+   - It's imperative to maintain this state. In the context of security, an
+	 air-gapped device introduces barriers to potential external threats.
+
+4. **Configuration of the Parity Wallet:** 
+   - Initialize the Parity Wallet application.
+   - Initiate the process to create a new wallet. This encrypted digital
+	 envelope will act as the guardian of your assets.
+   - Backup the wallet seed phrase in a secure location. The correct way
+	 of updating air-gapped wallet requires full reinstallation of GrapheneOS
+	 and Parity Wallet. Therefore, it's crucial to have a secure backup of the
+	 seed phrase.
+
+5. **Integration with Polkadot.js:** 
+   - On a separate secure computing environment, navigate to
+	 [polkadot.js.org/apps](https://polkadot.js.org/apps).
+   - Create [a pure proxy
+	 account](https://wiki.polkadot.network/docs/learn-proxies) for your Parity
+	 Wallet. As elucidated in the Polkadot documentation, proxies act as a
+	 secondary protective layer, enabling certain functionalities without
+	 exposing the primary account's assets. This modular security approach
+	 minimizes risk by segregating roles and responsibilities. The pure proxy
+	 also enables selling the account to new owner in secure manner.
+
+6. **Maintenance and Updating Protocols:** 
+   - Just as in the world of software engineering, version control and updates
+	 are crucial to the health of a digital wallet.
+   - Metadata of the wallet can be updated in air-gapped manner by reading QR
+	 code with the Parity Wallet app [here](https://metadata.parity.io/).
+   - When considering a wallet upgrade, a clean install approach is
+	 recommended. Purging the previous version and deploying a fresh
+	 installation eliminates residues and potential vulnerabilities. Detailed
+	 procedures for this can be found within the official [Parity
+	 documentation](https://paritytech.github.io/parity-signer/tutorials/Upgrading.html).
+
+In summation, the fusion of state-of-the-art hardware (Pixel devices with
+GrapheneOS) and meticulously crafted software (Parity Wallet) provides a
+foundation of unparalleled security for your digital assets. By emphasizing
+air-gapped operations, singular functionality, and rigorous update protocols,
+users are poised to harness maximum security for their Polkadot assets.
+Adapting to these practices not only enhances security but also instills
+confidence in users, assuring them that their investments are guarded with the
+utmost precision and care. As the decentralized space continues its exponential
+growth, these methodologies will serve as benchmarks for secure digital asset
+management, steering the community towards safer horizons.
