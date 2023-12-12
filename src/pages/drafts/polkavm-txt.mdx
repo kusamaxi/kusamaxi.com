@@ -1,0 +1,245 @@
+[00:00:00.000 --> 00:00:14.240]   Hi, I'm Jan, I work for Polkadot at Parity and today I'm here to tell you about PolkaVM,
+[00:00:14.240 --> 00:00:20.080]   which is our new RISC-V based virtual machine.
+[00:00:20.080 --> 00:00:23.920]   So first, a little bit of history.
+[00:00:23.920 --> 00:00:29.160]   Since the very beginning, Polkadot was essentially built on WebAssembly.
+[00:00:29.160 --> 00:00:34.720]   In particular, one of our unique features is that our state transition function, which
+[00:00:34.720 --> 00:00:41.120]   we call a runtime, and which essentially contains all of the business logic of the blockchain,
+[00:00:41.120 --> 00:00:49.260]   is a WebAssembly program that we can just dynamically upgrade in easy, forkless upgrades.
+[00:00:49.260 --> 00:00:55.220]   And also our native smart contract solution is WebAssembly based, so we're very much heavily
+[00:00:55.220 --> 00:00:58.320]   invested in WebAssembly.
+[00:00:58.320 --> 00:01:02.700]   And we care a lot about its speed.
+[00:01:02.700 --> 00:01:07.700]   In hindsight, I think picking WebAssembly was absolutely the right choice here because
+[00:01:07.700 --> 00:01:12.800]   there weren't really any other good alternatives back then.
+[00:01:12.800 --> 00:01:17.120]   And in general, we are happy with it, but there are some problems.
+[00:01:17.120 --> 00:01:22.940]   For example, WebAssembly is actually pretty complex.
+[00:01:22.940 --> 00:01:27.480]   There's no stable baseline, and it's constantly growing.
+[00:01:27.480 --> 00:01:32.960]   If we look at WebAssembly, the minimal viable product of WebAssembly had 172 instructions,
+[00:01:32.960 --> 00:01:36.520]   and that's up to over 400 today.
+[00:01:36.520 --> 00:01:40.200]   So that's quite a bit of growth.
+[00:01:40.200 --> 00:01:48.420]   And if we count all of the current proposals which are in flight, we get up to 541 instructions.
+[00:01:48.420 --> 00:01:51.120]   So this is quite complex.
+[00:01:51.120 --> 00:01:56.860]   For comparison, if we look at the current king of complexity of instruction sets, which
+[00:01:56.860 --> 00:02:05.580]   is the 64 bit x86 architecture, it has, depending on how you count, 2,000 instructions.
+[00:02:05.580 --> 00:02:08.680]   So WebAssembly is one fourth of that.
+[00:02:08.680 --> 00:02:10.580]   That's a lot.
+[00:02:10.580 --> 00:02:18.640]   And the compilers are gradually starting to use those new instructions by default, often
+[00:02:18.640 --> 00:02:20.260]   with no prior warning.
+[00:02:20.260 --> 00:02:26.660]   Like for example, most recently, the sign extension instructions were enabled by default
+[00:02:26.660 --> 00:02:34.820]   in LLVM, which did surprise multiple blockchains, including us.
+[00:02:34.820 --> 00:02:41.700]   It's also not 100% deterministic, and if you have a blockchain, you do very much need 100%
+[00:02:41.700 --> 00:02:42.700]   deterministic.
+[00:02:42.700 --> 00:02:46.220]   It's an absolute requirement.
+[00:02:46.220 --> 00:02:52.740]   The exact big patterns of a floating pond, not a number, values are unspecified, and
+[00:02:52.740 --> 00:02:56.460]   the size of the program stack is unlimited and might overflow.
+[00:02:56.460 --> 00:02:58.780]   Among other things.
+[00:02:58.780 --> 00:03:08.540]   So it's not a total deal-breaker because you can work around this, but it's really annoying.
+[00:03:08.540 --> 00:03:15.320]   And WebAssembly is a pure stack machine and real hardware is not.
+[00:03:15.320 --> 00:03:24.580]   So this means that when you want to execute a WebAssembly program in an efficient manner,
+[00:03:24.580 --> 00:03:28.080]   you need to reduce it into a register machine.
+[00:03:28.080 --> 00:03:34.700]   And register allocation is an NP-complete problem, which basically means it's really
+[00:03:34.700 --> 00:03:36.840]   hard and it's really expensive.
+[00:03:36.840 --> 00:03:48.300]   So it's hard to have fast execution and fast JIT compilation times with WebAssembly.
+[00:03:48.300 --> 00:03:51.020]   So can we do better than that?
+[00:03:51.020 --> 00:03:54.380]   Ideally, we would like an instruction set, which is like a register machine.
+[00:03:54.380 --> 00:04:00.140]   So it's easy to run on real hardware.
+[00:04:00.140 --> 00:04:05.880]   It's simple and has a stable baseline and doesn't change underneath us by itself.
+[00:04:05.880 --> 00:04:07.420]   It's portable.
+[00:04:07.420 --> 00:04:09.620]   It's well-defined and standardized.
+[00:04:09.620 --> 00:04:12.440]   It's already widely supported by compilers.
+[00:04:12.440 --> 00:04:15.700]   We do not want to maintain our own tool chain.
+[00:04:15.700 --> 00:04:19.800]   That's something we absolutely don't want to do.
+[00:04:19.800 --> 00:04:24.180]   It's guaranteed to be supported into the future.
+[00:04:24.180 --> 00:04:30.940]   It's something that at times of like 10, 20, 30 years has enough features to compile arbitrary
+[00:04:30.940 --> 00:04:36.600]   existing programs, but it doesn't force on those features which we don't want or need.
+[00:04:36.600 --> 00:04:41.200]   So wait a minute, doesn't that sound just like RISC-V?
+[00:04:41.200 --> 00:04:45.280]   And yes, exactly.
+[00:04:45.280 --> 00:04:53.980]   That's what we were thinking when we surveyed this whole landscape of alternatives to WebAssembly.
+[00:04:53.980 --> 00:05:01.560]   So we decided, hey, let's try to try it on a new VM and see how it goes.
+[00:05:01.560 --> 00:05:09.820]   So the very first prototype for PolkaVM or our new RISC-V based VM was written in only
+[00:05:09.820 --> 00:05:11.040]   two days.
+[00:05:11.040 --> 00:05:18.840]   Granted, those were very long two days, but it were two days nonetheless, and it was a
+[00:05:18.840 --> 00:05:23.780]   full JIT recompiler, which recompiled the RISC-V.
+[00:05:23.780 --> 00:05:27.700]   RISC-V code into fully native code.
+[00:05:27.700 --> 00:05:34.440]   And the funny thing is, this prototype written in two days was already faster than some of
+[00:05:34.440 --> 00:05:40.280]   the production VMs used today on some of the chains.
+[00:05:40.280 --> 00:05:44.640]   So we were like, this looks really promising.
+[00:05:44.640 --> 00:05:48.940]   Let's try and go all the way in and see how far we can take this.
+[00:05:48.940 --> 00:05:53.580]   And here we are today, PolkaVM is still a research project.
+[00:05:53.580 --> 00:05:58.360]   But it's slowly approaching production status.
+[00:05:58.360 --> 00:06:05.020]   And the current version already achieves state of art results on several metrics.
+[00:06:05.020 --> 00:06:07.220]   And we're not done yet.
+[00:06:07.220 --> 00:06:09.420]   So execution performance.
+[00:06:09.420 --> 00:06:15.960]   This is how fast one of our benchmarks runs.
+[00:06:15.960 --> 00:06:18.540]   And on the very left, we have native.
+[00:06:18.540 --> 00:06:23.380]   Also keep in mind, this is logarithmic scale to make the graph readable.
+[00:06:23.380 --> 00:06:25.080]   This is not linear.
+[00:06:25.080 --> 00:06:26.920]   So on the very left, we have native.
+[00:06:26.920 --> 00:06:34.260]   This is essentially the benchmark executed natively just on bare metal on the CPU, right?
+[00:06:34.260 --> 00:06:37.960]   And we have 3.8 milliseconds, quite fast.
+[00:06:37.960 --> 00:06:43.960]   And in the second place, we have PolkaVM, 5.7 milliseconds.
+[00:06:43.960 --> 00:06:48.040]   So almost native performance.
+[00:06:48.040 --> 00:06:53.180]   And in the third place, we have wasmtime, which is essentially the gold standard.
+[00:06:53.180 --> 00:06:55.980]   And this is the old standard for WebAssembly VMs.
+[00:06:55.980 --> 00:06:59.320]   And this is the WebAssembly VM we are currently using.
+[00:06:59.320 --> 00:07:08.960]   So we are already slightly faster than the wasmtime, which is quite amazing because PolkaVM
+[00:07:08.960 --> 00:07:11.300]   has been in development for only a few months.
+[00:07:11.300 --> 00:07:17.320]   And wasmtime has many, many years of effort put into it.
+[00:07:17.320 --> 00:07:20.280]   And it's very well optimized.
+[00:07:20.280 --> 00:07:22.980]   So these are great results.
+[00:07:22.980 --> 00:07:25.100]   In the fourth place, we have wasmer single pass.
+[00:07:25.100 --> 00:07:32.340]   And this VM is notable for the fact that it's essentially unlike wasmtime, it guarantees
+[00:07:32.340 --> 00:07:35.660]   linear time, single pass compilation.
+[00:07:35.660 --> 00:07:41.560]   So this is for blockchain, this is very good for security because you cannot then denial
+[00:07:41.560 --> 00:07:47.680]   of service attack the chain with a special crafted program.
+[00:07:47.680 --> 00:07:51.060]   Then we have Solana RBPF.
+[00:07:51.060 --> 00:07:52.780]   They're using eBPF as their standard.
+[00:07:52.780 --> 00:07:58.200]   They're using their instruction set, and their performance is not that great.
+[00:07:58.200 --> 00:08:08.360]   And in the last place, we have wasmer, which I've put it here just for comparison because
+[00:08:08.360 --> 00:08:11.700]   this is an interpreter written in pure Rust.
+[00:08:11.700 --> 00:08:22.580]   So this is essentially as fast as you can go, more or less, with an interpreter, without
+[00:08:22.580 --> 00:08:23.420]   assembly tricks.
+[00:08:23.420 --> 00:08:30.060]   So this is great, but this is only execution performance, and we also care about compile
+[00:08:30.060 --> 00:08:31.060]   time performance.
+[00:08:31.060 --> 00:08:36.720]   So how long does it take to translate a program from RISC-V into native code?
+[00:08:36.720 --> 00:08:43.780]   And we're already, we're also pretty good here.
+[00:08:43.780 --> 00:08:49.300]   We are in the first place with 427 microseconds.
+[00:08:49.300 --> 00:08:52.380]   And the second best is Solana.
+[00:08:52.380 --> 00:09:00.120]   It's not that great, but they have really fast compile time.
+[00:09:00.120 --> 00:09:02.380]   So that's something they got right.
+[00:09:02.380 --> 00:09:11.480]   And on the Verify right, we can see wasmtime, which is pretty slow when compiling.
+[00:09:11.480 --> 00:09:15.740]   So this is how they get their stellar performance.
+[00:09:15.740 --> 00:09:22.180]   They just have a really powerful optimizing compiler, which takes quite a long time.
+[00:09:22.180 --> 00:09:24.880]   PolkaVM features as of today.
+[00:09:24.880 --> 00:09:33.640]   We essentially execute as fast as wasmtime, but we are over 160 times faster to compile.
+[00:09:33.640 --> 00:09:41.360]   We compile faster than Solana, while being over 12 times faster executing than them.
+[00:09:41.360 --> 00:09:51.980]   We guarantee linear time compilation, so you cannot denial of service DVM by crafting especially
+[00:09:51.980 --> 00:09:55.780]   a malicious program to blow up the compilation times.
+[00:09:55.780 --> 00:09:59.260]   We guarantee 100% determinism out of box.
+[00:09:59.260 --> 00:10:06.220]   So you don't need any workarounds to make sure the execution is deterministic.
+[00:10:06.220 --> 00:10:09.000]   We are secure and sandboxed by default.
+[00:10:09.000 --> 00:10:14.560]   This is something that I haven't seen any other VM do.
+[00:10:14.560 --> 00:10:20.680]   Most other VMs just run their guest programs within the same process and hope they are
+[00:10:20.680 --> 00:10:21.780]   secure.
+[00:10:21.780 --> 00:10:26.020]   Which usually works, but bugs happened.
+[00:10:26.020 --> 00:10:28.760]   So we took a different approach.
+[00:10:28.760 --> 00:10:32.380]   We assumed that we have bugs.
+[00:10:32.380 --> 00:10:37.400]   So we always run guest programs in another process.
+[00:10:37.400 --> 00:10:43.160]   So if it misbehaves, it cannot do anything malicious to the host.
+[00:10:43.160 --> 00:10:46.180]   We also run them in another namespace.
+[00:10:46.180 --> 00:10:51.580]   This is essentially exactly the same technology as Docker uses.
+[00:10:51.580 --> 00:10:57.100]   The guest program, even if it breaks out of the sandbox, it cannot access the network.
+[00:10:57.100 --> 00:10:58.660]   It cannot access the file system.
+[00:10:58.660 --> 00:11:05.140]   It cannot access any other processes because it's fully namespaced, just like Docker containers
+[00:11:05.140 --> 00:11:06.140]   are.
+[00:11:06.140 --> 00:11:13.520]   And our guest programs also run under a strict SECCOM sandbox.
+[00:11:13.520 --> 00:11:21.380]   What this does is basically it blocks the vast majority of syscalls, which are essentially
+[00:11:21.380 --> 00:11:26.660]   calls into the Linux kernel to request some servers from the operating system.
+[00:11:26.660 --> 00:11:32.620]   And you have something like, I don't know, maybe 200 of them in total.
+[00:11:32.620 --> 00:11:36.200]   So we actually need only, I think, six of them.
+[00:11:36.200 --> 00:11:37.720]   So we block all the rest.
+[00:11:37.720 --> 00:11:44.420]   And this is quite important because most of the kernel exploits actually happen through
+[00:11:44.420 --> 00:11:48.380]   some obscure syscalls that are not commonly used.
+[00:11:48.380 --> 00:11:51.180]   So this reduces the attack.
+[00:11:51.180 --> 00:11:59.820]   But we can also run arbitrary C, C++, and Rust programs, which is not true, for example,
+[00:11:59.820 --> 00:12:09.960]   for Solana SVM, which has quite severe limitations on what you can render, but that's not something
+[00:12:09.960 --> 00:12:11.940]   I will elaborate here.
+[00:12:11.940 --> 00:12:19.880]   Oh, and we also have really fast gas metering, gas metering is essentially a feature that
+[00:12:19.880 --> 00:12:20.980]   you need for things.
+[00:12:20.980 --> 00:12:25.480]   Like smart contracts, right?
+[00:12:25.480 --> 00:12:34.060]   And we implement essentially two kinds of gas metering, synchronous gas metering and
+[00:12:34.060 --> 00:12:35.580]   asynchronous gas metering.
+[00:12:35.580 --> 00:12:40.380]   And the difference between them is quite simple.
+[00:12:40.380 --> 00:12:46.980]   With synchronous gas metering, before you execute a piece of code, you essentially consume
+[00:12:46.980 --> 00:12:50.780]   the gas and check whether you are out of gas.
+[00:12:50.780 --> 00:12:55.200]   If you are out of gas, you abort the execution.
+[00:12:55.200 --> 00:12:58.800]   If you still have gas in the tank, you continue, right?
+[00:12:58.800 --> 00:13:07.740]   So asynchronous gas metering removes the check for the gas, and gas is instead checked from
+[00:13:07.740 --> 00:13:13.380]   another thread running concurrently with the program.
+[00:13:13.380 --> 00:13:20.580]   So this makes it a lot more efficient, and for the majority of use cases like smart contracts,
+[00:13:20.580 --> 00:13:24.040]   you don't actually need synchronous gas metering.
+[00:13:24.040 --> 00:13:34.200]   So you can have this essentially free performance uplift for like, with no downside, essentially.
+[00:13:34.200 --> 00:13:39.820]   And the funny thing is, when we are running with gas metering, we are faster than was
+[00:13:39.820 --> 00:13:44.860]   time, which is running without gas metering.
+[00:13:44.860 --> 00:13:50.380]   And our gas metering in general is faster than theirs.
+[00:13:50.380 --> 00:13:55.320]   And, okay, so our VM can do quite a lot.
+[00:13:55.320 --> 00:13:56.780]   Can it run Crysis?
+[00:13:56.780 --> 00:13:59.120]   Not yet, but it can run Doom.
+[00:13:59.120 --> 00:14:06.300]   I have ported Doom to our VM, and it runs fully within the VM, including the graphics
+[00:14:06.300 --> 00:14:10.740]   and the sound, everything except I/O, obviously.
+[00:14:10.740 --> 00:14:16.880]   So input, output, you cannot encapsulate that fully within the VM, because the user has
+[00:14:16.880 --> 00:14:18.420]   to interact it with somehow.
+[00:14:18.420 --> 00:14:20.180]   But everything else runs inside of the PC.
+[00:14:20.180 --> 00:14:23.900]   And you can play it through the whole game.
+[00:14:23.900 --> 00:14:24.900]   Like this.
+[00:14:24.900 --> 00:14:26.700]   Here's a link.
+[00:14:26.700 --> 00:14:31.820]   You can git clone the repo and play it yourself if you want.
+[00:14:31.820 --> 00:14:36.020]   And we also run Doom on our CI.
+[00:14:36.020 --> 00:14:43.520]   So on every commit, we actually check that Doom still runs and that it works correctly.
+[00:14:43.520 --> 00:14:49.980]   So we are probably the only VM in existence which runs Doom on its own.
+[00:14:49.980 --> 00:14:53.580]   On its CI.
+[00:14:53.580 --> 00:14:55.220]   So what's our secret sauce?
+[00:14:55.220 --> 00:15:01.620]   Like why we have managed to achieve these results in only a few months of work?
+[00:15:01.620 --> 00:15:06.600]   So our first secret sauce is RV32E.
+[00:15:06.600 --> 00:15:11.820]   This is an embedded variant of RISC-V with only 16 registers.
+[00:15:11.820 --> 00:15:19.780]   But in reality, it's only actually 13, because the zero register, the zero register doesn't
+[00:15:19.780 --> 00:15:27.900]   really count, and the compiler by itself doesn't emit code which uses the GP and TPU registers.
+[00:15:27.900 --> 00:15:35.220]   It was quite recently ratified in January of this year, and the toolchain support is
+[00:15:35.220 --> 00:15:39.580]   not there yet, but hopefully soon it will be.
+[00:15:39.580 --> 00:15:48.700]   And this is perfect for a recompiler into an instruction set like 64-bit x86, which
+[00:15:48.700 --> 00:15:49.580]   only by itself.
+[00:15:49.580 --> 00:15:53.620]   Coincidentally, has 16 general purpose registers.
+[00:15:54.040 --> 00:16:01.000]   We can essentially map every RISC-V register one-to-one to a native register. So this makes
+[00:16:01.000 --> 00:16:09.160]   code generation really, really simple, because you don't need to spill any of the registers into
+[00:16:09.160 --> 00:16:18.600]   memory, and it also allows the compiler to essentially optimize the code for 16 registers.
+[00:16:18.600 --> 00:16:27.480]   Our secret sauce number two is the sandbox. This is not just for security actually.
+[00:16:27.480 --> 00:16:38.280]   We have a specially crafted ELF file which the VM launches, which guarantees that the lower
+[00:16:38.280 --> 00:16:45.320]   four gigabytes of other space of the process are free and can be used by the guest program.
+[00:16:45.320 --> 00:16:53.160]   And this has the magic property of allowing us to have really cheap single instruction memory
+[00:16:53.160 --> 00:17:00.920]   accesses. So here we have two bits of assembly, one generated by PolkaVM and one generated by
+[00:17:00.920 --> 00:17:08.520]   Wasmime. So as you can see, we can do this in one instruction, and Wasmime needs three more
+[00:17:08.520 --> 00:17:15.880]   significantly more complex instructions. So this makes it quite a bit faster to access memory.
+[00:17:15.880 --> 00:17:27.000]   And our secret number three is our compilation pipeline. Basically, we do not...
+[00:17:29.000 --> 00:17:35.800]   the VM doesn't actually load the files that a compiler spits out.
+[00:17:35.800 --> 00:17:42.280]   What we do is that we use a standard toolchain, so we have a standard RSC, Clang, or GCC, and we
+[00:17:42.280 --> 00:17:48.200]   compile the program into a standard ELF file. And then what we do is we have our own linker
+[00:17:48.200 --> 00:17:56.840]   which takes that ELF file and post-processes it. So this linker does things like it does
+[00:17:57.960 --> 00:18:04.520]   relocations. So now we don't have to do relocations in the VM, the linker does it. It does
+[00:18:04.520 --> 00:18:10.920]   macro op fusion. So basically in RISC-V, for example, if you want to load an immediate value
+[00:18:10.920 --> 00:18:19.320]   into a register, if the immediate is too big, you need two instructions. But we are a VM, we don't
+[00:18:19.320 --> 00:18:25.720]   have such limitations. So what we do is that we merge those two instructions into a single one.
+[00:18:25.720 --> 00:18:31.880]   So that's essentially macro op fusion and we do this in the linker. So the VM by itself doesn't
+[00:18:31.880 --> 00:18:38.520]   have to do this. We also do some other minor optimizations like extra inlining, constant
+[00:18:38.520 --> 00:18:49.080]   propagation, dead code elimination, etc. So the general idea is to move as much complexity as we
+[00:18:49.080 --> 00:18:59.160]   can into this linker and keep the VM as simple as possible. So the linker runs offline and generates
+[00:18:59.160 --> 00:19:09.480]   a program build-up which then the VM can load and generate native code. And this works quite well.
+[00:19:09.480 --> 00:19:19.000]   And so what about the future? We are not done yet. We're planning even more performance improvements.
+[00:19:19.560 --> 00:19:26.440]   Ideally, we would like to be as fast as native code, as natively compiled programs. We may or
+[00:19:26.440 --> 00:19:32.360]   may not get there, but we will certainly try. And there are quite a bit of things we haven't tried
+[00:19:32.360 --> 00:19:40.040]   yet. So even more macro op fusions. So we're currently fusing essentially only immediate loads,
+[00:19:40.040 --> 00:19:46.280]   but there are quite a bit of other macro op fusions which we could be doing,
+[00:19:47.000 --> 00:19:54.040]   which could improve performance. There are also a bunch of other RISC-V extensions which we could
+[00:19:54.040 --> 00:20:01.880]   implement. Currently, we're just supporting the M extension, which is the multiplication extension.
+[00:20:01.880 --> 00:20:12.520]   And besides that, we are playing vanilla baseline RISC-V. So there are quite a few interesting
+[00:20:12.520 --> 00:20:18.440]   extensions, like the bit manipulation extensions, which were ratified some time ago. There are those
+[00:20:18.440 --> 00:20:25.800]   T-head extensions. They are vendor specific, but some of them are very interesting and we think
+[00:20:25.800 --> 00:20:32.280]   they might improve performance quite a bit. And we also want to add 64-bit support, because we're
+[00:20:32.280 --> 00:20:41.240]   currently only searching the bit. We're also planning on adding even more features, like
+[00:20:41.240 --> 00:20:48.520]   dynamic link of multiple programs at runtime. Time travel debugging is also something we want to have,
+[00:20:48.520 --> 00:20:55.160]   which as far as I know, no other VM supports, basically. What is time travel debugging? When
+[00:20:55.160 --> 00:21:01.160]   you're debugging a normal program in a debugger, you can only go forward, but with time travel
+[00:21:01.160 --> 00:21:10.920]   debugging, you can also go backwards. So this is really cool. This is a really cool debugging
+[00:21:10.920 --> 00:21:19.320]   feature and thanks to the fact that we are 100% deterministic, this should be quite easy to
+[00:21:19.320 --> 00:21:25.080]   implement. And we also want to support running on another CPU instead of our architectures,
+[00:21:25.080 --> 00:21:33.800]   because right now we're only supporting 64-bit x86. So the major candidates here are 64-bit ARM,
+[00:21:34.440 --> 00:21:44.040]   namely the M1 couple silicon chips. We want to be able to run on them. And of course,
+[00:21:44.040 --> 00:21:51.640]   native RISC-V. RISC-V is not there yet with hardware, but maybe in the future when we will have
+[00:21:51.640 --> 00:22:01.560]   really high performance RISC-V servers, we want to be ready for that. Also, we also want to do some
+[00:22:01.560 --> 00:22:14.040]   research on coming up with better cost models for gas. So we want to figure out if we can lower the
+[00:22:14.040 --> 00:22:23.720]   gas fees by more closely modeling how modern CPUs work, which is something that we think
+[00:22:25.400 --> 00:22:35.160]   is a worthwhile research direction. Also, we do want to write a proper spec for the VM
+[00:22:35.160 --> 00:22:42.440]   before hitting version 1.0. So we want to have a comprehensive test suite as part of the spec,
+[00:22:42.440 --> 00:22:47.720]   which will be independent from the VM. And we want to make it really easy for someone else to
+[00:22:47.720 --> 00:22:56.360]   just implement a new VM that is 100% compatible with ours. And this will also help with long
+[00:22:56.360 --> 00:23:04.840]   support and long-term support and stability. So that's all I have for you today. Thank you. You
+[00:23:04.840 --> 00:23:09.960]   can check out the code at the following link. You can also, if you want to talk about this,
+[00:23:09.960 --> 00:23:29.720]   you can message me on Element or you can just email me. And that's all from my site today.

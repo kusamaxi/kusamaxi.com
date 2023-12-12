@@ -1,0 +1,163 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: PolkaVM - RISC-V based smart contract VM that runs ROOM
+date: 2023-12-12
+description:
+tags:
+- polkavm
+- polkadot
+- riscv
+- rust
+- vm
+---
+
+## PolkaVM - A High-Performance RISC-V Based VM: Insights and Analysis
+
+### Introduction
+
+In the rapidly evolving blockchain ecosystem, Polkadot has introduced PolkaVM,
+a cutting-edge virtual machine based on the RISC-V architecture. This post delves
+into the technical aspects of PolkaVM, highlighting its design choices that contribute
+to its remarkable speed and efficiency.
+
+
+### Background on Polkadot and WASM
+
+Polkadot's initial alignment with WebAssembly (WASM) was instrumental in shaping its
+blockchain functionalities. However, WASM's growing complexity and inherent non-determinism
+posed significant challenges, prompting the need for an alternative solution.
+
+
+### Why RISC-V for PolkaVM?
+
+RISC-V was chosen for its simplicity, stability, and ease of implementation on real hardware.
+Its portability and standardized design make it an ideal choice for a virtual machine aimed
+at long-term viability in the blockchain sector.
+
+
+### Challenges with WebAssembly
+
+1. **Complexity and Growing Instruction Set:** WASM's evolution has led to a substantial
+increase in its complexity. From a minimal viable product with 172 instructions,
+it has expanded to over 400, and with current proposals, up to 541. This complexity
+contrasts sharply with the simpler 64-bit x86 architecture, which has around 2,000 instructions.
+The rapid and often unexpected adoption of new instructions in compilers, like the sign
+extension instructions in LLVM, presents challenges for blockchain developers.
+
+2. **Lack of Determinism:** For blockchain applications, 100% determinism is crucial.
+However, WASM does not fully meet this requirement. Issues such as unspecified bit
+patterns in floating-point NaN (Not a Number) values and an unlimited program stack
+pose risks of non-deterministic behavior, which is problematic for blockchain applications.
+
+3. **Inefficiency of Stack Machine Architecture:** WASM is inherently a stack machine,
+whereas real hardware operates more efficiently as a register machine. The translation from
+stack to register machine is complex and often leads to inefficient execution and JIT (Just-In-Time)
+compilation times.
+
+
+### PolkaVM's RISC-V Based Solution
+
+1. **Simplified and Stable Instruction Set:** PolkaVM leverages the RISC-V architecture
+known for its simplicity and stable baseline. Unlike WASM, RISC-V's instruction set
+is not prone to rapid or unpredictable expansions, making it more manageable and predictable
+for blockchain development.
+
+2. **Enhanced Efficiency:** The RISC-V architecture aligns more closely with real hardware,
+being a register machine. This alignment significantly reduces the complexity involved
+in executing programs, leading to faster execution and JIT compilation times.
+
+3. **Determinism and Security:** PolkaVM addresses the non-determinism issue by ensuring
+100% deterministic execution, a fundamental requirement for blockchain applications.
+Additionally, the security and sandboxing features of PolkaVM provide a more robust
+environment for running blockchain applications.
+
+4. **Rapid Development and Performance:** The development of PolkaVM's initial prototype
+in just two days, and its subsequent performance outpacing some existing production VMs,
+demonstrates its efficiency and potential in blockchain technology.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/uB8ckQ_87uE?si=gPm5dHMrWjCiigxL" title="koute polkavm speech" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+### PolkaVM's Quick Development and Performance
+
+The first prototype of PolkaVM, a JIT recompiler translating RISC-V code to native code,
+was developed within just two days, showcasing not only rapid development but also superior
+performance compared to some existing VMs. RISC-V being extremely simple ISA plays a role here.
+
+<a href="/assets/post/polkavm-runs-doom/Pinky-Performance.png">![PolkaVM vs. WASM runtimes in Pinky(NES)](/assets/post/polkavm-runs-doom/Pinky-Performance.png)</a>
+
+### Key Aspects Contributing to PolkaVM's Speed
+
+1. **Simplified Architecture (RV32e):** PolkaVM leverages the RV32e architecture, which has
+fewer registers, allowing for efficient mapping to the x86 architecture. This simplification
+reduces the need for memory spilling and enhances execution speed.
+
+2. **Custom ELF Sandbox:** By ensuring a free lower four gigabytes in the address space, PolkaVM
+enables efficient single-instruction memory accesses. This approach is significantly faster
+than the complex memory access methods used by other VMs.
+
+3. **Optimized Compilation Pipeline:** PolkaVM uses standard toolchains and a unique linker that
+post-processes ELF files. This results in optimized code generation, macro-op fusion, and other
+enhancements, significantly reducing the runtime complexity.
+
+4. **Efficient Gas Metering:** The implementation of both synchronous and asynchronous gas metering
+methods contributes to the VM's efficiency, particularly in the context of smart contracts.
+
+5. **Security and Sandboxing:** Running guest programs in isolated processes and namespaces,
+similar to Docker containers, enhances security and prevents potential exploits.
+
+6. **Runs DOOM**: PolkaVM's ability to run DOOM, a popular first-person shooter game, demonstrates
+its speed and efficiency. DOOM is also in PolkaVM's CI pipeline to ensure it runs after every commit.
+
+<a href="/assets/post/polkavm-runs-doom/Prime-Sieve-Performance.png">![PolkaVM vs. Wasmtime runtimes in Prime Sieve](/assets/post/polkavm-runs-doom/Prime-Sieve-Performance.png)</a>
+
+### Current Status and Future Outlook of PolkaVM
+
+PolkaVM currently stands at a pivotal point of nearing production readiness, showcasing impressive strides
+in achieving execution performance that closely rivals native execution. This remarkable progress is primarily
+due to the platform's innovative approach to memory access and compilation. PolkaVM utilizes a unique memory
+access technique that drastically reduces the complexity and number of instructions required for single instruction
+memory accesses, thereby enhancing speed and efficiency. This approach is evident in the comparison with Wasmtime,
+where PolkaVM achieves what Wasmtime does with significantly fewer and less complex instructions.
+
+A critical component of PolkaVM's efficiency is its compilation pipeline. Unlike traditional virtual machines (VMs)
+that directly load compiler outputs, PolkaVM employs a standard toolchain (RustC, Clang, GCC) to compile programs into
+standard ELF files. These files then undergo post-processing by a custom linker, which performs various optimizations
+such as relocations, macro-op fusion, extra inlining, constant propagation, and dead code elimination. This process
+shifts the computational burden from the VM to the linker, simplifying the VM's architecture and enhancing performance.
+
+Looking ahead, PolkaVM's roadmap is ambitious and forward-thinking. Key future enhancements include:
+
+1. **Expanded RISC-V Extension Support:** PolkaVM plans to broaden its compatibility with various RISC-V extensions,
+moving beyond the current MX extension to incorporate extensions like the ratified bit manipulation extensions and
+the T-head extensions.
+
+2. **64-bit Compatibility:** The platform aims to evolve from its current 32-bit architecture to support 64-bit
+processing, a critical step for advanced computing needs.
+
+3. **Advanced Gas Cost Models:** Research is underway to develop more accurate gas cost models that reflect the workings
+of modern CPUs. This could lead to more efficient and lower gas fees.
+
+4. **Dynamic Features:** The introduction of dynamic linking of multiple programs at runtime and time travel
+debugging (allowing backward as well as forward debugging) is on the horizon. These features, particularly
+the latter, leverage PolkaVM's deterministic nature to offer unique debugging capabilities not commonly found
+in other VMs.
+
+5. **CPU Architecture Support Expansion:** Plans include extending support beyond 64-bit x86 to embrace platforms
+like 64-bit ARM, including M1 Apple Silicon chips, and native RISC-V hardware, anticipating future advancements
+in RISC-V server performance.
+
+6. **Comprehensive VM Specification:** Before reaching version 1.0, PolkaVM intends to establish a detailed
+specification with an independent comprehensive test suite. This will facilitate the development of new,
+fully compatible VMs by third parties, ensuring long-term support and stability.
+
+In summary, PolkaVM is rapidly evolving towards a state of production readiness, with a strong focus on
+performance, efficiency, and future-proofing through comprehensive planning and innovative technological
+advancements.
+
+### But does it really run doom?
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/5p_BTNArMZ0?si=Ha89PRS-YZCiMIDo" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+Well in crypto we do not trust but we verify. So we forked the koute/polkavm repo and decided to ran doom ourselves.
+You can watch the video of the process including introduction to [polkavm-disassembler-gui](https://polka.run/disassembler) tool.
