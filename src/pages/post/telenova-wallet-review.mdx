@@ -1,0 +1,60 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: Telenova Wallet Review
+date: 2024-06-09
+description: In this article, we'll review the entry-level Polkadot wallet on devices running Telegram.
+tags:
+- telegram
+- wallet
+- polkadot
+- entry-level
+---
+
+## Did Telenova Wallet Solve the UX Problem Of Crypto?
+
+The [source code](https://github.com/novasamatech/telenova-web-app/blob/dev/src/common/wallet/store.ts) for
+[Telenova Wallet](https://t.me/telenova_app_bot) has been released, marking its true release date in our opinion.
+Without the ability to review and authenticate the wallet's source code, users cannot be certain that they are the
+sole holders of their keys. Transparency in the source code is crucial for verifying the security claims of any wallet
+and ensuring that no hidden vulnerabilities or backdoors exist.
+
+Telenova Wallet employs advanced cryptographic techniques to secure user assets. It uses a combination of AES encryption and the
+Scrypt key derivation function to protect the mnemonic phrase, which serves as the foundation for generating key pairs. By deriving
+a unique encryption key from the user's password and a random salt, the wallet ensures that the mnemonic remains secure even if the
+encrypted data is exposed.
+
+The encryption process involves generating a random salt and using the Scrypt algorithm to derive a key from the user's password
+and the salt. This key is then used to encrypt the mnemonic with AES in CBC (Cipher Block Chaining) mode. The encrypted mnemonic
+and salt are stored together securely. When the mnemonic needs to be decrypted, the salt is extracted, and the key is derived
+again from the user's password to decrypt the mnemonic.
+
+The wallet efficiently manages cryptographic keys by generating and securely storing the mnemonic phrase and associated key pairs.
+The mnemonic is encrypted and stored locally, with an option for backup in Telegram Cloud Storage. This dual-storage approach offers
+both convenience and security, allowing users to easily recover their wallets while keeping their private keys protected.
+
+Designed with user-friendliness in mind, Telenova simplifies the onboarding process, requiring just two clicks to create an account
+and be ready to send and receive transactions. This streamlined experience makes it accessible for new users while maintaining strong
+security measures. The use of secure local storage and unique store names based on the user’s Telegram ID ensures that access remains
+secure and conflict-free.
+
+Telenova Wallet is particularly suitable for managing small to medium-sized amounts, such as a monthly salary or day-to-day expenses.
+The key security factor is the strength of the user’s password, making it crucial to choose one that is robust and unique. A long,
+complex password with a mix of letters, numbers, and special characters can greatly enhance security. This design reflects a deliberate
+balance between user experience and security, enabling Web2 users to transition to Web3 without needing to understand and manage key pairs.
+However, with the rise of LLM-powered password crackers that exploit extensive personal data, the reliability of passwords alone is becoming
+questionable. For managing larger amounts, using an offline wallet setup is recommended, as detailed in
+[this guide](https://kusamaxi.com/post/robust-vault-wallets), to ensure maximum security. Ultimately, Telenova users can control their security
+level by opting for more complex passwords, thereby safeguarding their assets from potential threats.
+
+The only critique we can give is that future enhancements could include consolidating all assets into an asset hub and providing
+a teleport option for old users' assets still located on relaychains. Node selection for RPC endpoint seems also unoptimized leading
+somewhat somewhat dragged down UX. It could have been better option to leverage the new polkadot-api js-library instead of the old
+allowing for use of light clients for more secure and faster interactions with the underlying blockchains. One easy fix could be
+to just use IBP/Dotters GeoDNS for low latency RPC endpoints as priority.
+
+Overall [Telenova Wallet](https://t.me/telenova_app_bot) stands out as a reliable and user-friendly solution for cryptocurrency management.
+Its robust encryption, efficient key management, and simple user interface make it an optimal choice for everyday transactions
+and entry-level amounts, providing a smooth and secure experience for all users. After reviewing the source code and evaluating
+the cryptographic scheme, we can highly recommend considering Telenova Wallet for onboarding your friends into crypto by gifting
+them some KSM or USDT using Telenova.
