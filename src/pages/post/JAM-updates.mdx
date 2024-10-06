@@ -1,0 +1,107 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: Updates on JAM Protocol
+date: 2023-03-24
+description: Summarizes the key updates and refinements made to the JAM protocol since its initial
+graypaper release. It covers major improvements in the Data Availability system, work package
+structure, guarantor responsibilities, validator statistics, and cryptographic techniques. 
+tags:
+- polkadot
+- jam
+- graypaper
+- polkavm
+---
+
+## JAM Protocol: Key Updates and Refinements to the Graypaper
+
+Since the release of the initial [JAM Protocol Graypaper](https://graypaper.com), Gav's team has
+been hard at work refining and enhancing the protocol. For those curious about the developments
+and improvements made since the original publication, we've compiled a comprehensive summary of
+the key updates:
+
+1. Data Availability (DA) System: The DA system has been overhauled, now using 4104-byte segments
+composed of 6 erasure coding pieces. This change optimizes erasure coding efficiency while
+maintaining manageable segment sizes. A constant-depth Merkle tree for segment roots has been
+introduced, balancing proof size and computation complexity. The system now separates short-term
+Audit DA from long-term Imports DA, allowing for more flexible data retention policies.
+
+2. Work Package Enhancements: Work packages now use data commitments instead of inline data,
+reducing package size and improving data handling efficiency. A new manifest system for imports,
+exports, and extrinsics provides clearer data reference structures. A limit of 2048
+imported/exported segments per package has been implemented to prevent potential DoS attacks while
+maintaining high throughput.
+
+3. Guarantor Responsibilities: Guarantors now have expanded roles, including reconstructing
+imported segments and generating paged proofs for exports. This increases system security by
+ensuring data integrity at multiple points. The introduction of core affinity and
+guarantor-to-guarantor distribution aims to improve network efficiency.
+
+4. Validator Statistics System: A new system tracks key metrics like block production, tickets,
+preimages, guarantees, and assurances, providing a comprehensive view of validator performance.
+These statistics are stored in the state and updated each epoch, allowing for trend analysis and
+more effective incentive mechanisms.
+
+5. Cryptographic Improvements: Updates to erasure coding, Merklization, and shuffling procedures
+show a commitment to using cutting-edge cryptographic techniques, potentially offering better
+performance and security.
+
+While these changes represent significant improvements, they also introduce new complexities that
+will require careful implementation. The interaction between Audit DA and Imports DA systems, as
+well as the expanded guarantor responsibilities, will need particular scrutiny to ensure
+robustness against potential exploits.
+
+## Networking Stack Overhaul: JAMSNP
+
+### IPv6-Only Support
+
+In response to the global IPv4 address exhaustion, JAMSNP takes a forward-looking approach by
+exclusively supporting IPv6. This decision aims to future-proof the protocol and promote wider
+IPv6 adoption in the blockchain space.
+
+### QUIC Protocol
+
+All connections in JAMSNP are based on the QUIC protocol, which offers improved performance and
+security compared to traditional TCP.
+
+### Validator Connectivity
+
+Validators are required to maintain connections with all other validators in both the current
+and upcoming epochs. Validator endpoints are specified using IPv6/port combinations, ensuring
+comprehensive network coverage.
+
+### TLS 1.3 Encryption and Authentication
+
+JAMSNP employs TLS 1.3 for connection encryption and peer authentication. The protocol mandates
+specific requirements for X.509 certificates:
+
+- Use of Ed25519 as the signature algorithm
+- Certificates must use the peer's Ed25519 key (published on-chain for validators)
+- A unique alternative name format for DNS
+
+### Protocol Identification
+
+The protocol uses QUIC/TLS ALPN (Application-Layer Protocol Negotiation) for version and chain
+identification. The protocol identifier follows the format `jamnp-s/V/H`, where `V` is the protocol
+version and `H` is derived from the chain's genesis header.
+
+### Stream-Based Communication
+
+JAMSNP utilizes QUIC streams for all communications, categorized into two types:
+
+1. Unique Persistent streams: Long-lived streams for ongoing communication
+2. Common Ephemeral streams: Short-lived streams for specific queries or data submissions
+
+### Specialized Message Types
+
+The protocol defines several specialized message types for various blockchain operations, including:
+
+- Ticket submission
+- Work Report publication
+- Assurance publication
+- Judgement publication
+- Preimage publication
+- Block publication
+- Work Package submission and sharing
+
+[Reference: JAM Simple Networking Protocol (JAMSNP)](https://hackmd.io/@polkadot/jamsnp)
