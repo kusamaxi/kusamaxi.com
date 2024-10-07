@@ -18,38 +18,36 @@ been hard at work refining and enhancing the protocol. For those curious about t
 and improvements made since the original publication, we've compiled a comprehensive summary of
 the key updates:
 
-1. Data Availability (DA) System: The DA system has been overhauled, now using 4104-byte segments
+### Data Availability (DA) System
+The DA system has been overhauled, now using 4104-byte segments
 composed of 6 erasure coding pieces. This change optimizes erasure coding efficiency while
 maintaining manageable segment sizes. A constant-depth Merkle tree for segment roots has been
 introduced, balancing proof size and computation complexity. The system now separates short-term
 Audit DA from long-term Imports DA, allowing for more flexible data retention policies.
 
-2. Work Package Enhancements: Work packages now use data commitments instead of inline data,
+### Work Package Enhancements
+Work packages now use data commitments instead of inline data,
 reducing package size and improving data handling efficiency. A new manifest system for imports,
 exports, and extrinsics provides clearer data reference structures. A limit of 2048
 imported/exported segments per package has been implemented to prevent potential DoS attacks while
 maintaining high throughput.
 
-3. Guarantor Responsibilities: Guarantors now have expanded roles, including reconstructing
+### Guarantor Responsibilities
+Guarantors now have expanded roles, including reconstructing
 imported segments and generating paged proofs for exports. This increases system security by
 ensuring data integrity at multiple points. The introduction of core affinity and
 guarantor-to-guarantor distribution aims to improve network efficiency.
 
-4. Validator Statistics System: A new system tracks key metrics like block production, tickets,
+### Validator Statistics System
+A new system tracks key metrics like block production, tickets,
 preimages, guarantees, and assurances, providing a comprehensive view of validator performance.
 These statistics are stored in the state and updated each epoch, allowing for trend analysis and
 more effective incentive mechanisms.
 
-5. Cryptographic Improvements: Updates to erasure coding, Merklization, and shuffling procedures
+### Cryptographic Improvements
+Updates to erasure coding, Merklization, and shuffling procedures
 show a commitment to using cutting-edge cryptographic techniques, potentially offering better
 performance and security.
-
-While these changes represent significant improvements, they also introduce new complexities that
-will require careful implementation. The interaction between Audit DA and Imports DA systems, as
-well as the expanded guarantor responsibilities, will need particular scrutiny to ensure
-robustness against potential exploits.
-
-## Networking Stack Overhaul: JAMSNP
 
 ### IPv6-Only Support
 
