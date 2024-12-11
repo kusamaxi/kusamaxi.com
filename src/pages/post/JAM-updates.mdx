@@ -11,96 +11,102 @@ tags:
 - polkavm
 ---
 
-## JAM Protocol: Key Updates and Refinements to the Graypaper
+# JAM Protocol: Technical Updates and Network Architecture
 
-Since the release of the initial [JAM Protocol Graypaper](https://graypaper.com), Gav's team has
-been hard at work refining and enhancing the protocol. For those curious about the developments
-and improvements made since the original publication, we've compiled a comprehensive summary of
-the key updates:
+Since the release of the initial JAM Protocol Graypaper, significant refinements have been made
+to the protocol, particularly in its networking layer (JAMNP-S). In this article we do a
+comprehensive overview of the key architectural changes to provide updates to those who read the
+paper on its 0.1 version.
 
-### Data Availability (DA) System
-The DA system has been overhauled, now using 4104-byte segments
-composed of 6 erasure coding pieces. This change optimizes erasure coding efficiency while
-maintaining manageable segment sizes. A constant-depth Merkle tree for segment roots has been
-introduced, balancing proof size and computation complexity. The system now separates short-term
-Audit DA from long-term Imports DA, allowing for more flexible data retention policies.
+## Network Protocol Foundation: QUIC and TLS 1.3
 
-### Work Package Enhancements
-Work packages now use data commitments instead of inline data,
-reducing package size and improving data handling efficiency. A new manifest system for imports,
-exports, and extrinsics provides clearer data reference structures. A limit of 2048
-imported/exported segments per package has been implemented to prevent potential DoS attacks while
-maintaining high throughput.
+The JAM network protocol builds on modern networking foundations:
 
-### Guarantor Responsibilities
-Guarantors now have expanded roles, including reconstructing
-imported segments and generating paged proofs for exports. This increases system security by
-ensuring data integrity at multiple points. The introduction of core affinity and
-guarantor-to-guarantor distribution aims to improve network efficiency.
+### QUIC Protocol Base
+All connections in JAMNP-S are based on QUIC, chosen for its performance and security advantages.
+This provides a solid foundation for the protocol's stream-based architecture.
 
-### Validator Statistics System
-A new system tracks key metrics like block production, tickets,
-preimages, guarantees, and assurances, providing a comprehensive view of validator performance.
-These statistics are stored in the state and updated each epoch, allowing for trend analysis and
-more effective incentive mechanisms.
+### Advanced Security with TLS 1.3
+The protocol implements robust security through TLS 1.3 with specific requirements:
+- Mandatory peer authentication through X.509 certificates
+- Ed25519 signature algorithm requirement
+- Certificates must use the peer's Ed25519 key (which must be published on-chain for validators)
+- Specific DNS name format: 53-character name starting with "e" followed by base-32 encoded Ed25519 public key
+   - f.g. eanxzefp2q4l6pyhuczm3rw8kjgvt5fdyxqn2c7hs5rakmjzcf7ay
 
-### Cryptographic Improvements
-Updates to erasure coding, Merklization, and shuffling procedures
-show a commitment to using cutting-edge cryptographic techniques, potentially offering better
-performance and security.
+## Network Architecture
 
-### IPv6-Only Support
+### IPv6-First Design
+JAMNP-S makes a forward-looking architectural choice by requiring IPv6 for all validator endpoints. Validator endpoints are specified through IPv6/port combinations, with addressing information stored in the first 18 bytes of validator metadata (16 bytes for IPv6 address, 2 bytes for port in little-endian format).
 
-In response to the global IPv4 address exhaustion, JAMSNP takes a forward-looking approach by
-exclusively supporting IPv6. This decision aims to future-proof the protocol and promote wider
-IPv6 adoption in the blockchain space.
-
-### QUIC Protocol
-
-All connections in JAMSNP are based on the QUIC protocol, which offers improved performance and
-security compared to traditional TCP.
-
-### Validator Connectivity
-
-Validators are required to maintain connections with all other validators in both the current
-and upcoming epochs. Validator endpoints are specified using IPv6/port combinations, ensuring
-comprehensive network coverage.
-
-### TLS 1.3 Encryption and Authentication
-
-JAMSNP employs TLS 1.3 for connection encryption and peer authentication. The protocol mandates
-specific requirements for X.509 certificates:
-
-- Use of Ed25519 as the signature algorithm
-- Certificates must use the peer's Ed25519 key (published on-chain for validators)
-- A unique alternative name format for DNS
-
-### Protocol Identification
-
-The protocol uses QUIC/TLS ALPN (Application-Layer Protocol Negotiation) for version and chain
-identification. The protocol identifier follows the format `jamnp-s/V/H`, where `V` is the protocol
-version and `H` is derived from the chain's genesis header.
+### Validator Connectivity Requirements
+The protocol implements a sophisticated connectivity model:
+- Validators must maintain connections with all validators from previous, current, and next epochs
+- Connection initiation is determined by a deterministic "Preferred Initiator" algorithm based on Ed25519 public keys
+- Reserved slots (approximately 20) are maintained for work-package builders
+- Epoch transitions include a 2-minute buffer period plus finalization of the first block before applying connectivity changes
 
 ### Stream-Based Communication
+All network communication occurs over QUIC streams, categorized into two types:
 
-JAMSNP utilizes QUIC streams for all communications, categorized into two types:
+1. Unique Persistent (UP) Streams:
+   - Single stream per connection
+   - Typically long-lived
+   - Opened by connection initiator
+   - Used for ongoing communication like block announcements
 
-1. Unique Persistent streams: Long-lived streams for ongoing communication
-2. Common Ephemeral streams: Short-lived streams for specific queries or data submissions
+2. Common Ephemeral (CE) Streams:
+   - Multiple concurrent streams allowed
+   - Short-lived for specific operations
+   - Used for queries and data submission
+   - Clear protocol for stream closure and error handling
 
-### Specialized Message Types
+## Protocol Features
 
-The protocol defines several specialized message types for various blockchain operations, including:
+### Block Distribution and State Access
+- Efficient block announcement system using a grid structure for validator organization
+- State request protocol allowing range-based state queries with size limits
+- Work-report distribution system with guaranteed delivery confirmation
 
-- Ticket submission
-- Work Report publication
-- Assurance publication
-- Judgement publication
-- Preimage publication
-- Block publication
-- Work Package submission and sharing
+### Work Package Processing
+- Dedicated protocols for work-package submission from builders to guarantors
+- Work-package sharing between guarantors on the same core assignment
+- Built-in verification steps before package sharing
+- Support for bundle distribution and shard management
+
+### Availability System
+- Sophisticated shard distribution protocol for assurers
+- Audit shard request system for auditors
+- Segment shard request protocols with optional verification
+- Support for both immediate and delayed verification strategies
+
+### Consensus and Validation
+- Safrole ticket distribution system with proxy-based architecture
+- Two-phase ticket distribution process with timing controls
+- Comprehensive availability assurance system
+- Audit announcement and judgment publication protocols
+
+## Protocol Identification
+
+JAMNP-S uses ALPN (Application Layer Protocol Negotiation) for protocol identification:
+- Format: `jamnp-s/V/H` or `jamnp-s/V/H/builder`
+- V: Protocol version (currently 0)
+- H: First 8 nibbles of chain's genesis header hash
+- Special builder suffix for work-package builder connections
+
+## Message Format Standardization
+
+All stream protocols use a consistent message format:
+- Size prefix: 32-bit little-endian unsigned integer
+- Content follows size specification
+- Clear protocol for message boundaries and stream termination
+
+This refined architecture demonstrates significant evolution from the original Graypaper,
+with particular attention to network security, efficiency, and scalability. The protocol provides
+a robust foundation for JAM's distributed consensus and computation systems.
 
 ### References:
-- [Gav's HackMD Simple Networking Protocol (JAMSNP)](https://hackmd.io/@polkadot/jamsnp)
+- [Gav's HackMD (JAMSNP)](https://hackmd.io/@polkadot/jamsnp)
 - [jamchain docs](https://docs.jamcha.in/advanced/networking/SNP)
 - [zdave-parity's jamp-np repo](https://github.com/zdave-parity/jam-np/blob/main/simple.md)
+- [Graypaper changelog](https://github.com/gavofyork/graypaper/commits/main/)
