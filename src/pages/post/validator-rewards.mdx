@@ -1,0 +1,188 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: Validator rewards
+date: 2024-12-12
+description:
+tags:
+- validator
+- rewards
+- performance
+---
+
+# Validator Rewards to Incentivize Performance
+
+Jeff Burdges from Web3 Foundation proposes restructuring Kusama's validator rewards to align
+with actual operational costs and network security contributions. The proposal (RFC119) introduces
+an off-chain approximation protocol for reward distribution based on approval checks and
+availability work.
+
+## Current Problem
+
+Validator rewards currently have minimal correlation with operational costs (bandwidth and
+CPU time). This misalignment particularly impacts Kusama's scaling capabilities due to "no-shows"
+when validators skip approval checks. Hardware specifications directly affect the number of
+parachain cores, with current requirements at four physical CPU cores, though some operate
+with less.
+
+## Proposed Reward Structure
+
+### Work Distribution
+
+1. **Parachain Security (70-75%)**
+   * Approval checking: Primary reward source
+   * Backing validity checks: Must be less profitable than approval checking
+   * Rationale: Most rewards should come from parachain security work
+
+2. **Relay Chain (15-20%)**
+   * Block production and uncle handling
+   * Significantly reduced from current levels
+
+3. **Availability Distribution (5-10%)**
+   * Rewards for providing data to approval checkers
+   * Implements tit-for-tat mechanism
+
+4. **Finality Tasks (5%)**
+   * BEEFY proving and related operations
+
+## Technical Implementation
+
+### Approval Tracking
+
+Validators track and report:
+* Used approval votes
+* Downloaded availability chunks
+* Chunk distribution to other validators
+
+The system computes medians across validators for used votes, requiring >50% honest validators
+for accuracy.
+
+### Availability Distribution System
+
+1. **Chunk Tracking**
+```rust
+CandidateRewards {
+    backers: [AuthorityId; NumBackers],
+    downloaded_from: HashMap<AuthorityId,u16>,
+    uploaded_to: HashMap<AuthorityId,u16>,
+}
+```
+
+2. **Tit-for-Tat Implementation**
+   * Validators maintain private stiffing records
+   * Chunk request prioritization based on past behavior
+   * Systemic chunks prioritized over non-systemic
+   * f+1 distinct chunks required per block
+
+### Reward Computation
+
+1. **Approval Rewards**
+   * Median computation of reported approval usages
+   * Backing rewarded at 80% of approval value
+   * Early announcements excluded
+
+2. **Availability Rewards**
+   * Reweighted based on median approvals
+   * Private gamma values for tit-for-tat
+   * No self-reporting of availability
+
+## Technical Constraints
+
+### Critical Requirements
+1. Backing rewards < Approval rewards
+2. Honest validator majority (>50%)
+3. Completion of started approval checks
+4. Efficient on-chain median computation
+
+### Edge Cases
+1. No rewards for early no-show replacements
+2. No direct rewards for backers' availability distribution
+3. Small committee manipulation possible
+4. Whale nominator rotation effects
+
+## Implementation Considerations
+
+### Storage Requirements
+* Approval usage tracking
+* Private stiffing records
+* Aggregate tally information
+
+### Performance Impact
+* Median computation efficiency
+* Message passing overhead
+* Storage scaling with validator set size
+
+### Hardware Implications
+* Direct correlation between specs and rewards
+* Natural pressure for hardware upgrades
+* Impact on parachain core capacity
+
+### Known Limitations
+1. Cannot prevent all strategic behaviors
+2. Some honest no-shows may lose rewards
+3. Requires monitoring for lazy backers
+4. Potential for preferential chunk distribution
+
+This proposal fundamentally ties validator rewards to their actual contributions to Kusama's
+security and performance. The system uses game theory and Byzantine-resistant mechanisms
+to ensure fair distribution while maintaining network security properties.
+
+## Geographic Centralization Risk
+
+While this proposal moves validator incentives in the right direction by aligning rewards
+with actual security work performed, it introduces significant geographic centralization
+pressures due to fundamental ISP and networking realities.
+
+### Network Cost Structure
+
+1. Bandwidth Cost Hierarchy(IPTx):
+   - National bandwidth: Base cost ~0.8$/Mbps/month
+   - Regional bandwidth (e.g., within SEA): ~1.6/Mbps/month
+   - International bandwidth (e.g., SEA to Europe): ~3.6$/Mbps/month
+
+2. ISP Infrastructure Reality:
+   - Equipment costs at ISP level are similar for 10Gbps and 400Gbps ports
+   - Long-distance connections often get lower priority and experience throttling
+   - ISPs optimize for cost over performance on international routes
+   - Consumer bandwidth prices are largely arbitrary and don't reflect actual costs or performance
+   - Very common that 10G connection is reaches those speeds within the same country speeds throttling
+	 further the distance from the source is. 
+
+### Performance Disparities
+
+- Path congestion over long distances
+- ISP peering agreements and routing policies
+- Traffic prioritization at international gateways
+- Infrastructure quality variation between regions
+
+### Centralization Pressure
+
+This network topology creates strong incentives for validators to locate near major European hubs
+like London because:
+
+1. Technical Advantages:
+   - Lower latency to majority of validator set
+   - More reliable high-speed connections
+   - Better peering arrangements
+   - Fewer network hops to other validators
+
+2. Economic Advantages:
+   - Lower bandwidth costs for similar performance
+   - More competitive ISP options
+   - Better price-to-performance ratio
+   - Reduced infrastructure investment needs
+
+3. Impact on Southeast Asian Validators:
+   - Must overprovision bandwidth to achieve similar performance
+   - Pay premium rates for international connectivity
+   - Face inherent latency disadvantages leading to missed backings
+
+This creates a feedback loop where validators in remote(200ms) regions like Southeast Asia become
+less competitive not due to their operational capabilities, but due to underlying network topology
+and economics. This geographic centralization pressure runs counter to Kusama's decentralization
+goals and needs careful consideration in future iterations of the reward mechanism.
+
+Given these geographic centralization pressures, Web3 Foundation's Decentralized Nodes Program
+should prioritize to have sufficient amount of validators in each region or thing are likely to
+snowball into a situation where it makes sense to relocate to run validator nodes from Europe
+for optimal routes, latencies and cheap bandwidth in general.
