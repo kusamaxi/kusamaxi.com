@@ -11,80 +11,169 @@ tags:
 - pureproxy
 ---
 
-## Securing Your Assets with Parity Vault
+# Securing Your Assets with Offline Wallet
 
+In the evolving landscape of blockchain security, protecting digital assets requires purpose-built
+tools. NovaSama Vault (formerly Parity Signer/Polkadot Vault) exemplifies this principle - a wallet
+focused solely on security. This guide details establishing a high-security air-gapped setup for
+Polkadot assets.
 
-In today's rapidly changing world of cryptocurrencies and blockchain, the
-security of digital assets is critical. Wallets, which bridge the gap between
-users and their funds, are essential to this security framework. While many
-wallets offer a range of features, sometimes less is more. Focusing on a single
-core function can actually boost security. That's where the Parity Wallet
-stands out — it has one main job: to protect your assets. This article provides
-a detailed guide on how to best secure your cryptocurrency using a
-security-centric approach.
+## Hardware Selection
 
-1. **Hardware Preparations:** 
-   - Acquire a Google Pixel 4a or a subsequent model. Pixel devices with
-	 GrapheneOS have been designed with an array of [security
-	 features](https://grapheneos.org/features), including hardware-backed
-	 keystores and a hardened memory allocator.
-   - On your Pixel device, install
-	 [GrapheneOS](https://grapheneos.org/install). It's an open-source mobile
-	 OS optimized for security and privacy, with features like the hardened
-	 malloc implementation and extensive hardening of the base system and
-	 bundled apps.
+**GrapheneOS officially supports these devices:**
+- **Pixel 9 series** - 9a (tegu), 9 (tokay), 9 Pro (caiman), 9 Pro XL (komodo), 9 Pro Fold (comet)
+- **Pixel 8 series** - 8 (shiba), 8 Pro (husky), 8a (akita)
+- **Pixel 7 series** - 7 (panther), 7 Pro (cheetah), 7a (lynx)
+- **Pixel 6 series** - 6 (oriole), 6 Pro (raven), 6a (bluejay)
+- **Other devices** - Pixel Fold (felix), Pixel Tablet (tangorpro)
 
-2. **Parity Wallet Deployment:**
-   - Utilizing the sandboxed environment of the Google Play Store on
-	 GrapheneOS, download the Parity Wallet. This isolation ensures minimal
-	 risk to the primary OS.
-   - Remember, the wallet's primary function is security, which requires a
-	 stripped-down, laser-focused environment.
+All listed devices receive official GrapheneOS support with ongoing security updates. Avoid older
+Pixel models (5a and earlier) as they lack both Google firmware updates and GrapheneOS support. 
 
-3. **Communication Lockdown:** 
-   - Enable airplane mode, severing all communication, including Wi-Fi,
-	 Bluetooth, and cellular.
-   - It's imperative to maintain this state. In the context of security, an
-	 air-gapped device introduces barriers to potential external threats.
+**Installing GrapheneOS:** Follow the [web installer](https://grapheneos.org/install/web) for a
+simple, step-by-step flashing process:
+1. Enable OEM unlocking and USB debugging
+2. Connect phone to computer via USB
+3. Use the web installer to automatically flash GrapheneOS
+4. Lock bootloader after installation
 
-4. **Configuration of the Parity Wallet:** 
-   - Initialize the Parity Wallet application.
-   - Initiate the process to create a new wallet. This encrypted digital
-	 envelope will act as the guardian of your assets.
-   - Backup the wallet seed phrase in a secure location. The correct way
-	 of updating air-gapped wallet requires full reinstallation of GrapheneOS
-	 and Parity Wallet. Therefore, it's crucial to have a secure backup of the
-	 seed phrase.
+GrapheneOS provides an open-source mobile OS with hardware-backed keystores, hardened memory
+allocation, and extensive security improvements.
 
-5. **Integration with Polkadot.js:** 
-   - On a separate secure computing environment, navigate to
-	 [polkadot.js.org/apps](https://polkadot.js.org/apps).
-   - Create [a pure proxy
-	 account](https://wiki.polkadot.network/docs/learn-proxies) for your Parity
-	 Wallet. As elucidated in the Polkadot documentation, proxies act as a
-	 secondary protective layer, enabling certain functionalities without
-	 exposing the primary account's assets. This modular security approach
-	 minimizes risk by segregating roles and responsibilities. The pure proxy
-	 also enables selling the account to new owner in secure manner.
+## Vault Deployment
 
-6. **Maintenance and Updating Protocols:** 
-   - Just as in the world of software engineering, version control and updates
-	 are crucial to the health of a digital wallet.
-   - Metadata of the wallet can be updated in air-gapped manner by reading QR
-	 code with the Parity Wallet app [here](https://metadata.parity.io/).
-   - When considering a wallet upgrade, a clean install approach is
-	 recommended. Purging the previous version and deploying a fresh
-	 installation eliminates residues and potential vulnerabilities. Detailed
-	 procedures for this can be found within the official [Parity
-	 documentation](https://paritytech.github.io/parity-signer/tutorials/Upgrading.html).
+1. **Download NovaSama Vault**
+   - Use GrapheneOS's sandboxed Google Play Store
+   - Alternatively, sideload from [vault.novasama.io](https://vault.novasama.io/)
+   - Verify APK signatures before installation
 
-In summation, the fusion of state-of-the-art hardware (Pixel devices with
-GrapheneOS) and meticulously crafted software (Parity Wallet) provides a
-foundation of unparalleled security for your digital assets. By emphasizing
-air-gapped operations, singular functionality, and rigorous update protocols,
-users are poised to harness maximum security for their Polkadot assets.
-Adapting to these practices not only enhances security but also instills
-confidence in users, assuring them that their investments are guarded with the
-utmost precision and care. As the decentralized space continues its exponential
-growth, these methodologies will serve as benchmarks for secure digital asset
-management, steering the community towards safer horizons.
+2. **Enable Air Gap**
+   - Activate airplane mode immediately
+   - Disable WiFi, Bluetooth, and cellular permanently
+   - Never reconnect this device to any network
+
+## Initial Configuration
+
+1. **Create New Vault**
+   - Launch NovaSama Vault
+   - Generate new wallet
+   - Write down seed phrase on paper (never digitally)
+   - Store seed phrase in secure physical location
+
+2. **Key Derivation Paths**
+   - Create separate accounts for different networks
+   - Use hardened derivation paths for extra security
+   - Consider multiple accounts for different purposes
+
+## Integration with Online Services
+
+### Using Rotko Signer Extension
+
+For daily transactions while maintaining security:
+
+1. Install [Rotko Signer](https://github.com/paritytech/rotkosigner) browser extension
+2. Connect to your Vault via QR codes
+3. Sign transactions offline, broadcast online
+4. Never expose private keys to internet-connected devices
+
+### Pure Proxy Setup
+
+For maximum security with flexibility:
+
+1. Navigate to [polkadot.js.org/apps](https://polkadot.js.org/apps)
+2. Create a [pure proxy account](https://wiki.polkadot.network/docs/learn-proxies) controlled by
+your Vault
+3. Fund the proxy, not the Vault address directly
+4. Use proxy for all on-chain activities
+
+**Benefits:**
+- Vault keys never touch online systems
+- Proxy can be transferred without moving funds
+- Modular security with role segregation
+
+## Metadata Management
+
+Keep your Vault updated without breaking air gap:
+
+1. Visit [metadata.parity.io](https://metadata.parity.io/)
+2. Display network metadata as QR code
+3. Scan with Vault to update chain information
+4. Verify metadata hash before accepting
+
+## Security Best Practices
+
+### Physical Security
+- Store device in secure location when not in use
+- Consider tamper-evident seals
+- Never leave device unattended in public
+
+### Operational Security
+- Use device only for signing transactions
+- No other apps or activities
+- Regular security audits of setup
+
+### Backup Strategy
+- Multiple copies of seed phrase
+- Geographically distributed storage
+- Consider metal backup plates for fire/water resistance
+
+### Advanced Backup Methods
+
+**Shamir's Secret Sharing via QR Codes** Use [Banana Split](https://bs.parity.io/) to split your
+seed phrase into multiple shards:
+1. Generate threshold shards (e.g., 3-of-5 scheme)
+2. Convert each shard to QR code
+3. Store QR codes in separate physical locations
+4. Require multiple shards to reconstruct seed
+
+**Steganographic Storage** For maximum operational security:
+1. Split seed using Shamir's Secret Sharing
+2. Password-protect each shard
+3. Embed shards into uncompressed images (PNG/BMP)
+4. Distribute images across different storage media
+5. Maintain plausible cover story for each image
+
+This approach provides:
+- Threshold security (need k-of-n shards)
+- Hidden storage (shards invisible to casual inspection)
+- Additional password layer
+- Resilience against single point of failure
+
+## Maintenance Protocol
+
+### Software Updates
+1. Check [vault.novasama.io](https://vault.novasama.io/) for new versions
+2. Verify update authenticity through multiple channels
+3. Clean install recommended:
+   - Export accounts if needed (QR backup)
+   - Factory reset device
+   - Reinstall GrapheneOS
+   - Fresh Vault installation
+   - Restore from seed phrase
+
+### Regular Verification
+- Test signing with small amounts periodically
+- Verify all derivation paths still accessible
+- Check backup seed phrase validity
+
+## Advanced Configurations
+
+### Multi-signature Setups
+- Use multiple Vaults for enhanced security
+- Implement m-of-n signing schemes
+- Geographic distribution of signing devices
+
+### Time-locked Vaults
+- Implement governance delays
+- Use conviction voting for extra protection
+- Consider social recovery mechanisms
+
+## Conclusion
+
+The combination of GrapheneOS-hardened hardware and NovaSama Vault's focused design creates an
+unparalleled security foundation. By maintaining strict air-gap discipline and following these
+protocols, your digital assets remain protected against both remote and physical threats.
+
+Remember: security is a practice, not a product. Regular reviews and updates of your setup ensure
+continued protection as the threat landscape evolves. The decentralized future demands decentralized
+security - your Vault is the cornerstone of that protection.

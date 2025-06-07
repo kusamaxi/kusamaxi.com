@@ -13,48 +13,65 @@ tags:
 
 ## Did Telenova Wallet Solve the UX Problem Of Crypto?
 
-The [source code](https://github.com/novasamatech/telenova-web-app/blob/dev/src/common/wallet/store.ts) for
-[Telenova Wallet](https://t.me/telenova_app_bot) has been released, marking its true release date in our opinion.
-Without the ability to review and authenticate the wallet's source code, users cannot be certain that they are the
-sole holders of their keys. Transparency in the source code is crucial for verifying the security claims of any wallet
-and ensuring that no hidden vulnerabilities or backdoors exist.
+The [source
+code](https://github.com/novasamatech/telenova-web-app/blob/57b937bdcd199e4ae072b4591382f46a7fed246a/src/common/wallet/store.ts)
+for [Telenova Wallet](https://t.me/telenova_app_bot) has been released, marking its true release
+	date in our opinion. Without source code transparency, users cannot verify they alone control
+	their keys - a fundamental requirement for any cryptocurrency wallet.
 
-Telenova Wallet employs advanced cryptographic techniques to secure user assets. It uses a combination of AES encryption and the
-Scrypt key derivation function to protect the mnemonic phrase, which serves as the foundation for generating key pairs. By deriving
-a unique encryption key from the user's password and a random salt, the wallet ensures that the mnemonic remains secure even if the
-encrypted data is exposed.
+## Cryptographic Security
 
-The encryption process involves generating a random salt and using the Scrypt algorithm to derive a key from the user's password
-and the salt. This key is then used to encrypt the mnemonic with AES in CBC (Cipher Block Chaining) mode. The encrypted mnemonic
-and salt are stored together securely. When the mnemonic needs to be decrypted, the salt is extracted, and the key is derived
-again from the user's password to decrypt the mnemonic.
+Telenova employs robust cryptographic techniques to secure user assets. The wallet uses AES
+encryption combined with Scrypt key derivation to protect mnemonic phrases - the foundation for
+generating key pairs. By deriving unique encryption keys from user passwords and random salts, the
+wallet ensures mnemonics remain secure even if encrypted data is exposed.
 
-The wallet efficiently manages cryptographic keys by generating and securely storing the mnemonic phrase and associated key pairs.
-The mnemonic is encrypted and stored locally, with an option for backup in Telegram Cloud Storage. This dual-storage approach offers
-both convenience and security, allowing users to easily recover their wallets while keeping their private keys protected.
+The encryption process generates a random salt and uses Scrypt to derive a key from the user's
+password. This key encrypts the mnemonic using AES in CBC mode. The encrypted mnemonic and salt are
+stored together securely. During decryption, the salt is extracted and the key is re-derived from
+the password to decrypt the mnemonic.
 
-Designed with user-friendliness in mind, Telenova simplifies the onboarding process, requiring just two clicks to create an account
-and be ready to send and receive transactions. This streamlined experience makes it accessible for new users while maintaining strong
-security measures. The use of secure local storage and unique store names based on the user’s Telegram ID ensures that access remains
-secure and conflict-free.
+## Key Management
 
-Telenova Wallet is particularly suitable for managing small to medium-sized amounts, such as a monthly salary or day-to-day expenses.
-The key security factor is the strength of the user’s password, making it crucial to choose one that is robust and unique. A long,
-complex password with a mix of letters, numbers, and special characters can greatly enhance security. This design reflects a deliberate
-balance between user experience and security, enabling Web2 users to transition to Web3 without needing to understand and manage key pairs.
-However, with the rise of LLM-powered password crackers that exploit extensive personal data, the reliability of passwords alone is becoming
-questionable. For managing larger amounts, using an offline wallet setup is recommended, as detailed in
-[this guide](https://kusamaxi.com/post/robust-vault-wallets), to ensure maximum security. Ultimately, Telenova users can control their security
-level by opting for more complex passwords, thereby safeguarding their assets from potential threats.
+The wallet efficiently manages cryptographic keys by generating and securely storing mnemonic
+phrases and associated key pairs. Mnemonics are encrypted and stored locally, with optional Telegram
+Cloud Storage backup. This dual-storage approach balances convenience and security - users can
+easily recover wallets while keeping private keys protected.
 
-The only critique we can give is that future enhancements could include consolidating all assets into an asset hub and providing
-a teleport option for old users' assets still located on relaychains. Node selection for RPC endpoint seems also unoptimized leading
-somewhat somewhat dragged down UX. It could have been better option to leverage the new polkadot-api js-library instead of the old
-allowing for use of light clients for more secure and faster interactions with the underlying blockchains.
-Straightforward improvement would be to prioritize low latency RPC endpoints by utilizing IBP/Dotters GeoDNS.
+## User Experience Excellence
 
-Overall [Telenova Wallet](https://t.me/telenova_app_bot) stands out as a reliable and user-friendly solution for cryptocurrency management.
-Its robust encryption, efficient key management, and simple user interface make it an optimal choice for everyday transactions
-and entry-level amounts, providing a smooth and secure experience for all users. After reviewing the source code and evaluating
-the cryptographic scheme, we can highly recommend considering Telenova Wallet for onboarding your friends into crypto by gifting
-them some KSM or USDT using Telenova.
+Designed with user-friendliness at its core, Telenova simplifies onboarding to just two clicks for
+account creation. This streamlined experience makes cryptocurrency accessible to new users without
+compromising security. Secure local storage and unique store names based on Telegram IDs ensure
+access remains both secure and conflict-free.
+
+## Security Recommendations
+
+Telenova Wallet suits managing small to medium amounts - think monthly salaries or daily expenses.
+Security depends primarily on password strength, making robust, unique passwords crucial. Long,
+complex passwords mixing letters, numbers, and special characters significantly enhance protection.
+
+This design deliberately balances user experience with security, enabling Web2 users to transition
+to Web3 without managing raw key pairs. However, with LLM-powered password crackers exploiting
+personal data becoming more sophisticated, password-only security faces increasing challenges. For
+larger amounts, we recommend offline wallet setups as detailed in [this
+guide](https://kusamaxi.com/post/robust-vault-wallets).
+
+## Areas for Enhancement
+
+Future improvements could include:
+- Consolidating all assets into an asset hub with teleport options for legacy relaychain assets
+- Optimizing RPC endpoint selection for better UX - current node selection creates some lag
+- Migrating to the new polkadot-api library instead of legacy versions, enabling light clients for
+  more secure and faster blockchain interactions
+- Implementing IBP/Dotters GeoDNS to prioritize low-latency RPC endpoints
+
+## Verdict
+
+[Telenova Wallet](https://t.me/telenova_app_bot) stands out as a reliable, user-friendly
+cryptocurrency management solution. Its robust encryption, efficient key management, and intuitive
+interface make it optimal for everyday transactions and entry-level amounts.
+
+After reviewing the source code and evaluating the cryptographic scheme, we highly recommend
+Telenova Wallet for onboarding friends into crypto. Gift them some KSM or USDT through Telenova -
+it's the smoothest introduction to Web3 they'll find.
