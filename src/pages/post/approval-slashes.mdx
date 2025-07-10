@@ -93,6 +93,43 @@ infrastructure and fulfill your duties, or find another network to validate.
 - **Fewer false disputes**: Validators think twice before crying wolf
 - **Better finality**: Active, updated validators mean smoother consensus
 
+## Wake-Up Call for Lazy Nominators
+
+This update doesn't just punish lazy validators - it finally gives nominators a reason to pay attention:
+
+### The Nominator Complacency Problem
+For years, many nominators have been on autopilot:
+- Set nominations once, forget forever
+- No rotation based on validator performance
+- No punishment for backing outdated or lazy validators
+- Collect staking rewards regardless of validator quality
+
+### Why 2% Matters
+With current Polkadot economics:
+- Minimum stake to enter active set: ~3M DOT (via Phragmén election)
+- A 2% slash on approval violations: significant stake loss
+- **Key point**: This slash applies to BOTH validator and nominator stakes
+
+Suddenly, backing a validator running v1.16 when everyone else is on v1.18 isn't just suboptimal -
+it's expensive.
+
+### The New Nominator Calculus
+Before: "My validator has 100% uptime, good enough."
+After: "Is my validator updated? Are they actually checking blocks? What's their dispute record?"
+
+This creates a virtuous cycle:
+1. Nominators start monitoring validator client versions
+2. Outdated validators lose nominations
+3. Validators must stay current to maintain stake
+4. Network health improves dramatically
+
+### Market Dynamics Shift
+We should expect to see:
+- **Validator differentiation**: "Always updated within 24hrs" becomes a selling point
+- **Nominator tools**: Services tracking validator version history
+- **Stake migration**: Flow from lazy validators to actively maintained ones
+- **Natural selection**: Validators who don't keep up lose economic viability
+
 ## The Bigger Picture
 
 This isn't just about punishing bad actors - it's about aligning incentives with network needs.
@@ -108,6 +145,8 @@ The approval slashes update fundamentally changes the validator experience from 
 participation to mandatory engagement. In a space where "code is law," this update adds an
 important corollary: "and law has consequences."
 
-For validators, the message is simple: stay updated, do your job, or pay the price. For the
-network, it means a more reliable, responsive, and resilient consensus mechanism where security
-doesn't depend on goodwill alone.
+For validators, the message is simple: stay updated, do your job, or pay the price. For nominators,
+the free lunch is over: your stake is now tied to your validator's diligence. Choose wisely and
+monitor actively. For the network, it means a more reliable, responsive, and resilient consensus
+mechanism where security doesn't depend on goodwill alone.
+
