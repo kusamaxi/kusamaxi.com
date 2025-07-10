@@ -1,0 +1,113 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: Approval Slashes
+date: 2025-07-11
+description: Addressing Systemic Validator Misbehavior in Polkadot's Consensus Protocol
+tags:
+  - crypto
+  - polkadot
+  - slashing
+---
+
+# When Validators Won't Update: Economic Incentives for Network Participation
+
+## Abstract
+
+This analysis examines the introduction of approval slashes in Polkadot's consensus mechanism,
+implemented via PR #6827. The modification addresses a critical problem: validators running outdated
+software or shirking their verification duties without consequences. Through analysis of a 23-hour
+network outage caused by validators failing to update their clients, we demonstrate why economic
+penalties are necessary to maintain network health.
+
+## The Core Problem: Passive Participation
+
+Polkadot's security model assumes active, engaged validators who:
+- Keep their client software updated
+- Actually verify the blocks they're supposed to check
+- Participate constructively in dispute resolution
+
+Reality showed otherwise. The network's penalty structure created a perverse incentive: validators
+could collect rewards while doing the bare minimum, running ancient client versions, and
+rubber-stamping approvals without real verification.
+
+## The Kusama Wake-Up Call
+
+In May 2025, this theoretical vulnerability became a 23-hour nightmare:
+
+### What Happened
+- 40+ validators hadn't updated their clients in months (still running < v1.17)
+- These outdated nodes couldn't understand the new candidate receipt format (RFC-103)
+- They started disputing perfectly valid blocks, thinking they were invalid
+- The dispute avalanche brought finality to a grinding halt
+
+### Why It Matters
+This wasn't a sophisticated attack or edge case bug. It was validators simply not doing their job:
+staying current with network upgrades. The incident revealed that without economic consequences,
+a significant portion of validators will inevitably fall behind, creating systemic risk.
+
+## The Economic Fix
+
+The solution: make negligence costly. The new penalty structure introduces:
+
+```rust
+pub enum DisputeOffenceKind {
+    ForInvalidBacked,     // 100% stake slash - you proposed garbage
+    ForInvalidApproved,   // 2% stake slash - you approved garbage
+    AgainstValid,         // Era ban - you disputed good blocks
+}
+```
+
+### Why These Numbers Matter
+
+**100% for backing invalid blocks**: This stays unchanged. If you're the primary validator proposing
+blocks, you better be damn sure they're valid.
+
+**2% for approving invalid blocks**: New addition. Forces approval checkers to actually check
+instead of blindly signing off. Small enough to not be catastrophic, large enough to hurt.
+
+**Era disablement for false disputes**: Prevents spam without being overly punitive for honest
+mistakes or version mismatches.
+
+## Game Theory Shift
+
+Before: "Why bother updating? Why spend CPU actually checking? Others will handle it."
+
+After: "If I don't update and actively verify, I'm risking real money."
+
+The free-rider problem disappears when free riding has a price tag.
+
+## What This Means for Validators
+
+1. **Update or pay**: Running outdated clients is now an expensive mistake
+2. **Verify or pay**: Rubber-stamping approvals without checking risks your stake  
+3. **Think before disputing**: False accusations get you temporarily banned
+
+The message is clear: passive participation is no longer viable. Either actively maintain your
+infrastructure and fulfill your duties, or find another network to validate.
+
+## Network-Wide Benefits
+
+- **Faster upgrades**: Economic pressure ensures validators update promptly
+- **Real verification**: Approval checking becomes actual checking, not theater
+- **Fewer false disputes**: Validators think twice before crying wolf
+- **Better finality**: Active, updated validators mean smoother consensus
+
+## The Bigger Picture
+
+This isn't just about punishing bad actors - it's about aligning incentives with network needs.
+Decentralized networks only work when participants actively contribute. By making passive
+participation expensive, Polkadot ensures its validators remain engaged, updated, and accountable.
+
+The Kusama incident showed what happens when validators can coast: critical network functions fail
+not from attacks, but from apathy. These economic updates ensure that won't happen again.
+
+## Conclusion
+
+The approval slashes update fundamentally changes the validator experience from optional
+participation to mandatory engagement. In a space where "code is law," this update adds an
+important corollary: "and law has consequences."
+
+For validators, the message is simple: stay updated, do your job, or pay the price. For the
+network, it means a more reliable, responsive, and resilient consensus mechanism where security
+doesn't depend on goodwill alone.
