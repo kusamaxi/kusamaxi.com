@@ -2,6 +2,9 @@
 import Footer from "~/components/Footer.astro";
 import Navbar from "~/components/Navbar.astro";
 import SEO, { type Props as SEOProps } from "~/components/SEO.astro";
+import { ViewTransitions } from 'astro:transitions';
+import '@unocss/reset/tailwind.css'
+import 'uno.css';
 
 // fonts
 import "@fontsource/space-grotesk/400.css";
@@ -23,6 +26,8 @@ const { seo } = Astro.props;
 <html lang="en">
 	<head>
 		<SEO {...seo} />
+		<ViewTransitions />
+		<link rel="alternate" type="application/rss+xml" title="Kusamaxi RSS Feed" href="/rss.xml">
 	</head>
 	<body class="bg-rose-50">
 		<main class="custom-scrollbar h-full max-w-[1920px] mx-auto">

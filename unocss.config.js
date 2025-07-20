@@ -1,10 +1,8 @@
-import { transformerVariantGroup, presetTypography } from "unocss";
-import { defineConfig } from "unocss/vite";
-import { colors, presetWind } from "@unocss/preset-wind";
+import { defineConfig, presetWind, presetTypography, transformerVariantGroup } from 'unocss'
 
 export default defineConfig({
 	presets: [
-		presetWind(),
+		presetUno({ dark: "class" }),
 		presetTypography({
 			cssExtend: {
 				a: {
@@ -69,49 +67,12 @@ export default defineConfig({
 					padding: "1rem",
 					"margin-top": "1.25rem",
 					"overflow-x": "auto",
-					"scrollbar-color": "var(--un-font-)",
 					"border-radius": "0.375rem",
-				},
-				"pre::-webkit-scrollbar": {
-					"background-color": "var(--c-prose-alt-bg)",
-					height: "0.5rem",
-					"border-bottom-right-radius": "0.375rem",
-					"border-bottom-left-radius": "0.375rem",
-					cursor: "pointer",
-				},
-				"pre:hover::-webkit-scrollbar": {
-					"background-color": "var(--c-prose-scrollbar-bg)",
-					height: "0.5rem",
-				},
-				"pre::-webkit-scrollbar-thumb": {
-					"border-radius": "0.375rem",
-					cursor: "pointer",
-				},
-				"pre:hover::-webkit-scrollbar-thumb": {
-					"background-color": "var(--c-prose-thumb-bg)",
-				},
-				"del, del *": {
-					"font-style": "italic",
-					"text-decoration": "line-through",
 				},
 				table: {
 					width: "100%",
 					"border-radius": "0.375rem",
 					"background-color": "var(--c-prose-alt-bg)",
-				},
-				"table a": {
-					transition: "all ease-out 200ms",
-					"font-weight": "semibold",
-					"line-height": "1.625",
-					"font-style": "italic",
-				},
-				"table th": {
-					color: "var(--un-prose-links)",
-					"font-size": "1.125rem",
-					"text-transform": "uppercase",
-				},
-				"table td": {
-					"text-align": "left",
 				},
 			},
 		}),
@@ -139,22 +100,43 @@ export default defineConfig({
 			{ layer: "typography" },
 		],
 		[
+			/^prose-custom-dark$/,
+			(_, { theme }) => ({
+				".dark &": {
+					"--un-prose-body": theme.colors.zinc[200],
+					"--un-prose-links": theme.colors.rose[400],
+					"--un-prose-headings": theme.colors.zinc[100],
+					"--c-prose-accent": theme.colors.rose[500],
+					"--c-prose-alt-bg": theme.colors.zinc[800],
+					"--c-prose-scrollbar-bg": theme.colors.zinc[700],
+					"--c-prose-thumb-bg": theme.colors.zinc[600],
+				}
+			}),
+			{ layer: "typography" },
+		],
+		[
 			/^custom-scrollbar$/,
-			(_, { theme }) =>
-				`
-				html {
-					color: ${theme.colors.rose[200]} ${theme.colors.rose[600]};
-					scroll-padding-top: 2rem;
+			(_, { theme }) => {
+				const styles = {
+					'scroll-padding-top': '2rem',
 				}
-
-				html::-webkit-scrollbar-thumb {
-					background-color: ${theme.colors.rose[600]};
+				const scrollbarStyles = {
+					'&::-webkit-scrollbar-thumb': {
+						'background-color': theme.colors.rose[600],
+					},
+					'&::-webkit-scrollbar': {
+						'background-color': theme.colors.rose[200],
+						'width': '0.5rem',
+					},
+					'.dark &::-webkit-scrollbar-thumb': {
+						'background-color': theme.colors.rose[500],
+					},
+					'.dark &::-webkit-scrollbar': {
+						'background-color': theme.colors.zinc[800],
+					}
 				}
-
-				html::-webkit-scrollbar {
-					background-color: ${theme.colors.rose[200]};
-					width: 0.5rem;
-				}`.replace(/(\s)/g, ""),
+				return { ...styles, ...scrollbarStyles }
+			},
 			{ layer: "default" },
 		],
 	],
@@ -175,8 +157,8 @@ export default defineConfig({
 			/^btn-(source|demo)$/,
 			([, kind]) => {
 				const colour =
-					kind === "demo" ? "bg-rose-600 text-white" : "bg-white text-zinc-900";
-				return `${colour} border-2 border-rose-900 shadow-sharp font-heading no-underline flex items-center gap-2 py-1 px-3 transition-property-filter ease-out duration-200 hover:brightness-90`;
+					kind === "demo" ? "bg-rose-600 text-white" : "bg-white text-zinc-900 dark:(bg-zinc-800 text-zinc-100)";
+				return `${colour} border-2 border-rose-900 dark:border-rose-600 shadow-sharp font-heading no-underline flex items-center gap-2 py-1 px-3 transition-property-filter ease-out duration-200 hover:brightness-90`;
 			},
 		],
 	],
@@ -198,11 +180,7 @@ export default defineConfig({
 			clamped: "clamp(12rem, calc(20vw + 4rem), 16rem)",
 		},
 		boxShadow: {
-			sharp: `0.25rem 0.25rem 0 0 ${colors.rose[900]}`,
-		},
-		backgroundImage: {
-			"red-fading-line": `linear-gradient(to right, ${colors.red[500]}, rgba(0, 0, 0, 0))`,
-			"blue-fading-line": `linear-gradient(to right, ${colors.rose[600]}, rgba(0, 0, 0, 0))`,
+			sharp: '0.25rem 0.25rem 0 0 #881337',
 		},
 	},
 	preflights: [
@@ -211,6 +189,11 @@ export default defineConfig({
 			*::selection {
 				background-color: ${theme.colors.zinc[800]};
 				color: ${theme.colors.white};
+			}
+			
+			.dark *::selection {
+				background-color: ${theme.colors.rose[400]};
+				color: ${theme.colors.zinc[900]};
 			}`,
 		},
 	],

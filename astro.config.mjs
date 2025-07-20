@@ -1,25 +1,22 @@
 import { defineConfig } from "astro/config";
-import Unocss from "unocss/astro";
-import path from "node:path";
 import svelte from "@astrojs/svelte";
 import mdx from "@astrojs/mdx";
-import image from "@astrojs/image";
-
-// https://astro.build/config
 import sitemap from "@astrojs/sitemap";
+import UnoCSS from "@unocss/astro";
+import icon from "astro-icon";
 
-// https://astro.build/config
 export default defineConfig({
-  integrations: [Unocss(), svelte(), mdx(), image({
-    serviceEntryPoint: "@astrojs/image/sharp"
-  }), sitemap()],
+  integrations: [
+    UnoCSS({
+      injectReset: true  // This injects the CSS reset
+    }),
+    svelte(),
+    mdx(),
+    sitemap(),
+    icon()
+  ],
   site: "https://kusamaxi.com",
   vite: {
-    resolve: {
-      alias: {
-        "~/*": path.resolve("src")
-      }
-    },
     ssr: {
       external: ["svgo"]
     }

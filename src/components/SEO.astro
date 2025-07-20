@@ -7,43 +7,82 @@ export type Props = {
 	description?: string;
 	keywords?: string[];
 	thumbnail?: string;
+	date?: string;
 };
 
 const {
 	isPost = false,
-	thumbnail = "",
+	thumbnail = "/android-chrome-512x512.png",
 	description = data.description,
 	keywords = data.keywords,
+	date,
 	...props
 } = Astro.props as Props;
+
 const { siteName, siteUrl } = data;
+const canonicalURL = new URL(Astro.url.pathname, siteUrl);
+const ogImage = new URL(thumbnail, siteUrl);
+
+// JSON-LD structured data
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@type": isPost ? "BlogPosting" : "WebSite",
+	"name": props.title,
+	"headline": props.title,
+	"description": description,
+	"url": canonicalURL.href,
+	"author": {
+		"@type": "Organization",
+		"name": "Kusamaxi",
+		"url": siteUrl
+	},
+	...(isPost && date && { 
+		"datePublished": new Date(date).toISOString(),
+		"dateModified": new Date(date).toISOString()
+	}),
+	"image": ogImage.href,
+	"publisher": {
+		"@type": "Organization",
+		"name": siteName,
+		"logo": {
+			"@type": "ImageObject",
+			"url": `${siteUrl}/android-chrome-512x512.png`
+		}
+	}
+};
 ---
 
 <title>{props.title} | {siteName}</title>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <meta name="theme-color" content="#fff1f2" />
-<link rel="canonical" href={`${siteUrl}${Astro.url.pathname}`} />
+<link rel="canonical" href={canonicalURL.href} />
 <meta name="description" content={description} />
 <meta name="keywords" content={keywords.join(",").toLowerCase()} />
+<meta name="author" content="Kusamaxi" />
 
 <!-- favicon -->
-<link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
-<link rel="icon" type="image/png" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content={isPost ? "blog" : "website"} />
-<meta property="og:url" content={`${siteUrl}${Astro.url.pathname}`} />
-<meta property="og:title" content={props.title || siteName} />
+<meta property="og:type" content={isPost ? "article" : "website"} />
+<meta property="og:url" content={canonicalURL.href} />
+<meta property="og:title" content={props.title} />
 <meta property="og:description" content={description} />
-<meta
-	property="og:image"
-	content={thumbnail ? thumbnail.toString() : "https://kusamaxi.com/android-chrome-192x192.png"}
-/>
+<meta property="og:image" content={ogImage.href} />
+<meta property="og:site_name" content={siteName} />
+{isPost && date && <meta property="article:published_time" content={new Date(date).toISOString()} />}
 
 <!-- Twitter -->
 <meta property="twitter:card" content={thumbnail ? "summary_large_image" : "summary"} />
-<meta property="twitter:url" content={`${siteUrl}${Astro.url.pathname}`} />
-<meta property="twitter:title" content={props.title || siteName} />
+<meta property="twitter:url" content={canonicalURL.href} />
+<meta property="twitter:title" content={props.title} />
 <meta property="twitter:description" content={description} />
-{thumbnail !== "" && <meta property="twitter:image" content={thumbnail ? thumbnail.toString() : "https://kusamaxi.com/android-chrome-192x192.png"} />}
+<meta property="twitter:image" content={ogImage.href} />
+<meta property="twitter:site" content="@kusamaxi" />
+
+<!-- JSON-LD -->
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

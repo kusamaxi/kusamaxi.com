@@ -1,18 +1,18 @@
 ---
 layout: ~/layouts/ProjectLayout.astro
-title: kukkaro - extension wallet
+title: swissh - terminal wallet
 date: 2023-02-12
-description: An security focused extension wallet for Kusama network
+description: An wallet for sending money with ssh keys
 demo: null
-source: https://github.com/kusamaxi/kukkaro
+source: https://github.com/rotkonetworks/swissh
 type: kusama
 stack:
   - ['rust', 'https://rust-lang.org/']
-  - ['leptos', 'https://github.com/leptos-rs/leptos/']
   - ['subkey', 'https://docs.substrate.io/reference/command-line-tools/subkey/']
-  - ['webauthn-rs', 'https://github.com/kanidm/webauthn-rs']
-  - ['unocss', 'https://uno.antfu.com']
 ---
-# kukkaro
+# swissh
 
+concept wallet for sending money with ssh keys using github names.
 
+polkadot supports ed25519 keys, which is defaulted ssh key. naturally each key is also a wallet so
+we can send money to users with their github names as long as they have pubkeys set in profile.

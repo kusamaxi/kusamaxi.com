@@ -1,0 +1,80 @@
+---
+layout: ~/layouts/ProjectLayout.astro
+title: zeratul - ligerito rust implementation
+date: 2024-01-15
+description: A Rust implementation of the Ligerito polynomial commitment scheme for lightweight sublinear arguments without trusted setup
+demo: null
+source: https://github.com/rotkonetworks/zeratul
+type: cryptography
+stack:
+  - ['rust', 'https://rust-lang.org/']
+  - ['ligerito', 'https://angeris.github.io/papers/ligerito.pdf']
+  - ['reed-solomon', 'https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction']
+  - ['merkle-tree', 'https://en.wikipedia.org/wiki/Merkle_tree']
+---
+# zeratul
+
+rust implementation of the ligerito polynomial commitment scheme described in [this
+paper](https://angeris.github.io/papers/ligerito.pdf) by andrija novakovic and guillermo angeris.
+
+## features
+
+- lightweight polynomial commitments without trusted setup
+- sublinear proof sizes and verification time
+- parallel proof generation using rayon
+- support for binary fields (gf(2^32), gf(2^128))
+- configurable parameters for different polynomial sizes (2^20 to 2^30)
+
+## architecture
+
+the implementation consists of several key components:
+
+- **binary-fields**: binary field arithmetic operations for gf(2^n)
+- **reed-solomon**: encoding/decoding with binary field ffts
+- **merkle-tree**: batched merkle proofs for efficient opening
+- **ligerito**: main protocol implementation with prover and verifier
+
+## usage
+
+```rust
+use binary_fields::{BinaryElem32, BinaryElem128};
+use ligerito::{prove_sha256, verify_sha256, hardcoded_config_24, hardcoded_config_24_verifier};
+use rand::Rng;
+
+// create configuration for 2^24 polynomial
+let config = hardcoded_config_24(
+    std::marker::PhantomData::<BinaryElem32>,
+    std::marker::PhantomData::<BinaryElem128>,
+);
+
+// generate random polynomial
+let mut rng = rand::thread_rng();
+let poly: Vec<BinaryElem32> = (0..1 << 24)
+    .map(|_| BinaryElem32::from(rng.gen::<u32>()))
+    .collect();
+
+// generate proof
+let proof = prove_sha256(&config, &poly).expect("proving failed");
+
+// verify proof
+let verifier_config = hardcoded_config_24_verifier();
+let result = verify_sha256(&verifier_config, &proof).expect("verification failed");
+assert!(result);
+```
+
+## performance
+
+- **proving time**: sublinear in polynomial size
+- **verification time**: polylogarithmic in polynomial size  
+- **proof size**: sublinear compression (e.g., ~1mb proof for 2^24 polynomial)
+- **parallelization**: automatic multi-threading via rayon
+
+## configuration
+
+pre-configured parameter sets available:
+- `hardcoded_config_20`: for 2^20 polynomials
+- `hardcoded_config_24`: for 2^24 polynomials  
+- `hardcoded_config_28`: for 2^28 polynomials
+- `hardcoded_config_30`: for 2^30 polynomials
+
+each configuration has corresponding verifier parameters.
