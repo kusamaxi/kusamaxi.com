@@ -5,15 +5,16 @@ export default {
 	twitter: "https://twitter.com/@kusamaxi",
 	email: "team@kusamaxi.com",
 	description:
-		"Development hub focused on improving user experience of Kusama network",
+		"anarchist perspectives on superintelligence, holographic reality, and humanity's cope in a computational universe",
 	keywords: [
-		"kusama",
-		"substrate",
 		"blog",
-		"kusamaxi",
 		"rust",
-		"wallet",
 		"staking",
 		"validator",
+		"science",
+		"ai",
+		"quantum",
+		"holographic",
+		"superintelligence",
 	],
 } as const;
