@@ -1,0 +1,29 @@
+---
+// Utterances comment component
+---
+
+<div class="utterances-container">
+  <script>
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadUtterances);
+    } else {
+      loadUtterances();
+    }
+    
+    function loadUtterances() {
+      const script = document.createElement('script');
+      script.src = 'https://utteranc.es/client.js';
+      script.setAttribute('repo', 'kusamaxi/kusamaxi.com');
+      script.setAttribute('issue-term', 'title');
+      script.setAttribute('theme', 'github-light');
+      script.setAttribute('crossorigin', 'anonymous');
+      script.async = true;
+      
+      const container = document.querySelector('.utterances-container');
+      if (container) {
+        container.appendChild(script);
+      }
+    }
+  </script>
+</div>

@@ -3,7 +3,7 @@ import type { Post } from "~/models/post";
 import type { MarkdownLayoutProps } from "astro";
 import MainLayout from "./MainLayout.astro";
 import Tag from "~/components/Tag.svelte";
-import Utterances from "~/components/Utterances.svelte";
+import Utterances from "~/components/Utterances.astro";
 
 export type Props = MarkdownLayoutProps<Post>;
 const { frontmatter, ...props } = Astro.props as Props;
@@ -82,7 +82,7 @@ function getIndentPadding(depth: number) {
 			</div>
 			<slot />
 			<h1>Comments</h1>
-			<Utterances client:visible />
+			<Utterances />
 		</main>
 	</section>
 </MainLayout>
