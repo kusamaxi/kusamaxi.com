@@ -78,8 +78,8 @@ const commentOptions = {
 			target="_blank"
 			rel="norel noreferrer">Suggest An Edit</a
 		>
-		<div class="flex gap-2 justify-center mb-6">
-			{frontmatter.tags.map((tag) => <Tag># {tag}</Tag>)}
+		<div class="flex flex-wrap gap-1 sm:gap-2 justify-center mb-4 sm:mb-6 px-2 max-w-full">
+			{frontmatter.tags.map((tag) => <Tag>{tag}</Tag>)}
 		</div>
 		<main class="font-serif mx-auto text-base text-justify text-lg max-w-screen-md prose prose-custom">
 			<div class="text-left">

@@ -6,14 +6,14 @@ export let variant: "ghost" | "solid" = "ghost"
 {#if onClick}
 <button
 	type="button"
-	class={`font-heading font-medium ${variant === "ghost" ? "bg-rose-100 text-rose-700" : "shadow-sharp border-2 border-rose-900 bg-white text-zinc-900"} text-sm no-underline gap-2 py-1 px-2 mt-2 uppercase transition-property-filter duration-200 ease-out cursor-pointer border-none`}
+	class={`inline-block font-heading font-medium ${variant === "ghost" ? "bg-rose-100 text-rose-700" : "shadow-sharp border-2 border-rose-900 bg-white text-zinc-900"} text-[0.65rem] sm:text-xs md:text-sm no-underline py-0.5 px-1.5 sm:py-1 sm:px-2 mt-1 sm:mt-2 uppercase transition-property-filter duration-200 ease-out cursor-pointer border-none whitespace-nowrap`}
 	on:click={() => onClick?.()}
 >
 	<slot />
 </button>
 {:else}
 <span
-	class={`font-heading font-medium ${variant === "ghost" ? "bg-rose-100 text-rose-700" : "shadow-sharp border-2 border-rose-900 bg-white text-zinc-900"} text-sm no-underline gap-2 py-1 px-2 mt-2 uppercase transition-property-filter duration-200 ease-out`}
+	class={`inline-block font-heading font-medium ${variant === "ghost" ? "bg-rose-100 text-rose-700" : "shadow-sharp border-2 border-rose-900 bg-white text-zinc-900"} text-[0.65rem] sm:text-xs md:text-sm no-underline py-0.5 px-1.5 sm:py-1 sm:px-2 mt-1 sm:mt-2 uppercase transition-property-filter duration-200 ease-out whitespace-nowrap`}
 >
 	<slot />
 </span>

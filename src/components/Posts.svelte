@@ -39,7 +39,7 @@
 	{/if}
 </div>
 {#if tagFilter.length > 0}
-	<div class="flex items-center gap-4 mt-2 text-zinc-700">
+	<div class="flex flex-wrap items-center gap-2 sm:gap-4 mt-2 text-zinc-700">
 		{#each tagFilter as filter}
 			<Tag onClick={() => { tagFilter = tagFilter.filter((x) => x !== filter); }} variant="solid">
 				{filter}

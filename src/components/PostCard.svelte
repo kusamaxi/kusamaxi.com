@@ -23,7 +23,7 @@
 		<p class="font-serif leading-normal text-zinc-700 mb-2 mb-4 text-lg">
 			{@html description}
 		</p>
-		<div class="flex gap-2 self-end">
+		<div class="flex flex-wrap gap-2 self-end">
 			{#each tags as tag}
 				<Tag># {tag}</Tag>
 			{/each}
