@@ -3,6 +3,7 @@ import type { Post } from "~/models/post";
 import type { MarkdownLayoutProps } from "astro";
 import MainLayout from "./MainLayout.astro";
 import Tag from "~/components/Tag.svelte";
+import Utterances from "~/components/Utterances.svelte";
 
 export type Props = MarkdownLayoutProps<Post>;
 const { frontmatter, ...props } = Astro.props as Props;
@@ -20,21 +21,6 @@ function getIndentPadding(depth: number) {
 		default: return "";
 	  }
 }
-const commentOptions = {
-	src: "https://giscus.app/client.js",
-	dataRepo: "kusamaxi/kusamaxi.com",
-	dataRepoId: "MDEwOlJlcG9zaXRvcnkzNDY4NjU0MDQ=",
-	"data-category": "General",
-	"data-category-id": "DIC_kwDOFKy-_M4CU8ZH",
-	"data-mapping": "pathname",
-	"data-strict": "0",
-	"data-reactions-enabled": "1",
-	"data-emit-metadata": "0",
-	"data-input-position": "bottom",
-	"data-lang": "en",
-	crossorigin: "anonymous",
-	async: true,
-};
 ---
 
 <style>
@@ -96,9 +82,7 @@ const commentOptions = {
 			</div>
 			<slot />
 			<h1>Comments</h1>
-			<div>
-				<script is:inline {...commentOptions} data-theme="light"></script>
-			</div>
+			<Utterances client:visible />
 		</main>
 	</section>
 </MainLayout>

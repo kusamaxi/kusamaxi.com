@@ -4,7 +4,7 @@ import MainLayout from "./MainLayout.astro";
 import siteData from "~/data/sites";
 import type { MarkdownLayoutProps } from "astro";
 import type { Project } from "~/models/project";
-import Giscus from "~/components/Giscus.svelte";
+import Utterances from "~/components/Utterances.svelte";
 
 export type Props = MarkdownLayoutProps<Project>;
 const { frontmatter, ...props } = Astro.props as Props;
@@ -84,7 +84,7 @@ const currentSlug = props.url?.split("/").at(-1);
 		</div>
 		<div>
 			<h2>Comments</h2>
-			<Giscus />
+			<Utterances client:visible />
 		</div>
 	</section>
 </MainLayout>
