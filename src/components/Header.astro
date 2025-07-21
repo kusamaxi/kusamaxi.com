@@ -1,5 +1,6 @@
 ---
 import data from "~/data/sites";
+import { Icon } from "astro-icon/components";
 ---
 
 <section class="relative grid grid-cols-1 text-center justify-items-center md:text-left md:grid-cols-[20rem_1fr] grid-rows-[14rem_1fr] md:grid-rows-none gap-8 md:gap-4 items-center justify-center text-slate-700 max-w-screen-lg mx-auto">
@@ -35,5 +36,12 @@ import data from "~/data/sites";
 		<span class="relative block font-serif text-clamped-sm leading-normal text-zinc-600 text-lg italic"
 			>Build your own infrastructure or become infrastructure for someone else's system.</span
 		>
+		<!-- Add RSS link here -->
+		<div class="mt-4">
+			<a href="/rss.xml" class="inline-flex items-center gap-2 text-rose-700 hover:text-rose-900 transition-colors">
+				<Icon name="mdi:rss" class="w-5 h-5" />
+				<span class="font-heading text-lg">RSS Feed</span>
+			</a>
+		</div>
 	</div>
 </section>
