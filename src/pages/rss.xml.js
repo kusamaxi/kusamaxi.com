@@ -3,7 +3,10 @@ import { Post } from '~/models/post';
 import data from '~/data/sites';
 
 export async function GET(context) {
-	const posts = await Post.fromGlob(import.meta.glob('./post/*.mdx'));
+	const postImports = import.meta.glob('./post/*.mdx', { eager: true });
+	const posts = Object.values(postImports)
+		.map(post => new Post(post))
+		.sort((a, b) => new Date(b.date) - new Date(a.date));
 	
 	return rss({
 		title: `${data.siteName} - An Anarchist Validator`,

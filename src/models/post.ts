@@ -21,10 +21,12 @@ export class Post extends ResourceBase {
   }
 
   public static async fromGlob(
-    glob: Promise<MDXInstance<Record<string, any>>[]>,
+    glob: Record<string, any> | MDXInstance<Record<string, any>>[],
     limit?: number,
   ): Promise<Post[]> {
-    const posts = (await glob)
+    // Handle both object (from import.meta.glob) and array formats
+    const items = Array.isArray(glob) ? glob : Object.values(glob);
+    const posts = items
       .map((p) => new Post(p))
       .sort((a, b) => (new Date(a.date) > new Date(b.date) ? 1 : -1));
     return ResourceBase.sortByDate(posts).slice(0, limit);

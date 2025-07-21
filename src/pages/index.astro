@@ -7,8 +7,8 @@ import { Project } from "~/models/project";
 //import { inject } from "@vercel/analytics";
 //inject();
 
-const posts = await Post.fromGlob(Astro.glob("./post/*.mdx"), 3);
-const projects = await Project.fromGlob(Astro.glob("./project/*.mdx"), 3);
+const posts = await Post.fromGlob(await import.meta.glob("./post/*.mdx", { eager: true }), 3);
+const projects = await Project.fromGlob(await import.meta.glob("./project/*.mdx", { eager: true }), 3);
 ---
 
 <MainLayout seo={{ title: "Home" }}>

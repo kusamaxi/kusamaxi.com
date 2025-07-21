@@ -3,7 +3,7 @@ import Posts from "~/components/Posts.svelte";
 import MainLayout from "~/layouts/MainLayout.astro";
 import { Post } from "~/models/post";
 
-const posts = await Post.fromGlob(Astro.glob("./post/*.mdx"));
+const posts = await Post.fromGlob(await import.meta.glob("./post/*.mdx", { eager: true }));
 ---
 
 <MainLayout seo={{ title: "Posts" }}>

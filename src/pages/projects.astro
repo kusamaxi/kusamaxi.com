@@ -3,7 +3,7 @@ import ProjectCard from "~/components/ProjectCard.astro";
 import MainLayout from "~/layouts/MainLayout.astro";
 import { Project } from "~/models/project";
 
-const projects = await Project.fromGlob(Astro.glob("./project/*.mdx"));
+const projects = await Project.fromGlob(await import.meta.glob("./project/*.mdx", { eager: true }));
 ---
 
 <MainLayout seo={{ title: "Projects" }}>

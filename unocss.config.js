@@ -198,3 +198,27 @@ color: ${theme.colors.zinc[900]};
 		},
 	],
 });
+
+// Add custom scrollbar styles as raw CSS
+export const preflights = [
+  {
+    getCSS: ({ theme }) => `
+      .custom-scrollbar {
+        scroll-padding-top: 2rem;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: ${theme.colors.rose[600]};
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        background-color: ${theme.colors.rose[200]};
+        width: 0.5rem;
+      }
+      .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: ${theme.colors.rose[500]};
+      }
+      .dark .custom-scrollbar::-webkit-scrollbar {
+        background-color: ${theme.colors.zinc[800]};
+      }
+    `
+  }
+];

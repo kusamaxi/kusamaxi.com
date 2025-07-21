@@ -37,10 +37,10 @@ export class Project extends ResourceBase {
 	}
 
 	public static async fromGlob(
-		glob: Promise<MDXInstance<Record<string, any>>[]>,
+		glob: Record<string, any> | MDXInstance<Record<string, any>>[],
 		limit?: number
 	): Promise<Project[]> {
-		const posts = (await glob).map((p) => new Project(p));
+		const posts = (Array.isArray(glob) ? glob : Object.values(glob)).map((p) => new Project(p));
 		return ResourceBase.sortByDate(posts).slice(0, limit);
 	}
 }
