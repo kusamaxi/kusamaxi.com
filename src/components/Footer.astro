@@ -22,11 +22,11 @@ const socials: Social[] = [
 	<div class="grid grid-cols-4 items-center justify-items-center max-w-[280px] mx-auto mb-8">
 		{
 			socials.map((s) => (
-				
+				<a	
 					class="text-zinc-600 hover:text-rose-600 transition-colors"
 					href={s.url}
 					target={s.url.startsWith('/') ? '_self' : '_blank'}
-					rel={s.url.startsWith('/') ? '' : 'norel noreferrer'}
+					rel={s.url.startsWith('/') ? 'internal' : 'norel noreferrer'}
 					aria-label={s.label}
 				>
 					<Icon class="w-8 h-8 text-current" name={s.icon} />
