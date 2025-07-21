@@ -1,4 +1,4 @@
-import { defineConfig, presetWind, presetTypography, transformerVariantGroup } from 'unocss'
+import { defineConfig, presetUno, presetTypography, transformerVariantGroup } from 'unocss'
 
 export default defineConfig({
 	presets: [
@@ -13,7 +13,7 @@ export default defineConfig({
 					display: "inline-block",
 					"z-index": 5,
 					"background-image":
-						"linear-gradient(var(--c-prose-accent), var(--c-prose-accent))",
+					"linear-gradient(var(--c-prose-accent), var(--c-prose-accent))",
 					"background-size": "0 2px",
 					"background-repeat": "no-repeat",
 					"background-position": "bottom left",
@@ -145,12 +145,12 @@ export default defineConfig({
 			/^btn-lg-(.*)$/,
 			([, c]) => {
 				return `bg-${c} inline-block
-					mt-8 px-5 py-2
-					text-white font-semibold no-underline font-heading text-lg tracking-wide
-					transition-property-transform ease-out duration-200 transform-gpu
-					shadow-sharp border-2 border-rose-900
-					hover:(-translate-y-1.5)
-				`;
+mt-8 px-5 py-2
+text-white font-semibold no-underline font-heading text-lg tracking-wide
+transition-property-transform ease-out duration-200 transform-gpu
+shadow-sharp border-2 border-rose-900
+hover:(-translate-y-1.5)
+`;
 			},
 		],
 		[
@@ -186,15 +186,15 @@ export default defineConfig({
 	preflights: [
 		{
 			getCSS: ({ theme }) => `
-			*::selection {
-				background-color: ${theme.colors.zinc[800]};
-				color: ${theme.colors.white};
-			}
-			
-			.dark *::selection {
-				background-color: ${theme.colors.rose[400]};
-				color: ${theme.colors.zinc[900]};
-			}`,
+*::selection {
+background-color: ${theme.colors.zinc[800]};
+color: ${theme.colors.white};
+}
+
+.dark *::selection {
+background-color: ${theme.colors.rose[400]};
+color: ${theme.colors.zinc[900]};
+}`,
 		},
 	],
 });
