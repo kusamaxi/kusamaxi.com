@@ -2,28 +2,40 @@
 // Utterances comment component
 ---
 
-<div class="utterances-container">
-  <script>
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadUtterances);
-    } else {
-      loadUtterances();
-    }
+<div id="utterances-container" class="mt-8 bg-white border-2 border-rose-900 shadow-sharp p-4 rounded"></div>
+
+<script>
+  // Wait for DOM to be ready
+  function loadUtterances() {
+    const script = document.createElement('script');
+    script.src = 'https://utteranc.es/client.js';
+    script.setAttribute('repo', 'kusamaxi/kusamaxi.com');
+    script.setAttribute('issue-term', 'title');
+    script.setAttribute('theme', 'github-light');
+    script.setAttribute('crossorigin', 'anonymous');
+    script.async = true;
     
-    function loadUtterances() {
-      const script = document.createElement('script');
-      script.src = 'https://utteranc.es/client.js';
-      script.setAttribute('repo', 'kusamaxi/kusamaxi.com');
-      script.setAttribute('issue-term', 'title');
-      script.setAttribute('theme', 'github-light');
-      script.setAttribute('crossorigin', 'anonymous');
-      script.async = true;
-      
-      const container = document.querySelector('.utterances-container');
-      if (container) {
-        container.appendChild(script);
-      }
+    const container = document.getElementById('utterances-container');
+    if (container) {
+      container.appendChild(script);
     }
-  </script>
-</div>
+  }
+  
+  // Run when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadUtterances);
+  } else {
+    loadUtterances();
+  }
+</script>
+
+<style>
+  #utterances-container :global(.utterances) {
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+  
+  #utterances-container :global(.utterances-frame) {
+    border: none !important;
+  }
+</style>
