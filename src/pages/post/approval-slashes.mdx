@@ -10,6 +10,8 @@ tags:
   - slashing
 ---
 
+import DotValidatorStake from '~/components/DotValidatorStake.svelte';
+
 # When Validators Won't Update: Or, how Polkadot learned to stop worrying and love the economic incentive
 
 There's something deeply human about the way blockchain networks fail. We build these elaborate
@@ -78,14 +80,16 @@ The solution is elegant in its brutality:
 ```rust
 pub enum DisputeOffenceKind {
     ForInvalidBacked,     // 100% stake slash - you proposed garbage
-    ForInvalidApproved,   // 2% stake slash - you approved garbage  
+    ForInvalidApproved,   // 2% stake slash - you approved garbage
     AgainstValid,         // Era ban - you disputed good blocks
 }
 ```
 
 That 2% for approval violations is the key innovation. It's small enough that honest mistakes won't
-destroy you, but large enough to hurt. With validators staking upwards of 1 million DOT, that 2%
-represents 20,000 DOT – or about $140,000 at current prices.
+destroy you, but large enough to hurt. With validators typically staking around <DotValidatorStake
+client:load showMinStake={true} />, a 2% slash represents <DotValidatorStake client:load
+showSlashAmount={true} slashPercentage={2} /> at current prices of <DotValidatorStake client:load
+showPrice={true} /> per DOT.
 
 Suddenly, that $200/month server upgrade looks pretty reasonable.
 
@@ -121,18 +125,56 @@ nominations once, forget forever, collect your ~14% APY. What could be simpler?
 
 Well, that free lunch just got a price tag.
 
-When your validator gets slashed 2% for being lazy, you get slashed too. Suddenly, backing a
-validator running version 1.16 when everyone else is on 1.18 isn't just suboptimal – it's expensive.
-Really expensive.
+When your validator gets slashed 2% for being lazy, you get slashed too. If you're nominating with
+<DotValidatorStake stakeAmount={100000} /> and your validator messes up, you lose
+<DotValidatorStake client:load showSlashAmount={true} slashPercentage={2} stakeAmount={100000} /> –
+enough to pay for a nice vacation, ruined by someone else's laziness.
 
 This creates a beautiful market dynamic. Nominators start caring about client versions. Validators
 who don't update lose stake. Natural selection, but for blockchain participants.
+
+## Beyond Slashing: Rewarding Performance
+
+The approval slashes represent just one side of Polkadot's economic evolution. While slashes punish
+bad behavior, Jeff Burdges from Web3 Foundation has proposed RFC119 to fundamentally restructure
+validator rewards to incentivize good performance.
+
+The proposal would shift reward distribution from the current flat model to one based on actual work
+performed:
+- **70-75%** for parachain security (approval checking, backing)
+- **15-20%** for relay chain operations (block production)
+- **5-10%** for availability distribution
+- **5%** for finality tasks
+
+This creates a double-sided economic pressure: validators lose money for being lazy (slashes) and
+make more money for being active (performance rewards). The combination should drive professional
+validator operations while pushing out the passive participants who've been riding on network
+effects.
+
+However, both slashing and performance rewards introduce geographic centralization risks. Validators
+in regions with poor connectivity to European hubs may find themselves unable to compete regardless
+of their operational competence – a consideration Web3 Foundation's Decentralized Nodes Program will
+need to address.
+
+## The Economics of Attention
+
+The beauty of this system is that it prices attention correctly. Previously, validator maintenance
+was an externalized cost – lazy validators imposed risks on the entire network while capturing the
+same rewards as diligent ones.
+
+Now the cost of inattention falls directly on those who choose not to pay attention. Market forces
+can finally work their magic:
+
+- Attentive validators retain more stake over time
+- Lazy validators gradually lose nominations
+- The most professional operations grow their influence
+- The network becomes more reliable without central planning
 
 ## Client Diversity as Risk Management
 
 Here's an unexpected consequence: with real economic penalties, running the same client as everyone
 else becomes a correlated risk. If a bug causes mass slashing, you want to be on a different
-	implementation.
+implementation.
 
 The system accidentally created an economic incentive for client diversity. Sometimes the best
 solutions are the ones you don't design.

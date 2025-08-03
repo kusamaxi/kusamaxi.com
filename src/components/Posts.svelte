@@ -16,7 +16,7 @@
 		>
 			{#if uniqueTags.length > 0}
 				{#each uniqueTags as tag}
-					<span
+					<button
 						class="block text-left font-heading text-lg p-2 cursor-pointer transition-property-all ease-out duration-100 hover:(text-white bg-rose-900)"
 						on:click={() => {
 							tagFilter = [...tagFilter, tag]; // cant use push here
@@ -26,14 +26,14 @@
 						}}
 					>
 						{tag.toUpperCase()} • {count[tag]} result{(count[tag] ?? 0) > 1 ? "s" : ""}
-					</span>
+					</button>
 				{/each}
 			{:else}
 				<span
 					class="block text-left font-heading text-lg p-2 cursor-not-allowed transition-property-all ease-out duration-100"
 				>
 					No result
-				</span>
+				</button>
 			{/if}
 		</div>
 	{/if}
