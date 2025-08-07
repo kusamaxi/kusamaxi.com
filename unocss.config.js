@@ -114,31 +114,6 @@ export default defineConfig({
 			}),
 			{ layer: "typography" },
 		],
-		[
-			/^custom-scrollbar$/,
-			(_, { theme }) => {
-				const styles = {
-					'scroll-padding-top': '2rem',
-				}
-				const scrollbarStyles = {
-					'&::-webkit-scrollbar-thumb': {
-						'background-color': theme.colors.rose[600],
-					},
-					'&::-webkit-scrollbar': {
-						'background-color': theme.colors.rose[200],
-						'width': '0.5rem',
-					},
-					'.dark &::-webkit-scrollbar-thumb': {
-						'background-color': theme.colors.rose[500],
-					},
-					'.dark &::-webkit-scrollbar': {
-						'background-color': theme.colors.zinc[800],
-					}
-				}
-				return { ...styles, ...scrollbarStyles }
-			},
-			{ layer: "default" },
-		],
 	],
 	shortcuts: [
 		[
@@ -194,31 +169,24 @@ color: ${theme.colors.white};
 .dark *::selection {
 background-color: ${theme.colors.rose[400]};
 color: ${theme.colors.zinc[900]};
+}
+
+.custom-scrollbar {
+  scroll-padding-top: 2rem;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: ${theme.colors.rose[600]};
+}
+.custom-scrollbar::-webkit-scrollbar {
+  background-color: ${theme.colors.rose[200]};
+  width: 0.5rem;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: ${theme.colors.rose[500]};
+}
+.dark .custom-scrollbar::-webkit-scrollbar {
+  background-color: ${theme.colors.zinc[800]};
 }`,
 		},
 	],
 });
-
-// Add custom scrollbar styles as raw CSS
-export const preflights = [
-  {
-    getCSS: ({ theme }) => `
-      .custom-scrollbar {
-        scroll-padding-top: 2rem;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background-color: ${theme.colors.rose[600]};
-      }
-      .custom-scrollbar::-webkit-scrollbar {
-        background-color: ${theme.colors.rose[200]};
-        width: 0.5rem;
-      }
-      .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-        background-color: ${theme.colors.rose[500]};
-      }
-      .dark .custom-scrollbar::-webkit-scrollbar {
-        background-color: ${theme.colors.zinc[800]};
-      }
-    `
-  }
-];

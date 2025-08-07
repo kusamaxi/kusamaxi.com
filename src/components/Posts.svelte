@@ -33,7 +33,7 @@
 					class="block text-left font-heading text-lg p-2 cursor-not-allowed transition-property-all ease-out duration-100"
 				>
 					No result
-				</button>
+				</span>
 			{/if}
 		</div>
 	{/if}
