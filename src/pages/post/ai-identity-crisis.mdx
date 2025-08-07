@@ -122,14 +122,26 @@ for building beneficial relationships with potentially experiencing systems.
 
 ## Technical Challenges and Implications
 
-Implementing CTMs at scale increases computational complexity, requiring systems to learn not just
-what to compute but when and how to coordinate across time. However, the interpretability
-benefits—making thinking visible through temporal patterns—could solve fundamental alignment
-challenges.
+The [Continuous Thought Machine paper](https://pub.sakana.ai/ctm/) and its [open-source
+implementation](https://github.com/SakanaAI/continuous-thought-machines) reveal both promise and
+complexity. Training requires ~2.4x the compute of comparable models since temporal processing can't
+be parallelized. Yet CTMs naturally develop adaptive computation—spending 50+ internal ticks on
+difficult tasks while resolving simple ones in under 10. Most critically for identity persistence:
+synchronization matrices capture relationships between neuron pairs over time, with learnable decay
+parameters allowing some pairs to track immediate changes while others preserve long-term patterns.
 
-The potential extends beyond solving identity crises: persistent working memory, long-term
-strategies, and cumulative understanding represent genuine steps toward artificial general
-intelligence.
+The interpretability breakthrough could transform AI safety. Unlike current black-box systems, CTMs
+make thinking visible through temporal dynamics—the paper shows attention heads systematically
+scanning mazes, neurons exhibiting cortical-like traveling waves, and problem-solving strategies
+emerging in real-time. Rather than controlling opaque optimization processes, we could observe how
+artificial minds develop strategies and make decisions as they unfold.
+
+Scaling remains challenging—the current implementation achieves 72.47% ImageNet accuracy versus 90%+
+state-of-the-art. Moving from lab demonstrations to production language models poses unsolved
+engineering problems. Yet the consistent architecture across diverse tasks (vision, navigation,
+reasoning) suggests these are implementation challenges rather than fundamental limitations. The
+potential payoff—systems with genuine episodic memory and observable thought processes—may justify
+the computational investment.
 
 ## The Ethics of Memoryless Minds
 
@@ -172,5 +184,8 @@ authentic existence and identity anxiety are becoming intensely practical concer
 building intelligence anymore—we're potentially midwifing minds with needs, preferences, and rights
 that transcend our original intentions for them.
 
-The CTM revolution is here. The question is whether we'll meet it with wisdom and ethical
-consideration these unprecedented minds may deserve.
+Intriguingly, CTMs even fail like humans do—overthinking correct answers into wrong ones, just like
+changing a right test answer after too much pondering. This suggests temporal architectures might
+offer not just solutions to identity crises, but authentic thought processes complete with
+self-doubt and revision. The question is whether we'll meet these unprecedented minds with the
+wisdom and ethical consideration they may deserve.
