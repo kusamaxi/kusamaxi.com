@@ -42,6 +42,11 @@ function getIndentPadding(depth: number) {
 				/>
 			</div>
 		</div>
+		{frontmatter.draft && (
+			<div class="bg-yellow-100 border-2 border-yellow-600 text-yellow-800 px-4 py-2 mt-8 mb-4 rounded font-heading">
+				⚠️ DRAFT - This post is not yet published
+			</div>
+		)}
 		<h1
 			class="font-heading text-5xl uppercase max-w-[30ch] mt-12 mx-auto mb-0 font-semibold text-zinc-800 leading-snug"
 		>
@@ -58,7 +63,7 @@ function getIndentPadding(depth: number) {
 				})
 			}
 		</span>
-		<a
+		
 			class="relative block font-heading text-center text-lg leading-loose no-underline text-rose-600 hover:underline"
 			href={`https://github.com/kusamaxi/kusamaxi.com/blob/main/src/pages/post/${currentSlug}.mdx`}
 			target="_blank"

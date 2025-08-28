@@ -1,6 +1,6 @@
 ---
 layout: ~/layouts/PostLayout.astro
-draft: false
+draft: true
 title: Why Only Penumbra Feels Like True Cryptocurrency
 date: 2025-08-25
 description: From surveillance DEXs to privacy theater - how Penumbra returns to cryptocurrency's original vision through architectural elegance rather than compromise

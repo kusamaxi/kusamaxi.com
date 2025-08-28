@@ -3,6 +3,7 @@ import { ResourceBase } from "./resource";
 
 export class Post extends ResourceBase {
   public readonly tags: string[];
+  public readonly draft: boolean;
 
   public constructor(data: MDXInstance<Record<string, any>>) {
     super(data);
@@ -18,16 +19,18 @@ export class Post extends ResourceBase {
     }
 
     this.tags = data.frontmatter.tags;
+    this.draft = data.frontmatter.draft || false;
   }
 
   public static async fromGlob(
     glob: Record<string, any> | MDXInstance<Record<string, any>>[],
     limit?: number,
+    includeDrafts: boolean = false
   ): Promise<Post[]> {
-    // Handle both object (from import.meta.glob) and array formats
     const items = Array.isArray(glob) ? glob : Object.values(glob);
     const posts = items
       .map((p) => new Post(p))
+      .filter((post) => includeDrafts || !post.draft)
       .sort((a, b) => (new Date(a.date) > new Date(b.date) ? 1 : -1));
     return ResourceBase.sortByDate(posts).slice(0, limit);
   }
