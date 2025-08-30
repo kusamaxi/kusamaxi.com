@@ -1,6 +1,6 @@
 ---
 layout: ~/layouts/PostLayout.astro
-draft: true
+draft: false
 title: Why Only Penumbra Feels Like True Cryptocurrency
 date: 2025-08-25
 description: From surveillance DEXs to privacy theater - how Penumbra returns to cryptocurrency's original vision through architectural elegance rather than compromise
@@ -350,8 +350,8 @@ real-world law would have to bend to the reality of unstoppable code? Well, the
 law didn't bend—it brought a sledgehammer. Turns out "code is law" only works
 until actual law shows up with handcuffs and asset freezes.
 
-And now look where we are: ["OFAC-compliant MEV relays" are being marketed as a
-feature](https://figment.io/insights/compliance-at-the-core-why-ofac-compliant-mev-relays-matter-for-institutional-ethereum-stakers/).
+And now look where we are: ["OFAC-compliant MEV relays"](https://figment.io/insights/compliance-at-the-core-why-ofac-compliant-mev-relays-matter-for-institutional-ethereum-stakers/) are being marketed as a
+feature.
 Read that again. The same ecosystem that promised to eliminate trusted
 intermediaries is now bragging about compliance with U.S. sanctions as a
 selling point. Institutional stakers are choosing relays based on how well they

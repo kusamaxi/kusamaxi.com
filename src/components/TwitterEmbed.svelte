@@ -6,7 +6,7 @@
   export let theme: 'light' | 'dark' = 'light';
   export let conversation: 'none' | 'all' = 'none';
   export let cards: 'hidden' | 'visible' = 'visible';
-  export let width: number | 'auto' = 'auto';
+//  export let width: number | 'auto' = 'auto';
   export let align: 'left' | 'center' | 'right' = 'center';
   export let lang: string = 'en';
 
