@@ -48,7 +48,7 @@ function getIndentPadding(depth: number) {
 			</div>
 		)}
 		<h1
-			class="font-heading text-5xl uppercase max-w-[30ch] mt-12 mx-auto mb-0 font-semibold text-zinc-800 leading-snug"
+			class="font-heading text-2xl md:text-5xl uppercase max-w-[30ch] mt-8 md:mt-12 mx-auto mb-0 font-semibold text-zinc-800 leading-snug"
 		>
 			{frontmatter.title}
 		</h1>
@@ -73,7 +73,7 @@ function getIndentPadding(depth: number) {
 		<div class="flex flex-wrap gap-1 sm:gap-2 justify-center mb-4 sm:mb-6 px-2 max-w-full">
 			{frontmatter.tags.map((tag) => <Tag>{tag}</Tag>)}
 		</div>
-		<main class="font-serif mx-auto text-base text-justify text-lg max-w-screen-md prose prose-custom">
+		<main class="font-serif mx-auto text-base md:text-lg text-left md:text-justify max-w-screen-md prose prose-custom overflow-x-hidden">
 			<div class="text-left">
 				<h1>Table of Contents</h1>
 				<ul class="!pl-0">

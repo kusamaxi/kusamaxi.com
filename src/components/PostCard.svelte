@@ -3,7 +3,7 @@
 		data-sveltekit-prefetch
 		rel="prefetch"
 		{href}
-		class="grid grid-rows-[auto_2rem_8rem_1fr] text-zinc-600 no-underline p-4 h-full"
+		class="grid grid-rows-[auto_2rem_auto_1fr] text-zinc-600 no-underline p-3 md:p-4 h-full"
 	>
 		<span
 			class="md:hover:(text-rose-700) font-heading text-xl font-semibold leading-normal capitalize text-zinc-800 transition-property-color duration-100 ease-out"
