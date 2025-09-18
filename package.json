@@ -8,10 +8,10 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/mdx": "4.3.3",
+    "@astrojs/mdx": "4.3.5",
     "@astrojs/rss": "^4.0.12",
-    "@astrojs/sitemap": "3.4.2",
-    "@astrojs/svelte": "^7.1.0",
+    "@astrojs/sitemap": "3.6.0",
+    "@astrojs/svelte": "7.1.1",
     "@fontsource/ibm-plex-mono": "^5.2.6",
     "@fontsource/ibm-plex-serif": "^5.2.6",
     "@fontsource/space-grotesk": "^5.2.8",
@@ -23,7 +23,7 @@
     "@iconify-json/tabler": "^1.2.19",
     "@iconify-json/vscode-icons": "^1.2.23",
     "@unocss/preset-wind": "^66.3.3",
-    "astro": "5.12.8",
+    "astro": "5.13.8",
     "astro-icon": "^1.1.5",
     "dedot": "^0.14.1",
     "nanostores": "^1.0.1",
