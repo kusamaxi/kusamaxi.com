@@ -1,12 +1,18 @@
 import rss from '@astrojs/rss';
 import { Post } from '~/models/post';
 import data from '~/data/sites';
-
 export async function GET(context) {
 	const postImports = import.meta.glob('./post/*.mdx', { eager: true });
 	const posts = Object.values(postImports)
-		.map(post => new Post(post))
-		.filter(post => !post.draft)
+		.map(post => {
+			try {
+				return new Post(post);
+			} catch (e) {
+				console.warn('Skipping invalid post:', e.message);
+				return null;
+			}
+		})
+		.filter(post => post && !post.draft)
 		.sort((a, b) => new Date(b.date) - new Date(a.date));
 	
 	return rss({
