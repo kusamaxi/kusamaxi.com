@@ -1,0 +1,142 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: Hardest thing in systems design
+date: 2025-08-31
+description: I've been wondering why JAM decided not to use NOMT
+tags:
+- polkadot
+- jam
+- nomt
+- patricia
+---
+
+## I've been wondering why JAM doesn't use NOMT
+
+I've been wondering about this for months now. Pretty much ever since Rob's introductory talk at
+sub0 reset 2024.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/N3BX2eTqpro" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+Let me back up. When computers store data that needs to be verified (like blockchain balances), they
+use something called a Merkle tree; basically a structure that creates a single "fingerprint" from
+millions of pieces of data. Change even one piece, and the fingerprint changes completely.
+
+NOMT is a new, elegant way to build these trees. It's optimized for modern SSDs, reduces unnecessary
+disk writes, and keeps frequently-used data in memory. It's the kind of engineering that makes you
+feel like you're finally doing things *right*.
+
+JAM, the new blockchain protocol from author of Ethereum's Yellow Paper and Polkadot at large, just
+doesn't use it. Instead, it uses possibly the simplest tree structure imaginable: at each step, go
+left if the next bit is 0, go right if it's 1. That's it. No optimizations. No cleverness.
+
+At first, conspiratorical human in me thought there must be some drama in here. But the more I dug
+in, the more I realized that it was just me holding a hammer looking for nails to hammer.
+
+## The thing about consensus
+
+Here's what nobody tells you about blockchain consensus: it's not trying to be fast. It's trying to
+be identical.
+
+Not similar. Not compatible. Identical. Bit-for-bit, byte-for-byte identical.
+
+Imagine you're writing instructions that need to work perfectly whether someone's running them on a
+Raspberry Pi in Bangladesh or a $50,000 server in San Francisco. Not "basically the same result."
+The. Exact. Same. Result. Down to every last bit.
+
+Now think about NOMT's optimizations. When should it allocate a new chunk of memory? When should it
+clear its cache? How should it batch updates?
+
+In a normal database, you'd say "whatever's fastest for your hardware." But in consensus, every one
+of these decisions is a potential fork in the road where different computers might go different
+ways. And when computers in a blockchain go different ways, the network breaks.
+
+## The elegance of simple stupid
+
+JAM's binary tree is stupid. I mean that as a compliment.
+
+You can explain it to someone in thirty seconds: "To find data, start at the top. For each bit in
+the address, go left if it's 0, right if it's 1. When you run out of bits, you're there."
+
+```julia
+# lookup in jam's binary patricia trie
+const ZERO_HASH = zeros(UInt8, 32)
+
+function lookup(state_root::Vector{UInt8}, key::Vector{UInt8})::Union{Vector{UInt8}, Nothing}
+    key_bits = bytes_to_bits(key)  # 31 bytes -> 248 bits
+    node_hash = state_root
+    depth = 0
+    
+    while node_hash != ZERO_HASH
+        node = fetch_node(node_hash)  # db lookup by hash
+        
+        if is_leaf(node)
+            stored_key, value = decode_leaf(node)
+            return stored_key == key ? value : nothing
+        end
+        
+        # branch: follow bit
+        left_hash, right_hash = decode_branch(node)
+        node_hash = key_bits[depth + 1] ? right_hash : left_hash
+        depth += 1
+    end
+    
+    nothing
+end
+
+# helpers
+bytes_to_bits(b::Vector{UInt8}) = BitVector([((b[i÷8 + 1] >> (7 - i%8)) & 1) == 1 for i in 0:length(b)*8-1])
+is_leaf(node::Vector{UInt8}) = (node[1] & 0x80) != 0  # first bit set
+```
+
+No edge cases. No optimization paths. No decisions that might differ between implementations.
+
+And here's the thing: that's not a bug. That's the entire point.
+
+## Optimizing the wrong layer
+
+There's this moment in every engineer's career where you realize you've been solving the wrong
+problem. For me, it was understanding where JAM's actual bottlenecks are.
+
+Think of JAM like a highway system. It can handle:
+- 10 million "gas" units of computation per work item (like a speed limit)
+- 2MB per second of data per core (like lane width)
+- About 1 million database operations per second (like road capacity)
+
+Here's the thing: that last number is already 100x more than JAM needs. The cars are limited by the
+speed limit and lane width, not the road material. By using nomt, we would try to optimize the part
+that's already fast enough.
+
+## The radical idea
+
+Here's what took me too long to understand: the consensus layer, the part all validators must agree
+on, shouldn't be clever. It should be correct. Boringly, obviously, stupidly correct.
+
+But here's the beautiful part: if a service running on JAM wants NOMT's performance, it can build
+NOMT *inside its own storage space*:
+
+```rust
+// service owns these storage slots, can structure however it wants
+service_storage: {
+    "my_fast_db_root": [some data],
+    "my_fast_db_page_0": [some data],
+    "my_fast_db_page_1": [some data],
+}
+```
+
+The service gets to be clever. The consensus layer stays dumb. The consensus layer *must* stay dumb.
+
+## On finality
+
+I've been thinking about this wrong the entire time. I kept asking "why doesn't JAM use the better
+database?" But JAM isn't trying to build a better database. It's trying to build perfect consensus.
+
+Perfect consensus isn't built on optimal algorithms. It's built on algorithms so simple that ideally
+hundreds different teams, writing in dozens different programming languages, on a thousand different
+types of hardware, will all arrive at exactly the same answer.
+
+NOMT is beautiful engineering as a result of year long engineering by the industry's [best
+talent](https://thrum.dev). It solves real problems elegantly. But consensus doesn't need beautiful.
+It needs boring.
+
+The hardest thing in systems design isn't knowing how to optimize. It's knowing when not to.
