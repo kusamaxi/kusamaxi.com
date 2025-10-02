@@ -26,31 +26,42 @@ been wondering since rob's sub0 talk.
   ></iframe>
 </div>
 
-nomt is elegant - optimized for ssds, reduces writes, keeps hot data in memory. the kind of
+nomt (nearly optimal merkle trie) is a binary patricia trie with aggressive ssd optimizations--nodes
+organized into pages, flash-native layouts, prefetching, intelligent caching. the kind of
 engineering that feels right.
 
-jam uses the dumbest possible binary patricia trie: go left on 0, right on 1. no optimizations. no
-cleverness.
+jam also uses a binary patricia trie, but stores nodes simply by hash in a key-value db. traverse by
+going left on 0, right on 1. no page layouts. no prefetching strategies. no cleverness.
 
-at first i thought drama. turns out i was demanding elegance where simplicity was the feature.
+same tree structure. why wasnt spec written after nomt then? at first conspiratiorial me assumed
+that there must be drama, but digging slightly deeper i realized that problem was me demanding
+elegance where simplicity was the feature.
 
-## consensus demands determinism
+## consensus demands trivial correctness
 
 blockchain consensus isn't about speed. it's about identical execution across every node -
 bit-for-bit identical on raspberry pis and $50k servers.
 
-nomt's optimizations are performance decisions: when to allocate, when to flush cache, how to batch.
-in consensus, each decision point is a potential fork where implementations diverge. divergence
-means network splits or slashing.
+nomt's optimizations are deterministic - page depth, d_tet addressing, rootless subtree indexing all
+produce the same merkle root. but they add implementation complexity. you need to understand:
+- how to split 256-bit keys into d_tets
+- how to compute page ids: `(prev_page_id << d) + int(dtet[i]) + 1`
+- how to index nodes within rootless subtrees: position `p` stores at index `p-1`, children at `p*2`
+  and `p*2+1`
+- how to organize pages for parallel ssd access
 
-jam's binary trie has zero decisions:
+all this complexity took for talented team over an year to design and implement. get any of this
+wrong and your node computes different roots. network splits and validators will be
+slashed.
+
+in comparison JAM's approach is trivial to implement correctly:
 
 ```julia
 # lookup in jam's binary patricia trie
 const ZERO_HASH = zeros(UInt8, 32)
 
 function lookup(state_root::Vector{UInt8}, key::Vector{UInt8})::Union{Vector{UInt8}, Nothing}
-    key_bits = bytes_to_bits(key)  # 31 bytes -> 248 bits
+    key_bits = bytes_to_bits(key)
     node_hash = state_root
     depth = 0
     
@@ -76,12 +87,12 @@ bytes_to_bits(b::Vector{UInt8}) = BitVector([((b[i÷8 + 1] >> (7 - i%8)) & 1) ==
 is_leaf(node::Vector{UInt8}) = (node[1] & 0x80) != 0  # first bit set
 ```
 
-no edge cases. no optimization paths. hundreds of teams in dozens of languages will produce
-identical results.
+store nodes by hash. fetch by hash. no complex addressing. hundreds of teams in dozens of languages
+will get this right.
 
 ## bottleneck analysis
 
-jam handles ~1M db ops/sec. needs ~10k. actual bottlenecks:
+jam handles ~1M db ops/sec. but actually needs ~10k db ops/sec. actual bottlenecks are:
 - 10M gas units per work item
 - 2MB/s data per core
 
@@ -89,25 +100,30 @@ storage isn't the constraint. optimizing it is optimizing the wrong layer.
 
 ## where nomt fits
 
-validators verify computation, not storage. work packages include merkle proofs against consensus
-state root. validators check proofs using the simple trie - never touch service state.
+validators don't provide storage infrastructure. they do temporarily store data in DA layer, but
+main task is to verify computation done in the services.
 
-services run nomt locally to:
+when a service submits a work package, it includes merkle proofs against the consensus state root.
+validators verify these proofs using the simple binary trie - they never touch the service's full
+state.
+
+services run nomt (or rocksdb, or any db) locally to:
 - query application state quickly
-- build work packages with merkle proofs
+- build work packages with valid merkle proofs
 - serve end users
 - maintain application-specific indexes
 
-clever database (nomt) interfaces with stupid consensus (binary trie). performance where needed,
-determinism where required.
+nomt produces standard binary patricia proofs that jam validators understand. the page layouts and
+ssd optimizations are invisible to consensus - they're local performance wins.
 
-nomt isn't competing with jam's trie. it's the fast local database that services use to participate
-in jam's consensus.
+clever database interfaces with stupid consensus. performance where needed, trivial correctness
+where required.
 
 ## the point
 
 consensus needs algorithms so simple that diverse implementations converge. nomt is beautiful
-engineering from the industry's [best talent](https://thrum.dev). it solves real problems elegantly.
+engineering from [thrum.dev](https://thrum.dev), the team that built it. it solves real problems
+elegantly.
 
 but consensus doesn't need beautiful. it needs boring.
 
