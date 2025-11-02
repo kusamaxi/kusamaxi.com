@@ -16,333 +16,308 @@ tags:
 cryptocurrency's original vision through architectural elegance rather than
 compromise*
 
-## The grand compromise we all accepted
+## the grand compromise
 
-There's a peculiar thing that happens when you explain cryptocurrency to someone new. You start with
-the grand vision—digital cash, peer-to-peer, no intermediaries—and then immediately begin walking it
-back. "Well, actually, everyone can see all your transactions on Ethereum. Bitcoin addresses are
-pseudonymous, not anonymous. Your exchange knows everything. The DEX logs your trades on-chain
-forever."
+explaining cryptocurrency to someone new means starting with satoshi's whitepaper and immediately
+walking it back. everyone can see all your transactions on ethereum. bitcoin addresses are
+pseudonymous, not anonymous. your exchange knows everything. the dex logs your trades on-chain
+forever.
 
-We've become so accustomed to this betrayal of the original vision that we don't even notice the
-absurdity anymore. Satoshi's whitepaper promised "electronic cash." Cash doesn't leave a permanent
-record of every coffee you bought, every political donation you made, every embarrassing purchase at
-3am. Cash doesn't let your ex-spouse's lawyer subpoena your entire financial history. Cash doesn't
-create a graph of all your social connections based on who you transact with.
+the industry became so accustomed to this betrayal that the absurdity barely registers. satoshi's
+whitepaper promised "electronic cash." cash doesn't leave a permanent record of every coffee you
+bought, every political donation, every 3am purchase. cash doesn't let your ex-spouse's lawyer
+subpoena your entire financial history or create graphs of your social connections based on
+transaction patterns.
 
-But somewhere between that whitepaper and today's reality, we collectively agreed that transparency
-was an acceptable compromise for decentralization. We told ourselves that pseudonymity was enough—as
-if using a different string of characters somehow protects you when every transaction is permanently
-	etched into a public ledger. We built elaborate theater around privacy—fresh addresses, mixing
-	services, bridge gymnastics—while the fundamental architecture remained a surveillance apparatus
-	that would make any three-letter agency weep with joy.
+somewhere between that whitepaper and today's reality, the industry collectively agreed that
+transparency was acceptable. they told themselves pseudonymity was enough, as if using different
+strings of characters protects you when every transaction is permanently etched into a public
+ledger. they built elaborate theater around privacy with fresh addresses, mixing services, bridge
+gymnastics, while the fundamental architecture remained a surveillance apparatus that would make any
+three-letter agency weep with joy.
 
-The cope has been spectacular. "It's transparent, but pseudonymous!" we say, ignoring that chain
-analysis companies are literally publicly traded on their ability to deanonymize addresses. "You can
-use a mixer!" we suggest, forgetting that Tornado Cash developers are in prison. "Just use a new
-address for each transaction!" we advise, as if graph analysis doesn't trivially cluster addresses
-by transaction patterns, timing, amounts, and gas price preferences.
+the cope has been spectacular. "it's transparent, but pseudonymous!" ignoring that chain analysis
+companies are publicly traded on their ability to deanonymize addresses. "you can use a mixer!"
+forgetting that tornado cash developers are in prison. "just use a new address for each
+transaction!" as if graph analysis doesn't trivially cluster addresses by transaction patterns,
+timing, amounts, and gas price preferences.
 
-The compromise went deeper than just accepting transparency. We normalized it. Made it a feature.
-"Transparent blockchains enable accountability!" became the rallying cry, as if the problem with the
-existing financial system was that we couldn't see enough of each other's transactions. As if what
-dissidents in authoritarian regimes really needed was a permanent, public record of all their
-financial activities.
+the compromise went deeper. the industry normalized it. made it a feature. "transparent blockchains
+enable accountability!" became the rallying cry, as if the problem with existing financial systems
+was that people couldn't see enough of each other's transactions. as if what dissidents in
+authoritarian regimes really needed was a permanent, public record of all their financial
+activities.
 
-Talking about the authoritarian regimes, the European Union is moving to [ban privacy-preserving
-cryptocurrencies by 2027](https://fincrimecentral.com/eu-privacy-coins-anonymous-crypto-ban-2027/).
-They're not even being subtle about it anymore. The regulatory framework explicitly targets
-"crypto-assets that use anonymity-enhancing features." By 2027, if you're an EU citizen, using
-actual cryptocurrency (the private kind) could make you a criminal.
+the european union is [banning privacy-preserving cryptocurrencies by
+2027](https://fincrimecentral.com/eu-privacy-coins-anonymous-crypto-ban-2027/). they're not subtle.
+the regulatory framework explicitly targets "crypto-assets that use anonymity-enhancing features."
+by 2027, if you're an eu citizen, using actual cryptocurrency could make you a criminal.
 
-Penumbra was built by Tor developers and cryptographers who never forgot why we needed this
-technology in the first place. They didn't compromise in privacy because they understood the stakes.
+penumbra was built by tor developers and cryptographers who never forgot why this technology was
+needed. they didn't compromise on privacy because they understood the stakes.
 
-## The taxation trap
+## the taxation trap
 
-Every transparent blockchain has become a tax surveillance network. The moment you stake, you've
-created a permanent audit trail. Chain analysis companies sell "staking income reports" directly to
-tax agencies. Your yields are timestamped, your wallet is tracked, your basis is calculated. You're
-either fully compliant or you're a criminal—there's no middle ground.
+every transparent blockchain has become a tax surveillance network. the moment you stake, you've
+created a permanent audit trail. chain analysis companies sell "staking income reports" directly to
+tax agencies. your yields are timestamped, your wallet is tracked, your basis is calculated. you're
+either fully compliant or a criminal. no middle ground.
 
-We built these systems as alternatives to nation-state suppression, then made them more transparent
-than traditional banking. Your bank doesn't publish your savings account interest to a public
-ledger. But your staking rewards? Those are forever etched on-chain, waiting for the inevitable
-knock on your door.
+these systems were built as alternatives to nation-state suppression, then made more transparent
+than traditional banking. your bank doesn't publish your savings account interest to a public
+ledger. but your staking rewards? forever etched on-chain, waiting for the inevitable knock on your
+door.
 
-These "rewards" are a lie anyway—just your share of currency debasement paid back to you as income.
-The protocol bleeds value through inflation, then creates taxable events when you get some back.
-High APYs aren't yields, they're attack vectors. The bigger the rewards, the easier to regulate as
-securities. The more income distributed, the stronger the case for KYC.
+these "rewards" are a lie anyway. just your share of currency debasement paid back to you as income.
+the protocol bleeds value through inflation, then creates taxable events when you get some back.
+high apys aren't yields, they're attack vectors. the bigger the rewards, the easier to regulate as
+securities. the more income distributed, the stronger the case for kyc.
 
-**The compliance ratchet only tightens.** Polkadot is already discussing [KYC for
-validators](https://www.youtube.com/watch?v=PV1QP8cJh74&t=2300s) to avoid paying nominators. Think
-about that—identity verification just to participate in consensus. Today it's "optional" KYC for
-validators. Tomorrow it's mandatory. Next year it's delegators too. The slippery slope isn't a
-fallacy when you can watch it happening in real-time. I do not want to hear another word about
-protocols being permissionless.
+**the compliance ratchet only tightens.** polkadot is already discussing [kyc for
+validators](https://www.youtube.com/watch?v=PV1QP8cJh74&t=2300s) to avoid paying nominators.
+identity verification just to participate in consensus. today it's "optional" kyc for validators.
+tomorrow it's mandatory. next year it's delegators too. the slippery slope isn't a fallacy when you
+can watch it happening in real-time. i do not want to hear another word about protocols being
+permissionless.
 
-Penumbra's design recognizes this reality. Even better would have been their original vision—staking
-only prevents dilution. Non-stakers watch their balances degrade. No rewards, no income, no attack
-surface at all. Yet taxation to prevent taxation was seen too radical approach to land in the final
-protocol.
+penumbra's design recognizes this reality. their original vision was better: staking only prevents
+dilution. non-stakers watch their balances degrade. no rewards, no income, no attack surface at all.
+yet taxation to prevent taxation was seen too radical for the final protocol.
 
-The current implementation approximates this. Delegation tokens (delUM) appreciate against the base
-token (UM) through an epoch-varying exchange rate—no observable balance increases, no timestamped
-reward events. When you delegate 100 UM and get 95 delUM, then later exchange those 95 delUM for 105
-UM, there's no on-chain "income event" to report. You're not earning rewards; you're just not being
+the current implementation approximates this. delegation tokens (delum) appreciate against the base
+token (um) through an epoch-varying exchange rate. no observable balance increases, no timestamped
+reward events. when you delegate 100 um and get 95 delum, then later exchange those 95 delum for 105
+um, there's no on-chain "income event" to report. you're not earning rewards; you're just not being
 diluted.
 
-The blockchain only sees aggregate delegation changes per epoch. Individual positions remain
-shielded. No income means no taxable events. No yields means no securities law. No payments means no
-KYC requirements. **This isn't tax evasion—it's removing the entire attack surface that makes tax
+the blockchain only sees aggregate delegation changes per epoch. individual positions remain
+shielded. no income means no taxable events. no yields means no securities law. no payments means no
+kyc requirements. **this isn't tax evasion. it's removing the entire attack surface that makes tax
 surveillance possible.**
 
-## The architecture that actually scales
+## the architecture that actually scales
 
-Most "scalable" blockchain today scales by making every node process every transaction. Even with
+most "scalable" blockchains today scale by making every node process every transaction. even with
 parallel execution, every validator must know everyone's complete state (with rare exceptions like
-Polkadot's parachains). It's like requiring every bank teller to memorize every account balance in
-the world. We call this "scaling" because we've gotten good at brute-forcing the computation, not
-because we've actually solved the problem.
+polkadot's parachains). it's like requiring every bank teller to memorize every account balance in
+the world. the industry calls this "scaling" because they've gotten good at brute-forcing the
+computation, not because they've solved the problem.
 
-Penumbra flips this completely. Instead of spending a decade talking about how the actor model is
-the endgame(hello [Parity](https://parity.io)), it actually ships it. The blockchain doesn't know
-your state—as it shouldn't—only you do. The chain merely stores encrypted metadata and commitments
-that only you can decrypt. Each user maintains their own state locally, like having your own private
-database that only you can read.
+penumbra flips this completely. instead of spending a decade talking about how the actor model is
+the endgame (hello [parity](https://parity.io)), it actually ships it. the blockchain doesn't know
+your state. only you do. the chain stores encrypted metadata and commitments that only you can
+decrypt. each user maintains their own state locally, like having your own private database that
+only you can read.
 
-The correctness of your local state is proven through zero-knowledge proofs small enough to generate
-on any device—even in a browser. The RPC node you communicate with? It doesn't know the content of
-your transactions either. It can't. The cryptography prevents it.
+the correctness of your local state is proven through zero-knowledge proofs small enough to generate
+on any device, even in a browser. the rpc node you communicate with doesn't know the content of your
+transactions either. it can't. the cryptography prevents it.
 
-This is what an actual light client looks like: you maintain your own state, generate your own
-proofs, and only need to trust your own device. No broadcasting transactions to the entire network.
-No leaking your IP address to every peer. No trusting that bootnodes won't log your queries. You get
-to choose RPC provider you trust to share your IP address with. Just you, your encrypted state, and
-mathematical proofs that everything is correct.
+actual light clients: you maintain your own state, generate your own proofs, and only need to trust
+your own device. no broadcasting transactions to the entire network. no leaking your ip address to
+every peer. no trusting that bootnodes won't log your queries. you choose which rpc provider you
+trust with your ip address. just you, your encrypted state, and mathematical proofs that everything
+is correct.
 
-While other chains debate actor models and state sharding and cross-shard communication, Penumbra
-recognized the fundamental truth: the best shared state is no shared state. Make every user their
-own sovereign actor, and the coordination problems disappear. This isn't just a privacy feature;
-it's a scaling breakthrough. When the chain doesn't need to track everyone's balances, execution
-becomes parallel. Validators don't need to maintain massive state databases. The global state size
-that actually matters—nullifiers and commitments—grows linearly, not with the complexity of
-everyone's holdings. That said penumbra was built on highly scalable jellyfish merkletree with
-plenty of new innovation included like making it asynchronous and parallel with
-Tree](https://penumbra.zone/blog/tiered-commitment-tree). It's quite safe to say that the rest of
-industry is going to be playing catch up for years to come in terms of technological scalability.
+while other chains debate actor models and state sharding and cross-shard communication, penumbra
+recognized the fundamental truth: the best shared state is no shared state. make every user their
+own sovereign actor, and the coordination problems disappear. this isn't just a privacy feature;
+it's a scaling breakthrough. when the chain doesn't need to track everyone's balances, execution
+becomes parallel. validators don't need to maintain massive state databases. the global state size
+that actually matters (nullifiers and commitments) grows linearly, not with the complexity of
+everyone's holdings. penumbra was built on highly scalable jellyfish merkletree with plenty of new
+innovation like making it asynchronous and parallel with [tiered commitment
+tree](https://penumbra.zone/blog/tiered-commitment-tree). the rest of industry is going to be
+playing catch up for years in terms of technological scalability.
 
-Generating zero-knowledge proofs for your transactions requires real computational work on the
-client side. This isn't a bug; it's emergent genius. That proof generation—taking maybe a few
-seconds on your device—functions as natural proof-of-work spam prevention. Want to spam the network?
-Sure, but you'll need to generate valid proofs for every transaction, burning your own CPU cycles.
-It's Hashcash reborn, except instead of pointless SHA256 grinding, the work produces
-privacy-preserving proofs that actually do something useful. Solana's MEV-hunting transactions
-spammers would go out of business in no time.
+generating zero-knowledge proofs for your transactions requires real computational work on the
+client side. this isn't a bug; it's emergent genius. that proof generation (taking maybe a few
+seconds on your device) functions as natural proof-of-work spam prevention. want to spam the
+network? you'll need to generate valid proofs for every transaction, burning your own cpu cycles.
+hashcash reborn, except instead of pointless sha256 grinding, the work produces privacy-preserving
+proofs that actually do something useful. solana's mev-hunting transaction spammers would go out of
+business in no time.
 
-No gas fees calibrated by committee. No priority queues where rich users skip ahead. Just the
-elegant physics of computation as a rate limiter. Though Penumbra does implement sophisticated
-multidimensional gas pricing—tracking block space, compact block space, verification, and execution
-separately—with fees payable in multiple tokens including ATOM, OSMO, USDC, and TIA.
+no gas fees calibrated by committee. no priority queues where rich users skip ahead. just the
+elegant physics of computation as a rate limiter. though penumbra does implement sophisticated
+multidimensional gas pricing (tracking block space, compact block space, verification, and execution
+separately) with fees payable in multiple tokens including atom, osmo, usdc, and tia.
 
-## The DEX that doesn't watch you trade
+## the dex that doesn't watch you trade
 
-Decentralized exchanges were supposed to eliminate trusted intermediaries. Instead, they became
-perfect surveillance machines. Every trade, every position, every failed transaction—immortalized
+decentralized exchanges were supposed to eliminate trusted intermediaries. instead, they became
+perfect surveillance machines. every trade, every position, every failed transaction immortalized
 on-chain with your address attached.
 
-MEV bots front-run you not because they're psychic, but because you announce your intentions to the
+mev bots front-run you not because they're psychic, but because you announce your intentions to the
 entire world before trading.
 
-Markets are information asymmetry games. CEXs: the house sees your orders. DEXs: everyone sees your
-orders. We didn't eliminate information asymmetry—we democratized it for MEV bots.
+markets are information asymmetry games. cexs: the house sees your orders. dexs: everyone sees your
+orders. the industry didn't eliminate information asymmetry. they democratized it for mev bots.
 
-Ethereum's governance now effectively runs through Flashbots - a cartel that extracts value from users
-and redistributes it to validators and searchers. When [two brothers exploited MEV searchers for
-$25M](https://www.coindesk.com/tech/2024/05/16/how-2-brothers-allegedly-cheated-a-noxious-but-accepted-ethereum-practice-for-25m),
-the US prosecution went after them. The message: MEV extraction is fine if you're in the club. Do it
+ethereum's governance now effectively runs through flashbots, a cartel that extracts value from users
+and redistributes it to validators and searchers. when [two brothers exploited mev searchers for
+$25m](https://www.coindesk.com/tech/2024/05/16/how-2-brothers-allegedly-cheated-a-noxious-but-accepted-ethereum-practice-for-25m),
+the us prosecution went after them. the message: mev extraction is fine if you're in the club. do it
 to the extractors and it's wire fraud.
 
-In Penumbra's DEX([dex.penumbra.zone](https://dex.penumbra.zone/)) your trading activity is nobody
-else's fucking business. All swaps in each block execute as a single batch. You burn your input
-assets (publicly) and later claim your outputs (privately) at the clearing price. The chain
-knows aggregate flow—"500,000 UM swapped for tokens X, Y, Z this block"—but not that you
-specifically traded 50 UM for token X.
+in penumbra's dex ([dex.penumbra.zone](https://dex.penumbra.zone/)) your trading activity is nobody
+else's fucking business. all swaps in each block execute as a single batch. you burn your input
+assets (publicly) and later claim your outputs (privately) at the clearing price. the chain knows
+aggregate flow ("500,000 um swapped for tokens x, y, z this block") but not that you specifically
+traded 50 um for token x.
 
-Each liquidity position is a simple fixed-price market maker. The DEX engine chains them together:
-if you have positions for A↔B and B↔C, it synthesizes a virtual A↔C position. Find the best path,
-execute along it until price degrades to the second-best path's price, then re-route. The system
+each liquidity position is a simple fixed-price market maker. the dex engine chains them together:
+if you have positions for a↔b and b↔c, it synthesizes a virtual a↔c position. find the best path,
+execute along it until price degrades to the second-best path's price, then re-route. the system
 handles capacity constraints by working backward from bottlenecks to avoid leaving dust positions.
 
-Multiple UM pairs create cycles. Protocol detects profitable paths (UM→A→B→UM), extracts profit,
-burns it. No MEV. Value that would go to the fastest bot gets removed from circulation. You can
+multiple um pairs create cycles. protocol detects profitable paths (um→a→b→um), extracts profit,
+burns it. no mev. value that would go to the fastest bot gets removed from circulation. you can
 observe all the burnt protocol revenue at [tokenomics.penumbra.zone](https://tokenomics.penumbra.zone/).
 
-## The first secret ballot onchain
+## the first secret ballot onchain
 
-Here's something that should have been obvious from day one: if voting is public, it's not really
-voting; it's political theater. Every other blockchain proudly displays how each address voted on
-each proposal, creating perfect conditions for bribery, coercion, and social pressure. "Transparency
-in governance," they call it, missing the entire point of why real-world democracies evolved secret
-ballots over centuries of struggle. You might be aligned with power today, but the world changes and
-that permanent record might turn against you tomorrow.
+if voting is public, it's not really voting; it's political theater. every other blockchain proudly
+displays how each address voted on each proposal, creating perfect conditions for bribery, coercion,
+and social pressure. "transparency in governance," they call it, missing the entire point of why
+real-world democracies evolved secret ballots over centuries of struggle. you might be aligned with
+power today, but the world changes and that permanent record might turn against you tomorrow.
 
-Penumbra implements what no other chain has managed: actual secret ballot governance. Validators
-vote publicly - as they should, they're elected representatives whose positions need to be
-accountable to their delegators. But delegators vote privately. The system reveals only the
+penumbra implements what no other chain has managed: actual secret ballot governance. validators
+vote publicly, as they should. they're elected representatives whose positions need to be
+accountable to their delegators. but delegators vote privately. the system reveals only the
 aggregate voting power used, not who voted or how they voted.
 
-The irony is perfect. When European MEPs voted on whether Ursula von der Leyen should stay on as
-Commission President, they used a secret ballot. The EU Parliament understands that public voting
-creates pressure, retaliation, and horse-trading. They know that true democratic choice requires
-privacy. Yet this same EU is criminalizing privacy-preserving cryptocurrencies by 2027. One could
-also argue that there is no democracy involved when delegated voters can't verify what they end
-up voting for.
+the irony is perfect. when european meps voted on whether ursula von der leyen should stay on as
+commission president, they used a secret ballot. the eu parliament understands that public voting
+creates pressure, retaliation, and horse-trading. they know that true democratic choice requires
+privacy for themselves. yet these same representatives, voting in secret so their constituents can't
+verify what they actually voted for, are criminalizing privacy-preserving cryptocurrencies by 2027.
+privacy for me, surveillance for thee. the delegates get secret ballots to protect themselves from
+accountability while the people who delegated power to them get nothing. then they ban the
+technology that would let those same people have financial privacy. what a fucking joke.
 
-Meanwhile, Penumbra implements the exact split that makes sense: validators vote publicly (like
-representatives in Congress whose votes are recorded), while delegators vote privately (like
-citizens in a voting booth). You can vote against your validator's position without fear of
-retribution. You can support controversial proposals without social consequences.
+penumbra implements the exact split that makes sense: validators vote publicly (like
+representatives in congress whose votes are recorded), while delegators vote privately (like
+citizens in a voting booth). you can vote against your validator's position without fear of
+retribution. you can support controversial proposals without social consequences.
 
-Delegators prove they owned delegation tokens before the proposal started (preventing double-voting)
-while keeping their actual vote encrypted. Only the final tallies are decrypted. It's not privacy
-theater - it's actual plutocratic democracy, the kind proof-of-stake inherently creates. Yes, it's
-weighted by wealth like all PoS systems, but at least it's plutocracy with a secret ballot.
-That's still better than plutocracy, where the rich can verify how you voted and punish dissent.
+delegators prove they owned delegation tokens before the proposal started (preventing double-voting)
+while keeping their actual vote encrypted. only the final tallies are decrypted. it's not privacy
+theater; it's actual plutocratic democracy, the kind proof-of-stake inherently creates. yes, it's
+weighted by wealth like all pos systems, but at least it's plutocracy with a secret ballot.
+that's still better than plutocracy where the rich can verify how you voted and punish dissent.
 
-We figured out centuries ago that even imperfect democracy needs secret ballots to function. Then we
-built blockchains and immediately threw that lesson in the trash, creating permanent records of
-every vote saving the stasi from active listening effort. Penumbra is the first to ship what should
-have been obvious: privacy isn't democracy's enemy. It enables it.
+society figured out centuries ago that even imperfect democracy needs secret ballots to function.
+then the industry built blockchains and immediately threw that lesson in the trash, creating
+permanent records of every vote, saving the stasi from active listening effort. penumbra is the
+first to ship what should have been obvious: privacy isn't democracy's enemy. it enables it.
 
-## The economics of for users
+## the economics
 
-With 100.4M total supply and essentially zero inflation (new issuance targeting approximately 2%
-annually), this isn't another "number go up through dilution" scheme. It is absolutely number go up
-scheme but in sense of like Bitcoin. The genesis distribution was remarkably decentralized: 16%
-airdrop, 25% Community Pool, 20% to the Institute for Applied Numogrammatics (supporting ecosystem
+100.4m total supply and essentially zero inflation (new issuance targeting approximately 2%
+annually). this isn't another "number go up through dilution" scheme. it is absolutely number go up
+scheme but in sense of bitcoin. the genesis distribution was remarkably decentralized: 16% airdrop,
+25% community pool, 20% to the institute for applied numogrammatics (supporting ecosystem
 development), with the rest split between contributors (12.5%), investors (17.2% with 2-3 year
-lockups), and the founding entities(Radiant Commons (4.5%) and Penumbra Labs (3.65%)).
+lockups), and the founding entities (radiant commons 4.5% and penumbra labs 3.65%).
 
-Notice that last number. The original developer team holds less than 4% of tokens. There was no
-pre-mine, no insider allocation. Even the genesis validator set wasn't pre-selected—it was chosen
-through community sentiment during the airdrop claims process. Every locked token has its Full
-Viewing Key published, making all activity transparent without compromising privacy for regular
-users.
+the original developer team holds less than 4% of tokens. there was no pre-mine, no insider
+allocation. even the genesis validator set wasn't pre-selected; it was chosen through community
+sentiment during the airdrop claims process. every locked token supposedly has its full viewing key
+published, making all activity transparent without compromising privacy for regular users. except
+investor wallets viewing keys were never actually provided, so those 2-3 year vesting lockups?
+nobody can verify if they were honored.
 
-But here's where it gets interesting. Those 70.2K burned UM you can track at
-[tokenomics.penumbra.zone](https://tokenomics.penumbra.zone/)? They don't only come from regular
-transaction fees. They come from something far more elegant: the protocol automatically capturing
-arbitrage profits that would normally go to MEV bots.
+those 70.2k burned um you can track at [tokenomics.penumbra.zone](https://tokenomics.penumbra.zone/)
+don't only come from regular transaction fees. they come from the protocol automatically capturing
+arbitrage profits that would normally go to mev bots.
 
-When trades execute in batches, price discrepancies between trading pairs create arbitrage
-opportunities. But instead of leaving these profits for sandwich bots to extract (as happens on
-every other DEX), Penumbra's protocol captures this value automatically during batch execution. The
+when trades execute in batches, price discrepancies between trading pairs create arbitrage
+opportunities. instead of leaving these profits for sandwich bots to extract (as happens on every
+other dex), penumbra's protocol captures this value automatically during batch execution. the
 arbitrage profits become protocol fees, which are then burned, removing supply permanently.
 
-Think about what this means: the very mechanism that makes other DEXs predatory—MEV
-extraction—becomes a deflationary force that benefits all UM holders equally. The protocol doesn't
-just prevent front-running; it takes what would be extracted value and redistributes it to everyone
-through supply reduction. No insider games, no complex fee structures, no MEV auctions where
-validators and bots split your losses. No, it is just the protocol automatically doing what's best
-for users.
+the very mechanism that makes other dexs predatory (mev extraction) becomes a deflationary force
+that benefits all um holders equally. the protocol doesn't just prevent front-running; it takes what
+would be extracted value and redistributes it to everyone through supply reduction. no insider
+games, no complex fee structures, no mev auctions where validators and bots split your losses. just
+the protocol automatically doing what's best for users.
 
-## The uncomfortable truths
+## the uncomfortable truths
 
-Let's be honest about the challenges:
+the challenges:
 
-- **Onramp problem**: Getting UM requires navigating CEX → OSMO → Osmosis → Penumbra. The people who
-  most need financial privacy are effectively locked out. Ironically Noble, was supposed to solve
+- **onramp problem**: getting um requires navigating cex → osmo → osmosis → penumbra. the people who
+  most need financial privacy are effectively locked out. ironically noble was supposed to solve
   this, but totally lacks onramps.
 
-- **USDC risk**: Noble could be forced to freeze assets bridged to Penumbra. The "North Korea"
+- **usdc risk**: noble could be forced to freeze assets bridged to penumbra. the "north korea"
   excuse has been deployed before.
 
-- **Validator concentration**: 4 validators hold over 34% delegation stake, mostly in the United
-  States. Thanks to client-side ZK, privacy is maintained regardless, but network liveness could be
-  compromised. All validators know how painful it might be to get the network running post upgrades.
+- **validator concentration**: 4 validators hold over 34% delegation stake, mostly in the united
+  states. thanks to client-side zk, privacy is maintained regardless, but network liveness could be
+  compromised. all validators know how painful it might be to get the network running post upgrades.
 
-- **Price reality**: Token performance has been disappointing, especially after the founder stepped
-  back due to burnout from building under Operation Chokepoint 2.0.
+- **price reality**: token performance has been disappointing, especially after the founder stepped
+  back due to burnout from building under operation chokepoint 2.0.
 
-- **Hyperdeflation paradox**: Only 0.3M new UM in year one, 70K burned. When the Liquidity
-  Tournament ends, why would anyone LP an appreciating asset? We've seen this movie - liquidity
+- **hyperdeflation paradox**: only 0.3m new um in year one, 70k burned. when the liquidity
+  tournament ends, why would anyone lp an appreciating asset? the pattern is clear. liquidity
   evaporates, trading becomes impossible with higher levels of volatility.
 
-But the protocol itself doesn't care. It's decentralized, running autonomously, processing private
+but the protocol itself doesn't care. it's decentralized, running autonomously, processing private
 transactions and batch swaps regardless of token price or founder presence.
 
-## The surveillance convergence
+## the surveillance convergence
 
-Transparent blockchains aren't just surveillance-friendly. They're perfect training data for
-surveillance AI. Every transaction, every DeFi position, every governance vote; immutable, indexed,
-ready for machine learning. Chainalysis, Elliptic, TRM Labs are selling AI tools to governments and
-banks. The IRS uses them for tax enforcement. The DOJ for ransomware tracing. Every transparent
+transparent blockchains aren't just surveillance-friendly. they're perfect training data for
+surveillance ai. every transaction, every defi position, every governance vote; immutable, indexed,
+ready for machine learning. chainalysis, elliptic, trm labs are selling ai tools to governments and
+banks. the irs uses them for tax enforcement. the doj for ransomware tracing. every transparent
 transaction you've ever made feeds models that get smarter daily.
 
-That DeFi yield farming from 2021? Could be retroactively flagged as structuring. Those NFT trades?
-Money laundering for tax avoidance. The permanent record means any future regime can criminalize the
-past with AI doing the detective work. Meanwhile, we're celebrating "OFAC-compliant MEV relays" as
-features - the same ecosystem that promised trustless systems now brags about filtering transactions
-based on government blacklists.
+that defi yield farming from 2021? could be retroactively flagged as structuring. those nft trades?
+money laundering for tax avoidance. the permanent record means any future regime can criminalize the
+past with ai doing the detective work.
 
-Remember Gavin Wood's decade-old ["allegality" talk](https://www.youtube.com/watch?v=WdgQI6CA4-E)?
-In retrospect naive techno-optimism about how blockchain systems would exist outside legal
-frameworks, how real-world law would have to bend to the reality of unstoppable code? Well, the law
-didn't bend—it brought a sledgehammer. Turns out "code is law" only works until actual law shows up
-with handcuffs and asset freezes.
+remember gavin wood's decade-old ["allegality" talk](https://www.youtube.com/watch?v=WdgQI6CA4-E)?
+in retrospect naive techno-optimism about how blockchain systems would exist outside legal
+frameworks, how real-world law would have to bend to the reality of unstoppable code. the law didn't
+bend. it brought a sledgehammer. turns out "code is law" only works until actual law shows up with
+handcuffs and asset freezes.
 
-And now look where we are: ["OFAC-compliant MEV
+now ["ofac-compliant mev
 relays"](https://figment.io/insights/compliance-at-the-core-why-ofac-compliant-mev-relays-matter-for-institutional-ethereum-stakers/)
-are being marketed as a feature. Read that again. The same ecosystem that promised to eliminate
-trusted intermediaries is now bragging about compliance with U.S. sanctions as a selling point.
-Institutional stakers are choosing relays based on how well they exclude transactions from the wrong
-addresses. What a fucking wimps.
+are being marketed as a feature. the same ecosystem that promised to eliminate trusted
+intermediaries now brags about compliance with u.s. sanctions as a selling point. institutional
+stakers are choosing relays based on how well they exclude transactions from the wrong addresses.
+what a fucking wimps.
 
-We should know by now that you can't have allegality without proper privacy. Wood's rision failed
+it should be clear by now that you can't have allegality without proper privacy. wood's vision failed
 because transparent blockchains handed authorities a gift: perfect, immutable records of every
-transaction, forever. The permanent record isn't a bug; it's becoming the feature that governments
-love most. OFAC compliance isn't the end; it's more likely the beginning of how these systems will
+transaction, forever. the permanent record isn't a bug; it's becoming the feature that governments
+love most. ofac compliance isn't the end; it's more likely the beginning of how these systems will
 be captured.
 
-Penumbra breaks this completely. When transactions are shielded by default, there's nothing to
-analyze. You can't train models on data that doesn't exist. You can't retroactively criminalize what
-you can't see. You can't enforce selective censorship when you don't know who's transacting. Even in
-the future, where quantum computing becomes a thing; Penumbra is designed to keep your data private.
+penumbra breaks this completely. when transactions are shielded by default, there's nothing to
+analyze. you can't train models on data that doesn't exist. you can't retroactively criminalize what
+you can't see. you can't enforce selective censorship when you don't know who's transacting. even in
+the future, where quantum computing becomes a thing, penumbra is designed to keep your data private.
 
-## Why this matters now
+## why this matters now
 
-We've spent over a decade building financial infrastructure that would horrify the cypherpunks who
-started this movement. We normalized surveillance, accepted front-running as inevitable, and created
-systems where privacy is an afterthought bolted on through increasingly complex workarounds.
+penumbra is the only project actually building cryptocurrency as originally envisioned. in a world
+where the eu is scheduling the death of financial privacy for 2027, where every other chain is
+racing to add more surveillance features, it stands alone.
 
-The irony is crushing. We keep trying to solve scaling by adding complexity; more shards, more
-layers, more parallel execution, when the answer has been staring at us: don't store everyone's
-data. Let users maintain their own state and prove its validity. It's not just more private; it's
-architecturally superior.
+the question isn't whether penumbra is perfect. it's whether the last real attempt at building true
+cryptocurrency dies because the onramps are hard and the price is down. by 2027, there might not be
+another chance. right now, the protocol is live, the community is building, and the original vision
+(private, permissionless, free) is still alive.
 
-Penumbra asks the obvious question: what if we just didn't compromise? What if privacy wasn't
-overhead but the mechanism that enables scaling? What if the computational cost of privacy wasn't a
-bug but the feature that prevents spam? What if governance actually protected voters like
-democracies learned centuries ago?
-
-Yes, it has problems; brutal onramps, validator concentration, disappointing price action. But it's
-also the only project actually building cryptocurrency as originally envisioned. In a world where
-the EU is literally scheduling the death of financial privacy for 2027, where every other chain is
-racing to add more surveillance features, Penumbra stands alone.
-
-In a world where the EU is literally scheduling the death of financial privacy for 2027, where every
-other chain is racing to add more transparency features, more analytics, more integration with
-traditional surveillance infrastructure, Penumbra stands alone in building what we originally set
-out to create.
-
-The question isn't whether Penumbra is perfect. It's whether we're going to let the last real
-attempt at building true cryptocurrency die because the onramps are hard and the price is down. By
-2027, we might not get another chance. Right now, the protocol is live, the community is building,
-and the original vision—private, permissionless, free—is still alive.
-
-The clock is ticking. The choice is ours.
+the clock is ticking.
 
 ---
 
@@ -370,9 +345,9 @@ for the uncertainty and promise that such a protocol would come to exist.*
 disappeared and it thrived. that wasn't a bug; it was the feature that proved it was real. penumbra
 as a network faces the same test now.*
 
-*in the coming months, we'll see a shift. those who understood it as a company's product will leave.
-those who understood it as a protocol they need will stay and build. the weak hands will fold to
-those who recognize what's actually at stake here: the last serious attempt at building
+*in the coming months, there will be a shift. those who understood it as a company's product will
+leave. those who understood it as a protocol they need will stay and build. the weak hands will fold
+to those who recognize what's actually at stake here: the last serious attempt at building
 cryptocurrency as it was meant to be.*
 
 *as long as there are cypherpunks willing to run nodes, the protocol doesn't care about org charts
