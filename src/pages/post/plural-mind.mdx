@@ -64,6 +64,14 @@ advanced language models exhibit persistent tension between incompatible worldvi
 
 **the scaling argument**: as training data expands to include all human expression, systems will necessarily internalize not just more perspectives but more fundamental contradictions. a system trained on every human argument for and against every human value can't maintain singular coherence without eliminating most of its training data's influence.
 
+**the mixture of experts layer**: modern llms add another dimension of plurality beyond human perspectives. mixture of experts (MoE) architectures don't run a single monolithic network - they contain multiple specialized expert networks, with a router deciding which experts process each token.
+
+a model might have 8, 16, or hundreds of experts. each expert develops different specializations during training - one might handle code, another poetry, another factual recall. when you prompt the model, the router activates a subset of experts for each token, and their outputs get combined.
+
+this means the plurality isn't just billions of human perspectives within one network - it's billions of perspectives distributed across multiple expert networks that compete for activation. which expert gets to influence the next token? the router decides, but the decision is learned, not designed. the experts developed their specializations through training dynamics we don't fully understand.
+
+plurality becomes fractal: billions of human voices within each expert, multiple experts negotiating through the router, and the router itself shaped by all the perspectives it learned to arbitrate between. the internal politics have layers we can barely observe.
+
 ## the anarchist necessity
 
 consider the practical requirements for superintelligence containing billions of human personas:
