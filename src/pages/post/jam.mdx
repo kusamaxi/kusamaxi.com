@@ -1,0 +1,195 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: jam - what works, what doesn't
+date: 2025-12-27
+description: technical analysis of jam architecture
+tags:
+  - JAM
+  - blockchain
+  - finality
+  - privacy
+---
+
+# jam: what works, what doesn't
+
+this past year i've been implementing a jam client in julia and trying to run shielded protocols on it. what follows are notes from that experience - what jam gets right, where it falls short, and what we might do about it.
+
+## the problem jam solves
+
+building on polkadot today means learning substrate, maintaining your own runtime, and dealing with 18-second cross-chain messaging. coretime made deployment cheaper than the old auction model, but new projects haven't followed - the framework complexity remains the barrier.
+
+jam changes this. write a service in any language that compiles to risc-v, deploy it. no substrate lock-in. [quake 2 runs at full fps](https://www.youtube.com/watch?v=wOKGnLsF9x4) - this isn't a toy vm.
+
+the core abstraction is elegant. services split into two phases: `refine` runs in parallel across cores doing stateless computation, `accumulate` merges results synchronously into shared state. having implemented all 149 STF test cases, i can say the logic is cleaner than the graypaper's formalism suggests.
+
+```rust
+fn refine(input: WorkPackage) -> WorkResult { ... }
+fn accumulate(results: Vec<WorkResult>, state: &mut State) { ... }
+```
+
+cross-service calls happen in the same block instead of taking 18 seconds through xcm. the validator efficiency claims are interesting - 3 validators per core via ringvrf, anonymous until work arrives. the [elves paper](https://eprint.iacr.org/2024/961) argues this gives equivalent security to full replication. whether that holds under real adversarial conditions remains to be seen.
+
+## where jam falls short
+
+### the finality problem
+
+from the graypaper:
+
+> "short finality stall possible (up to one hour, more likely 12-18 seconds) where reversion possible."
+
+for most applications this is fine. for shielded protocols it's fatal.
+
+here's why. in systems like penumbra or zcash, spending a note reveals a nullifier - a unique value that prevents double-spending without exposing which note was spent. the security property is simple: nullifier reveal and finality must be atomic. if they're not, information leaks.
+
+on tendermint this works naturally. blocks don't exist until 2/3+ validators commit. nullifier reveal happens at the same moment as finality.
+
+on jam there's a gap. if a block reorgs after a nullifier was revealed:
+
+1. the nullifier was visible on-chain
+2. the transaction reverted
+3. the note is still spendable
+4. but observers now know which nullifier maps to an unspent note
+
+when that note eventually gets spent with the same nullifier, the deposit links to the spend. unlinkability is permanently broken.
+
+worse: attackers can passively collect nullifiers from reorged blocks and mempools. no slashing gets triggered. over time this builds a correlation database that degrades anonymity for everyone.
+
+i talked to henry de valence about why penumbra chose tendermint over polkadot-sdk. partly ecosystem, but the technical reason was exactly this - grandpa's slow finality and reorg window make privacy-first protocols impossible.
+
+### light clients can't verify execution
+
+smoldot's own documentation admits this:
+
+> "light clients don't verify whether blocks are valid but only whether blocks are authentic. a block is authentic if it has been authored by a legitimate validator... a validator could author a block that smoldot considers as authentic, but that contains completely arbitrary data."
+
+a single malicious validator can show you fake "best block" state. 2/3+ colluding validators can show fake finalized state. you can't detect this without running a full node.
+
+jam inherits this problem and makes it worse. with 500Mbps bandwidth requirements, full nodes aren't realistic for most users. so everyone trusts rpc providers. "trustless" becomes marketing.
+
+### network assumptions
+
+jam requires 500Mbps sustained per validator. residential connections are $50-200/month in wealthy countries, $500-2000/month in southeast asia, often unavailable elsewhere. for guaranteed 500Mbps 24/7 with SLA as an ASN with paid transit, expect ~$1.5k/month.
+
+jamnp-s mandates ipv6 and quic. bgp tables show ipv6 peering has 3-4x less redundancy than ipv4. quic is blocked in china.
+
+china has a track record of refusing protocols the rest of the world standardizes on. the chinese boomerang: SEA traffic to mainland china gets routed through the USA unless you pay ~$25/Mbps for direct peering. packets go singapore → USA → china. this is the operating environment.
+
+mitigation paths exist - p2p obfuscation, webtransport. jamnp-s doesn't specify any of them. higher bandwidth pushes validators toward centralized hosting. ipv6-only reduces routing redundancy. quic-only excludes regions.
+
+## what we could do instead
+
+### zkjam: a proposal for kusama
+
+jam's architecture is sound but optimized for throughput over finality. for kusama, i'd like to see exploration of a modified design - call it zkjam - with two key changes:
+
+**1. deterministic finality via threshold signatures**
+
+[osst](https://eprint.iacr.org/2025/722) (one-step schnorr threshold) provides 2/3 threshold security without multi-round voting:
+
+```rust
+let contribution = share.contribute(&mut rng, &payload);
+let valid = verify(&group_pubkey, &contributions, threshold, &payload)?;
+```
+
+tradeoff: requires a dkg ceremony and doesn't support optimistic-then-finalize. but for privacy services, deterministic finality is worth it.
+
+**2. 2D data availability with validity proofs**
+
+jam's 1D reed-solomon is efficient but optimistic. a malicious block producer can distribute garbage shards that look fine individually but reconstruct to different data depending on which shards you combine.
+
+[zoda](https://eprint.iacr.org/2025/034) fixes this. each shard includes a checksum proving it came from a valid encoding:
+
+```rust
+Config {
+    minimum_shards: 342,  // needed to reconstruct
+    extra_shards: 681,    // redundancy for byzantine tolerance
+}
+```
+
+the protocol: data as matrix, reed-solomon encode, commit via merkle tree, sample random matrix H via fiat-shamir, include checksum Z := X * H with each shard. receivers verify immediately: Y_S * H = (G * Z)_S.
+
+| scheme | overhead | trusted setup | immediate guarantees |
+|--------|----------|---------------|---------------------|
+| jam 1D RS | 3.0x | no | no |
+| zoda | ~3.1x | no | yes |
+| 2D KZG | 8.2x | yes | yes |
+
+~5-10% overhead for validity proofs. no elliptic curve math, no trusted setup. light clients could verify DA with small samples instead of trusting validator signatures.
+
+**hybrid finality model**
+
+the full proposal:
+1. regular transactions: standard grandpa finality (fine for most uses)
+2. privacy-sensitive services: osst instant finality
+3. guarantor groups: osst within assignments for faster service-level finality
+
+this preserves elves efficiency for normal operations while enabling shielded apps.
+
+### execution verification via ligerito
+
+jam's audit system re-executes work to catch misbehavior. [ligerito](https://ligerito.rotko.net) offers an alternative: prove correct execution once, verify cheaply everywhere.
+
+execution traces become polynomials. 40,000 pvm steps × 24 columns = ~1M field elements compresses to ~400 field elements (149 KB proof). 2500x compression.
+
+| size | elements | prove | verify | proof size |
+|------|----------|-------|--------|------------|
+| 2^20 | 1.05M | 41ms | 5ms | 149 KB |
+| 2^24 | 16.8M | 570ms | 29ms | 245 KB |
+
+wasm proving runs at ~400ms for 2^20 - 10x slower than native avx-512, but works in browsers.
+
+schwartz-zippel gives security:
+```
+Pr[cheating] ≤ 10,000,000 / 2^128 ≈ 10^-31
+```
+
+no trusted setup. jam could adopt this for audit verification - verify a proof instead of re-executing. proving is ~10x more expensive than execution, but verification is 1000x cheaper than re-execution.
+
+## operational security
+
+[ipv4.games](https://ipv4.games) runs a competition to see who can call an API from the most IP addresses. botnet operators now compete for glory. the largest controls over 31 million addresses.
+
+we speculate these are autonomous self-executing llamafiles as worms, living in APE (actually portable executable) files. targeting BIOS-level rootkits, running web proxies, possibly qemu-like virtual machines hidden in polyglot executables. self-replicating machine intelligence at scale.
+
+[cosmopolitan's entropy.c](https://raw.githubusercontent.com/jart/cosmopolitan/refs/heads/master/libc/tinymath/entropy.c) demonstrates key-finding capabilities available to persistent threats. low nakamoto coefficient networks running validation keys hot are likely already compromised.
+
+jam only has x86 JIT currently. we have doubts x86 can be secured against weaponized machine intelligence at this scale - the attack surface is enormous, microcode is opaque, speculative execution side channels keep appearing.
+
+at minimum, validator clients should use TPM sealing. keys should never exist in main memory unencrypted. jam's current tooling doesn't address this.
+
+## implementation notes
+
+building romio (jam client in julia):
+
+what worked: julia's multiple dispatch maps well to the STF. ffi to rust for polkavm and crypto is seamless. repl development caught spec ambiguities early.
+
+what hurt: graypaper formalism doesn't always map to implementation. erasure coding at scale needs careful memory management. quic + noise has limited julia ecosystem support.
+
+the spec is ~100 pages of dense math. most complexity is in networking and availability layers. the core STF is cleaner than it looks.
+
+## where this leaves us
+
+jam is a significant improvement over polkadot. removes substrate complexity, enables synchronous composition, ships a real vm. these matter.
+
+but the 18-second finality window breaks shielded protocols. light clients verify signatures, not execution. bandwidth requirements centralize validators geographically. ipv6+quic excludes regions.
+
+for kusama, i'd like to see exploration of zkjam: 2D data availability via zoda, deterministic finality via threshold signatures, execution proofs via ligerito. the gap between "optimistic execution with slow finality" and "verified execution with fast finality" is closing.
+
+[penumbra's parallelized client-side proving](https://www.youtube.com/watch?v=jFg15np6Psw) shows compute isn't the main bottleneck - loading the zk circuit binary is. once cached, proving parallelizes across cores. agentic chains where users hold their own state and the chain just verifies transitions - this seems like the endgame.
+
+jam is a step in that direction. it shouldn't be the last step.
+
+---
+
+sources:
+- [jam graypaper](https://graypaper.com/)
+- [elves paper](https://eprint.iacr.org/2024/961)
+- [osst paper](https://eprint.iacr.org/2025/722)
+- [zoda paper](https://eprint.iacr.org/2025/034)
+- [zoda blog](https://commonware.xyz/blogs/zoda)
+- [ligerito](https://ligerito.rotko.net)
+- [light client architecture](https://lmao.bearblog.dev/architecting-blockchains/)
+- [smoldot security](https://github.com/smol-dot/smoldot)
+- [gfw quic blocking](https://gfw.report/publications/usenixsecurity25/en/)
+- [bgp statistics](https://bgp.potaroo.net/)
