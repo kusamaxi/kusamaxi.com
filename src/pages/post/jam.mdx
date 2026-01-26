@@ -67,8 +67,6 @@ this is what the linux philosophy looks like on-chain. small focused services. e
 composition instead of duplication. you can even deploy corevm as a service and build on top of it.
 corevm supports std rust today with extensibility for custom entrypoints.
 
-![modular services](/assets/post/jam/modular.webp)
-
 and unlike most blockchain "composability" claims, you can actually inspect it. polkajam's `jamt`
 provides modular trace streams. every opcode, pc, register, gas value, memory load/store goes to
 separate files. `diff` traces between implementations. `grep` for specific opcodes. O(1) seeking,
