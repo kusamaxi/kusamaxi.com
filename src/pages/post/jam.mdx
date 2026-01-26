@@ -137,42 +137,15 @@ the key distinction: babe had *protocol-level* forks where two honest validators
 win the same slot. safrole eliminates this. reorgs from malice or network conditions remain until
 grandpa finality.
 
-for shielded state actions, any reorg window is fatal. this is why you have not been able to build
-proper shielded apps on polkadot so far.
+for shielded state actions, reorgs can leak information. when you spend a shielded note, you
+reveal a nullifier - if that block gets orphaned, the nullifier was briefly visible. observers
+could link your deposit to spend. this is why penumbra never built on polkadot - i discussed
+this with henry de valence at [shielding summit](https://shieldingsummit.org/) in bangkok.
+babe's accidental forks made this a regular occurrence.
 
-when you spend a shielded note, you reveal a nullifier - a unique identifier that prevents double-
-spending without exposing which note you spent. the security property is simple: once a nullifier
-is revealed, that note is burned forever. but what if the block containing your nullifier gets
-orphaned?
-
-- nullifier was visible on-chain (even briefly)
-- transaction reverted, note still spendable
-- observers now know which nullifier maps to an unspent note
-- when you spend that note again with the same nullifier, deposit links to spend
-- unlinkability gone. permanently.
-
-this is why penumbra never built on polkadot. i remember discussing this with henry de valence
-at [shielding summit](https://shieldingsummit.org/) in bangkok. the technical reason wasn't performance or tooling - it was that babe's
-accidental forks made shielded protocols fundamentally unsafe. can't have "oops fork" as normal
-operation when it burns your anonymity set. safrole removes accidental forks but the 12-18 second
-finality window remains.
-
-the graypaper says it plainly. blocks can revert for up to an hour. realistically 12 to 18 seconds.
-for most applications this is fine. for shielded protocols it's still problematic.
-
-even with safrole, a malicious validator can equivocate during that window. they produce block A
-with your nullifier, you see confirmation, they produce block B without it, grandpa finalizes B.
-your nullifier was visible. your privacy leaked. yes, the validator gets slashed - but your
-unlinkability is gone forever. slashing doesn't un-leak information.
-
-tendermint takes a different tradeoff. blocks don't exist until two-thirds of validators commit.
-nullifier reveal happens at finality. same exact moment. no window for information leakage. the
-cost: validator set caps around 100 due to bft networking overhead. penumbra accepted this tradeoff
-because for privacy-first protocols, there's no alternative.
-
-jam chose differently - larger validator sets, higher throughput, but a finality gap. for compute-
-heavy applications (defi, gaming, data availability), this is the right call. for shielded state
-actions, the gap remains a fundamental limitation.
+safrole changes the calculus. accidental forks are gone. the remaining edge cases - malicious
+equivocation (slashable) or rare netsplits - might leak a nullifier once every few months. for
+most shielded use cases, that's an acceptable tradeoff. not perfect, but practical.
 
 ### light clients
 
