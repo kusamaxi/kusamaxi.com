@@ -73,7 +73,7 @@ function getIndentPadding(depth: number) {
 		<div class="flex flex-wrap gap-1 sm:gap-2 justify-center mb-4 sm:mb-6 px-2 max-w-full">
 			{frontmatter.tags.map((tag) => <Tag>{tag}</Tag>)}
 		</div>
-		<main class="font-serif mx-auto text-base md:text-lg text-left md:text-justify max-w-screen-md prose prose-custom overflow-x-hidden">
+		<main data-sonotxt class="font-serif mx-auto text-base md:text-lg text-left md:text-justify max-w-screen-md prose prose-custom overflow-x-hidden">
 			<div class="text-left">
 				<h1>Table of Contents</h1>
 				<ul class="!pl-0">
@@ -91,4 +91,6 @@ function getIndentPadding(depth: number) {
 			<Utterances />
 		</main>
 	</section>
+	<!-- SonoTxt embed - generates audio from article content -->
+	<script is:inline src="https://app.sonotxt.com/embed.js" data-sig={import.meta.env.PUBLIC_SONOTXT_SIG || ''}></script>
 </MainLayout>
