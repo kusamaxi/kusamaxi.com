@@ -206,6 +206,12 @@ zoda with mmr also strengthens bridging. beefy gives compact finality proofs tha
 this. you're still trusting signed data is correct. zoda adds that data is available AND valid.
 external chains verify without trusting relayers.
 
+alternative stacks are already moving on this. celestia's [fibre](https://blog.celestia.org/fibre/)
+builds their 1tb/s DA layer on zoda - 881x faster than KZG, recovery from any 1/3 honest validators.
+commonware's [tempo](https://github.com/commonwarexyz/monorepo/tree/main/consensus/tempo) uses zoda
+for block dissemination with immediate guarantees. jam staying on 1D reed-solomon while competitors
+ship 2D is a gap that matters for light client security.
+
 ### network
 
 graypaper specifies ~387 Mb/s TX, ~357 Mb/s RX. recommends 500 Mb/s sustained with margin.
@@ -556,6 +562,8 @@ sources:
 - [reshare](https://commonware.xyz/blogs/reshare)
 - [zoda paper](https://eprint.iacr.org/2025/034)
 - [zoda implementation](https://commonware.xyz/blogs/zoda)
+- [celestia fibre](https://blog.celestia.org/fibre/)
+- [commonware tempo](https://github.com/commonwarexyz/monorepo/tree/main/consensus/tempo)
 - [accidental computer](https://eprint.iacr.org/2025/918)
 - [ligerito](https://ligerito.rotko.net)
 - [binius64](https://github.com/IrreducibleOSS/binius64)
