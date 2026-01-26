@@ -322,44 +322,25 @@ traffic manager but as a public good with cryptoeconomic guarantees. great stepp
 demo for broader adoption - technical people at rirs and ixps negotiating peering contracts
 would love more transparency and public state for routing decisions.
 
-## identity and validator selection
+## identity and spam
 
-ringvrf/bandersnatch with proof of personhood enables pseudonymous identity. fresh accounts, no
-history. polkadot's exploring using proof of personhood for nomination - real people selecting
-validators instead of plutocratic staker nomination.
+polkadot handles 20k tps per parachain. solana does 200-300 actual user interactions per second.
+we're not capacity constrained. we're ux constrained. gatekeeping this capacity with compulsory
+fee mechanisms or complex identity rituals is overkill.
 
-economic games work best when participants are hungry. backs against the wall. nominated proof of
-stake has been one of polkadot's core failures. continuous reselection is technically demanding.
-gains for nominators are minimal. and nominator incentives don't align with network health anyway -
-you optimize for yield, not for geographic distribution or client diversity. proof of personhood
-nomination could fix this. one human, one vote. no plutocracy. doesn't help transaction privacy,
-but decentralizes validator selection where it matters.
+proof of personhood enables pseudonymous identity for validator nomination - one human, one vote
+instead of plutocratic staker nomination. nominated proof of stake has been one of polkadot's
+core failures. nominators optimize for yield, not geographic distribution or client diversity.
+proof of personhood nomination could fix this.
 
-seems like another high-risk bet gavin is willing to take. trying to solve the problem the hard
-way - hitting multiple flies at once. we want it to work, but will it actually find participation
-when the onboarding is this painful? proof of work in the form of computational proofs, limited
-to 50% of network capacity, would get us most of the way on spam without the ux friction of
-weekly rituals. hopefully polkadot app and hub prove me wrong.
+but proof of personhood asks for tattoos and weekly video calls. there's value in proving
+humanity in the era of ai - last moment to try before video gets fully synthetic. but that
+shouldn't be the paywall for using a network.
 
-### spam protection
-
-polkadot handles 20k tps per parachain on 6 cores. solana does 200-300 actual user interactions
-per second. we're not capacity constrained. we're ux constrained. gatekeeping this capacity with
-compulsory fee mechanisms is insane.
-
-there's value in proving humanity in the era of ai - it's literally the last moment to try, if
-not already too late especially over video. but that should not be the paywall for using a
-network.
-
-stop reinventing wheels. captcha worked because grandma could click pictures of traffic lights.
-proof of personhood asks people to get tattoos and do weekly video calls. explaining complex
-mechanisms to participate leads to apathy, not growth. solving growing pains proactively has
-proven to be bad in markets - congestion drives prices up. ethereum bubble had people happy to
-pay $100 to interact with a cat jpg for months in 2017, making you question your own sanity.
-
-computational proofs hit the same ux as captcha - browser does the work silently, user clicks
-submit, done. [ligerito](https://ligerito.rotko.net) proves 1M elements in 50ms. fast to verify,
-no mental overhead. can't spam faster than you can prove. just works.
+captcha worked because grandma could click traffic lights. computational proofs hit the same ux
+- browser does the work silently, user clicks submit, done. [ligerito](https://ligerito.rotko.net)
+proves 1M elements in 50ms. can't spam faster than you can prove. proof of personhood for
+validator selection, computational proofs for spam. different tools for different problems.
 
 ## what would enable shielded apps
 
