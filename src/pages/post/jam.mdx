@@ -148,6 +148,11 @@ but what if the block containing your nullifier gets orphaned?
 - when you spend that note again, deposit links to spend
 - unlinkability gone. permanently.
 
+and nullifiers are just the simple case. penumbra has split state - shielded balances, positions,
+delegations all living in encrypted form. a reorg doesn't just leak one nullifier, it forks your
+entire private state. users see different balances depending on which chain won. reconciliation
+is a nightmare.
+
 this is why penumbra never built on polkadot. i discussed this with henry de valence at
 [shielding summit](https://shieldingsummit.org/) in bangkok. babe causes forks by design -
 validators run a vrf lottery each slot. if your output is below threshold, you can produce a
