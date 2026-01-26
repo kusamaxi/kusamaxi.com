@@ -137,15 +137,28 @@ the key distinction: babe had *protocol-level* forks where two honest validators
 win the same slot. safrole eliminates this. reorgs from malice or network conditions remain until
 grandpa finality.
 
-for shielded state actions, reorgs can leak information. when you spend a shielded note, you
-reveal a nullifier - if that block gets orphaned, the nullifier was briefly visible. observers
-could link your deposit to spend. this is why penumbra never built on polkadot - i discussed
-this with henry de valence at [shielding summit](https://shieldingsummit.org/) in bangkok.
-babe's accidental forks made this a regular occurrence.
+for shielded state actions, reorgs leak information. when you spend a shielded note, you reveal
+a nullifier - a unique identifier that prevents double-spending without exposing which note you
+spent. the security property is simple: once a nullifier is revealed, that note is burned forever.
+but what if the block containing your nullifier gets orphaned?
 
-safrole changes the calculus. accidental forks are gone. the remaining edge cases - malicious
-equivocation (slashable) or rare netsplits - might leak a nullifier once every few months. for
-most shielded use cases, that's an acceptable tradeoff. not perfect, but practical.
+- nullifier was visible on-chain (even briefly)
+- transaction reverted, note still spendable
+- observers now know which nullifier maps to an unspent note
+- when you spend that note again, deposit links to spend
+- unlinkability gone. permanently.
+
+this is why penumbra never built on polkadot. i discussed this with henry de valence at
+[shielding summit](https://shieldingsummit.org/) in bangkok. babe causes forks by design -
+validators run a vrf lottery each slot. if your output is below threshold, you can produce a
+block. but multiple validators can win the same slot. both produce valid blocks. fork. the
+network picks one, orphans the other. this happens regularly - it's baked into the protocol.
+shielded apps can't tolerate "oops fork" as normal operation.
+
+safrole fixes this. accidental forks are gone - one author per slot, no ambiguity. the remaining
+edge cases are malicious equivocation (slashable) or rare netsplits. a nullifier might leak once
+every few months instead of daily. for most shielded use cases, that's an acceptable tradeoff.
+jam with safrole makes shielded apps practical where babe couldn't.
 
 ### light clients
 
