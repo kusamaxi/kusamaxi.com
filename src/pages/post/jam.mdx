@@ -24,7 +24,7 @@ the surveillance infrastructure ourselves. in all the gold rush, we're building 
 into current designs is likely to look as bad in hindsight as those architectural decisions today.
 
 this article covers what current designs get right - composability, real VMs, synchronous
-execution - and what's still missing: instant finality, proper light clients, network adapters,
+execution - and what's still missing: deterministic finality, proper light clients, network adapters,
 and cryptography that would actually enable private applications on public chains.
 
 ## what jam fixes
@@ -511,7 +511,7 @@ worth it? depends on threat model:
   at 2^24. block producer proves once, validators verify. almost free.
 - **private computation**: user proves client-side. can't expose inputs to block producer. 1000x
   overhead but happens user-side. still enough compute for useful applications. works best as a
-  jam service, but requires instant finality to be practical.
+  jam service, but requires deterministic finality to be practical.
 
 [binius64](https://github.com/IrreducibleOSS/binius64) takes a different approach. opcode-specific
 circuits instead of generic traces. `band` one constraint, `imul` one constraint, `rotr32`
