@@ -190,8 +190,9 @@ detect this. rob's justification: fits ELVES model, faster. but after the 2025 z
 is hard to justify.
 
 [zoda](https://eprint.iacr.org/2025/034) fixes both problems. 2D encoding where each shard includes
-checksum proving valid encoding. receivers verify immediately. overhead: 3.1x vs jam's 3x. no
-trusted setup. no elliptic curves. light clients verify DA with ~300kb samples.
+checksum proving valid encoding. receivers verify immediately. [commonware's implementation](https://commonware.xyz/blogs/zoda)
+shows ~2.1x overhead vs ~8x for 2D KZG at scale - no trusted setup, no elliptic curves, just field
+ops and hashing. light clients verify DA with ~300kb samples.
 
 key insight from [the accidental computer](https://eprint.iacr.org/2025/918): 2D polynomial
 structure that proves DA can also encode validity constraints. same commitment proves both.
@@ -554,6 +555,7 @@ sources:
 - [osst crate](https://github.com/rotkonetworks/zeratul/tree/main/crates/osst)
 - [reshare](https://commonware.xyz/blogs/reshare)
 - [zoda paper](https://eprint.iacr.org/2025/034)
+- [zoda implementation](https://commonware.xyz/blogs/zoda)
 - [accidental computer](https://eprint.iacr.org/2025/918)
 - [ligerito](https://ligerito.rotko.net)
 - [binius64](https://github.com/IrreducibleOSS/binius64)
