@@ -177,12 +177,12 @@ actions, the gap remains a fundamental limitation.
 
 ### light clients
 
-light clients verify block authenticity, not validity. authenticity: a validator signed it.
-validity: the state transition is correct. [different security properties](https://github.com/smol-dot/smoldot?tab=readme-ov-file#invalid-best-block-light-clients-only).
+light clients have only verified block authenticity, not validity. authenticity: a validator
+signed it. validity: the state transition is correct. [different security properties](https://github.com/smol-dot/smoldot?tab=readme-ov-file#invalid-best-block-light-clients-only).
 
 malicious validator signs block with invalid state transitions. light client accepts it until
-grandpa finality. documented trust model says "trustless." actual trust model: trust validators
-or wait 12-18 seconds.
+grandpa finality. documented trust model says "trustless." actual trust model so far: trust
+validators or wait 12-18 seconds.
 
 jam uses 1D reed-solomon for data availability. efficient but optimistic. malicious producer can
 distribute shards that individually look valid but reconstruct to garbage. light client can't
