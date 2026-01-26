@@ -148,10 +148,35 @@ but what if the block containing your nullifier gets orphaned?
 - when you spend that note again, deposit links to spend
 - unlinkability gone. permanently.
 
-and nullifiers are just the simple case. penumbra has split state - shielded balances, positions,
-delegations all living in encrypted form. a reorg doesn't just leak one nullifier, it forks your
-entire private state. users see different balances depending on which chain won. reconciliation
-is a nightmare.
+and nullifiers are just the simple case. think through penumbra's zswap mechanism:
+
+- users submit encrypted swap intents during a block
+- batch auction computes uniform clearing price from all intents
+- flow encryption: validators threshold-decrypt only the aggregate flow (total buys/sells)
+- individual amounts stay hidden, only aggregate revealed
+
+now a fork happens:
+
+- chain A reveals aggregate flow F1 for batch B1, your swap executes at price P1
+- chain B has different swap set, reveals flow F2, clears at price P2
+- grandpa finalizes chain B. your swap on chain A is orphaned
+- but F1 was already threshold-decrypted. that aggregate is public forever
+- if only a few swaps differ between batches, observers narrow down which was yours
+- you resubmit your swap on chain B - now they know you were in the orphaned batch
+
+it gets worse with delegations. penumbra has private staking - delegation amounts shielded,
+transitions happen at epoch boundaries. fork during epoch transition means your delegation state
+diverges. one chain you're staked to validator A, other chain the delegation didn't land. your
+wallet's view of your own balance is wrong until you re-scan the canonical chain.
+
+the fundamental issue: every shielded action produces encrypted state only you can decrypt. your
+wallet builds its view by scanning and decrypting. fork means your local state diverges from
+canonical. you try spending notes that don't exist. you miss notes that do. re-scanning fixes
+your view but any actions on the orphaned fork are visible to anyone watching for them.
+
+in vm design, the benchmark is "can it run doom". in blockchain design, the question should be
+"can it run penumbra". if your consensus can't handle shielded state without leaking information
+on forks, you haven't solved the hard problem.
 
 this is why penumbra never built on polkadot. i discussed this with henry de valence at
 [shielding summit](https://shieldingsummit.org/) in bangkok. babe causes forks by design -
