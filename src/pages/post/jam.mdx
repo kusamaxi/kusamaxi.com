@@ -426,10 +426,9 @@ osst + zoda together: light client samples one shard (~300kb), verifies merkle i
 (instant proof of valid DA), then verifies one threshold signature (instant proof of finality).
 no waiting for 2-3 blocks. no trusting validators. trustless light clients become real.
 
-if you've ever built a trustless light client on smoldot, you know the pain. ~18 seconds waiting
-for finality on every interaction because blocks aren't verifiable until grandpa commits. the ux
-is brutal - users stare at spinners, developers lose patience mid-debugging. current design simply
-isn't light-client friendly. osst + zoda would flip this entirely: verify block validity from one
+if you've ever built a trustless light client on smoldot, you know that finality gap firsthand.
+~18 seconds waiting on every interaction because blocks aren't verifiable until finalized. the ux
+is brutal - users stare at spinners, developers lose patience mid-debugging. osst + zoda would flip this entirely: verify block validity from one
 shard, verify finality from one signature, done in milliseconds not seconds.
 
 we've implemented osst with curve backends for ristretto255 (polkadot), pallas (zcash), secp256k1
