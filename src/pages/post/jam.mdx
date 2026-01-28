@@ -20,8 +20,9 @@ here's some yapping about what's still missing.
 [web3](https://gavwood.com/dappsweb3.html) was supposed to be the post-snowden response to mass
 surveillance. instead we got permanent public ledgers where every transaction is visible forever,
 every balance queryable, every interaction logged. with few exceptions like penumbra, we created
-the surveillance infrastructure ourselves. in all the gold rush, we're building the xorg of public compute. the information leakage baked
-into current designs is likely to look as bad in hindsight as those architectural decisions today.
+the surveillance infrastructure ourselves. we're building the xorg of public compute - the
+information leakage baked into current designs will look as bad in hindsight as those
+architectural decisions do today.
 
 this article covers what current designs get right - composability, real VMs, synchronous
 execution - and what's still missing: deterministic finality, proper light clients, network adapters,
@@ -77,6 +78,19 @@ real toolchains. real jit. decades of compiler optimization just works. that's t
 between evm that nobody optimizes and leveraging what silicon vendors and compiler teams have been
 perfecting since the 80s.
 
+polkajam testnet (v0.1.27, 6-node local, kernel 6.17.4-xanmod):
+
+| metric | interpreter | jit (compiler) |
+|--------|-------------|----------------|
+| block import | 13.5 blocks/s | 30.5 blocks/s |
+| trie insert (1M keys) | 552k keys/s | 552k keys/s |
+| ec encode (14MB) | 56ms | 56ms |
+| ec reconstruct | 122 MiB/s | 122 MiB/s |
+
+jit is 2.3x faster for block import. standalone polkavm shows ~50x gap for compute-heavy
+workloads (1600fps jit vs 32fps interpreter). doom.corevm deploys via `jamt vm new`, chunking
+the 5.3MB binary across work packages. 320x200x24 video mode runs continuously.
+
 the core model is dead simple. services have two functions. refine does stateless parallel work
 across cores. accumulate merges results into shared state.
 
@@ -107,9 +121,10 @@ epoch N+1: each slot has exactly ONE valid author
            no ambiguity, no race, no accidental fork
 ```
 
-the tickets use ring vrf - anonymous but verifiable. nobody knows which validator won which slot
-until they actually produce the block. but critically, there's only ONE winner per slot. two honest
-validators will never both believe they should produce the same block.
+the tickets use ring vrf - anonymous within the validator set. the ring signature proves "one of
+these 1024 validators submitted this ticket" without revealing which one. nobody knows who won
+which slot until they produce the block. but critically, there's only ONE winner per slot. two
+honest validators will never both believe they should produce the same block.
 
 note on fallback mode: safrole needs E tickets (one per slot) to fill an epoch. if validators don't
 submit enough during the submission window (genesis, mass outages, small validator set), it falls
@@ -117,78 +132,71 @@ back to round-robin based on bandersnatch public keys. this doesn't affect fork 
 author per slot, still no accidental forks. the weakness is losing anonymity: everyone knows who's
 producing next, making targeted dos attacks possible.
 
-for most applications, this is a genuine improvement - accidental forks were the common case, now
-they're gone.
+why does this matter? shielded state. when you spend a shielded note, you reveal a nullifier.
+if that block gets orphaned, the nullifier was visible - observers learn your spend was in that
+batch. with a small anonymity set, that's significant entropy loss. larger pools help but any
+reorg leaks information you can't take back.
 
-## where jam falls apart
-
-### finality gap
-
-safrole eliminates accidental forks, but reorgs are still possible from:
-
-- **equivocation**: slotted validator announces more than one block. slashable, but the reorg
-  happens before punishment lands.
-- **netsplit**: hurricane electric cuts peering with cogent (as6939 ↔ as174). validators on HE-
-  reachable networks see block 100, validators behind cogent don't. slot 101's author is cogent-
-  side, builds on block 99. partition heals, grandpa finalizes one chain, other orphaned. no
-  malice required - just infrastructure politics. this has happened before and will happen again.
-
-the key distinction: babe had *protocol-level* forks where two honest validators both legitimately
-win the same slot. safrole eliminates this. reorgs from malice or network conditions remain until
-grandpa finality.
-
-for shielded state actions, reorgs leak information. when you spend a shielded note, you reveal
-a nullifier - a unique identifier that prevents double-spending without exposing which note you
-spent. the security property is simple: once a nullifier is revealed, that note is burned forever.
-but what if the block containing your nullifier gets orphaned?
-
-- nullifier was visible on-chain (even briefly)
-- transaction reverted, note still spendable
-- observers now know which nullifier maps to an unspent note
-- when you spend that note again, deposit links to spend
-- unlinkability gone. permanently.
-
-and nullifiers are just the simple case. think through penumbra's zswap mechanism:
+and nullifiers are just the simple case. think through penumbra's zswap:
 
 - users submit encrypted swap intents during a block
 - batch auction computes uniform clearing price from all intents
-- flow encryption: validators threshold-decrypt only the aggregate flow (total buys/sells)
+- flow encryption: validators threshold-decrypt only the aggregate flow
 - individual amounts stay hidden, only aggregate revealed
 
-now a fork happens:
+now imagine babe forks:
 
-- chain A reveals aggregate flow F1 for batch B1, your swap executes at price P1
+- chain A reveals aggregate flow F1, your swap executes at price P1
 - chain B has different swap set, reveals flow F2, clears at price P2
-- grandpa finalizes chain B. your swap on chain A is orphaned
+- network picks chain B. your swap on chain A is orphaned
 - but F1 was already threshold-decrypted. that aggregate is public forever
-- if only a few swaps differ between batches, observers narrow down which was yours
-- you resubmit your swap on chain B - now they know you were in the orphaned batch
+- you resubmit your swap - now observers know you were in the orphaned batch
 
 it gets worse with delegations. penumbra has private staking - delegation amounts shielded,
 transitions happen at epoch boundaries. fork during epoch transition means your delegation state
-diverges. one chain you're staked to validator A, other chain the delegation didn't land. your
-wallet's view of your own balance is wrong until you re-scan the canonical chain.
-
-the fundamental issue: every shielded action produces encrypted state only you can decrypt. your
-wallet builds its view by scanning and decrypting. fork means your local state diverges from
-canonical. you try spending notes that don't exist. you miss notes that do. re-scanning fixes
-your view but any actions on the orphaned fork are visible to anyone watching for them.
+diverges. your wallet's view of your own balance is wrong until you re-scan the canonical chain.
 
 in vm design, the benchmark is "can it run doom". in blockchain design, the question should be
-"can it run penumbra". if your consensus can't handle shielded state without leaking information
-on forks, you haven't solved the hard problem.
+"can it run penumbra". if your consensus can't handle shielded state without leaking on forks,
+you haven't solved the hard problem.
 
 this is why penumbra never built on polkadot. i discussed this with henry de valence at
-[shielding summit](https://shieldingsummit.org/) in bangkok. babe causes forks by design -
-validators run a vrf lottery each slot. if your output is below threshold, you can produce a
-block. but multiple validators can win the same slot. both produce valid blocks. fork. the
-network picks one, orphans the other. this happens regularly - it's baked into the protocol.
-shielded apps can't tolerate "oops fork" as normal operation.
+[shielding summit](https://shieldingsummit.org/) in bangkok. babe's regular forks made shielded
+apps impossible.
 
-safrole fixes this. accidental forks are gone - one author per slot, no ambiguity. the remaining
-edge cases are malicious equivocation (slashable) or rare netsplits. a nullifier might leak once
-every few months instead of daily. for most shielded use cases, that's an acceptable tradeoff.
-jam with safrole makes shielded apps practical where babe couldn't.
+safrole fixes the common case - accidental forks gone. but reorgs are still possible from:
+
+- **equivocation**: slotted validator announces more than one block. slashable, but the reorg
+  happens before punishment lands. in practice this happens when operators inject keys into two
+  machines - bad operational hygiene, not malice. jam clients should prevent this by design.
+  keys belong in yubikey hsm or tpm, not copied between boxes. [tpm spec 1.84+](https://trustedcomputinggroup.org/resource/tpm-library-specification/)
+  finally supports ed25519, but current hardware doesn't ship it - amd 7945hx (2024) runs ftpm
+  spec 1.59. by the time 1.84 hardware is purchasable, ed25519 might be deprecated for
+  post-quantum alternatives. [convenient timing](https://blog.cr.yp.to/).
+- **netsplit**: hurricane electric cuts peering with cogent (as6939 ↔ as174). validators on
+  different sides of the partition build on different blocks. partition heals, grandpa finalizes
+  one chain, other orphaned. no malice required - just infrastructure politics.
+
+the remaining edge cases are rare - equivocation slashings happen maybe once a year on polkadot,
+not daily like babe's accidental forks. for most shielded use cases, that's an acceptable tradeoff.
+
+if you're building a penumbra-like chain on jam, two options. conservative: wait for grandpa
+finality before allowing shielded actions. watch the finality stream, only mark notes spendable
+once their block is final. 12-18 second wait on every interaction.
+
+or accept the risk and act on non-final blocks. equivocation means massive slashing - attacking
+your privacy costs the validator their entire stake. netsplits are rare infrastructure events.
+but then you need reorg handling: detect orphaned blocks, resync to canonical chain, recalculate
+spendable notes. privacy leak is rare, but when it happens you still need to stay functional.
+more complexity for better ux. your call.
+
+for cross-chain shielded composability under the same assumptions, [speculative messaging](https://github.com/paritytech/polkadot-sdk/pull/10449)
+replaces hrmp with off-chain message passing and merkle mountain range commitments. collator acknowledgements add
+economic guarantees - lying about message availability is slashable. combined with safrole's
+single-author slots, you get parachain-speed cross-chain messaging within trust domains. still
+optimistic (reorgs possible before grandpa), but the economic deterrents stack.
+
+## where jam falls apart
 
 ### light clients
 
@@ -218,8 +226,9 @@ structure that proves DA can also encode validity constraints. same commitment p
 light clients sample and verify both properties. no waiting for finality. no trusting validators.
 
 zoda with mmr also strengthens bridging. beefy gives compact finality proofs that validators signed
-this. you're still trusting signed data is correct. zoda adds that data is available AND valid.
-external chains verify without trusting relayers.
+this. you're still trusting signed data is correct. zoda adds DA guarantees - data exists and is
+retrievable. combined with accidental computer's validity encoding, external chains verify both
+availability and correctness without trusting relayers.
 
 alternative stacks are already moving on this. celestia's [fibre](https://blog.celestia.org/fibre/)
 builds their 1tb/s DA layer on zoda - 881x faster than KZG, recovery from any 1/3 honest validators.
@@ -232,11 +241,35 @@ matters for light client latency and security.
 graypaper specifies ~387 Mb/s TX, ~357 Mb/s RX. recommends 500 Mb/s sustained with margin.
 
 geographic concentration follows. residential 500 Mb/s symmetric: $50-200/month wealthy countries,
-$500-2000 southeast asia, unavailable elsewhere. business-grade with SLA: $500-1500/month. 10x
-cost jump prices out hobbyist validators.
+$500-2000 southeast asia, unavailable elsewhere. and residential means oversubscribed - isps sell
+the same capacity to 20-50 households assuming they won't all use it simultaneously. peak hours
+(evenings, weekends) your "500 Mb/s" becomes 100 Mb/s or worse. validators need consistent
+throughput, not best-effort. business-grade with SLA: $500-1500/month. 10x cost jump prices out
+hobbyist validators.
 
-jam mandates ipv6 and quic. ipv6 has 3-4x less peering redundancy than ipv4 in bgp tables. quic
-blocked in china. validator set will concentrate in well-connected datacenters.
+you'd think bandwidth gets cheaper - 1Tbit switch ports increasingly affordable, core network
+costs dropping. but it's last mile that costs most, and that's where monopolies live. isps are
+losing application layer revenue to quic (can't inject ads, can't sell "zero-rating" deals when
+everything's encrypted end-to-end), so they squeeze harder on transport. and with compute costs
+rising across the board (electricity, hardware, cooling), isps will follow even when there's no
+direct reason - "costs are up everywhere" is excuse enough. until validators multihome with their
+own v6 resources and buy peering/transit directly from hurricane electric or local ixps, unlikely
+to see savings trickle down. except at 500Mbps volumes, bypassing doesn't make sense anyway -
+best deal without pooling is ~$1/Mbit, up to 10x more depending on region. $500-5000/month for
+transit alone, before you count colo and hardware. the economics only favor bypass at scale,
+which means validator pools or professional operators.
+
+jam mandates ipv6 and quic. the rationale should be p2p friendliness (no nat, every node
+directly addressable), not resilience - ipv6 is significantly less resilient. full v6 bgp table
+is ~250k routes vs ipv4's ~1M. fewer routes means fewer paths, less redundancy when links fail.
+quic blocked in china. validator set will concentrate in well-connected datacenters.
+
+w3f's decentralized nodes program missed an opportunity here - three cohorts of benchmarking
+without advocating for v6 addresses as jam-ready networking requirement. high mvr on polkadot
+validators is more often networking timeouts than compute bottlenecks. the transition will hurt.
+there's good reason v6 adoption has taken four decades - it's not inertia, it's extra work on
+an already complex subject for barely any gain from isp perspective. networking is hard enough
+without maintaining parallel stacks.
 
 ### no network adapters
 
@@ -244,7 +277,7 @@ jam services can't initiate outbound connections. no http. no websockets. no dns
 requires it - validator A calls oracle, gets price $100. validator B calls same oracle 50ms
 later, gets $100.02. who's wrong? neither. network is non-deterministic by nature.
 
-corevm CAN have networking - we've built socket syscall extensions for polkakernel, musl libc
+corevm CAN have networking - parity built socket syscall extensions for polkakernel, musl libc
 runs sandboxed with host providing actual sockets. but for jam validators it's a non-starter.
 `refine()` must return identical results given identical inputs.
 
@@ -321,13 +354,6 @@ zerotier mesh, coordinating announcements - this won't happen overnight. most op
 never touched bgp. we've documented our setup at [rotkonetworks/networking](https://github.com/rotkonetworks/networking)
 but it's still a significant learning curve for anyone not already running their own asn.
 
-alternatively: large botnets already solve this problem. globally distributed nodes, low-latency
-c2 coordination, resilient routing - same infrastructure pattern as rage4 + zerotier, built for
-different reasons. [ipv4.games](https://blog.apnic.net/2026/01/06/an-interview-with-the-creators-of-ipv4-games/)
-leaderboard is basically a map of who has distributed ip presence. ideal incentivization wouldn't
-care if nodes are zombies or datacenters - just latency and uptime. supposedly blockchains are
-[allegal](https://www.youtube.com/watch?v=Zh9BxYTSrGU) anyway - systems that [shouldn't](https://figment.io/insights/compliance-at-the-core-why-ofac-compliant-mev-relays-matter-for-institutional-ethereum-stakers/) care.
-
 traffic steering as an incentivized jam service could be extremely interesting. a global
 singleton that coordinates routing decisions - which pop handles which queries, load balancing
 across operators, failover when nodes go down. sla monitoring feeds real latency data, service
@@ -336,125 +362,237 @@ traffic manager but as a public good with cryptoeconomic guarantees. great stepp
 demo for broader adoption - technical people at rirs and ixps negotiating peering contracts
 would love more transparency and public state for routing decisions.
 
-## identity and spam
+## state economics
 
 polkadot handles 20k tps per parachain. solana does 200-300 actual user interactions per second.
 we're not capacity constrained. we're ux constrained. gatekeeping this capacity with compulsory
 fee mechanisms or complex identity rituals is overkill.
 
-proof of personhood enables pseudonymous identity for validator nomination - one human, one vote
-instead of plutocratic staker nomination. nominated proof of stake has been one of polkadot's
-core failures. nominators optimize for yield, not geographic distribution or client diversity.
-proof of personhood nomination could fix this. note: this is speculation based on breadcrumbs -
-polkadot r&d has moved to closed source repos.
+but maybe the gatekeeping is why polkadot runs empty. 20k tps capacity, 0.3 tps usage. penumbra
+tried the opposite - $0.000009 withdrawal fees, no barriers - and also has 3 withdrawals per day.
+high friction or no friction, same result: empty chains. the answer isn't at either extreme.
 
-but proof of personhood asks for tattoos and weekly video calls. proving humanhood has real
-value in the era of ai - it's the very last moment if not already too late given realtime
-synthetic video. we should proceed. but slamming a paywall-like blocker on participating in a
-niche network won't bring adoption.
+### why shielded state needs utxo
 
-captcha worked because grandma could click traffic lights. computational proofs hit the same ux
-- browser does the work silently, user clicks submit, done. [ligerito](https://ligerito.rotko.net)
-proves 1M elements in 50ms. can't spam faster than you can prove.
+account model: balance stored at address. transfer updates sender and receiver balances. simple.
+but every state transition is visible - balance before, balance after, delta computed trivially.
+"privacy" means hiding WHO transacted, not WHAT changed. that's not privacy, it's pseudonymity
+with extra steps.
+
+utxo/note model: no balances. just unspent outputs. spending reveals a nullifier - a commitment
+to "this note is now spent" - without revealing WHICH note. observers see nullifiers appear but
+can't link them to specific outputs. the anonymity set is all unspent notes, not just current
+transaction participants.
+
+penumbra, zcash, aztec all use note-based models. not because utxo is elegant (it's not - wallet
+complexity is real) but because account model fundamentally leaks state transitions. you can
+encrypt the amounts, but if i see your account touched in block N, i learned something. with
+notes, all i see is "someone spent something from the pool of all notes ever created."
+
+### the state bloat problem
+
+here's what nobody talks about: shielded notes persist forever.
+
+transparent utxo chains can prune spent outputs. once spent, the output is gone. state grows
+with UNSPENT outputs, not total history. but shielded chains can't do this. the commitment tree
+- the merkle structure proving notes exist - must keep every commitment ever made. why? because
+revealing which commitments correspond to spent notes would leak the nullifier-to-note mapping.
+that's the whole secret.
+
+penumbra has ~53 million um in shielded pool. that's millions of notes in the commitment tree.
+every dust note from every split transaction. every change output. permanent state. the tree
+only grows.
+
+this is why fees matter even in a world with computational proofs. spam protection gates WHO
+can submit. but it doesn't address WHAT gets stored. without fees, users split notes into dust
+without penalty. convenient for privacy (more outputs = larger anonymity set) but unsustainable
+for state growth.
+
+penumbra burns fees - more usage = scarcer supply. but at $0.000009 per withdrawal, the burn is
+decorative. 18 months of operation, ~75k um total burned - but most of that is dex arbitrage, not
+tx fees. actual transaction fees: ~420 um total. monthly issuance is ~33k um. the fee mechanism
+exists but doesn't bite.
+
+### separating submission from persistence
+
+the insight: rate-limiting and state-limiting are different problems. conflating them creates
+the adoption trap - make submission expensive to limit state, kill casual usage.
+
+```
+submission: computational proof
+  - ligerito proves 1M elements in 50ms
+  - bound to recent blockhash (no precomputation)
+  - browser does work silently, user clicks submit
+  - gates rate, not access - no upfront capital
+
+persistence: identity OR economic stake
+  - shielded notes default to ephemeral
+  - pruned after N epochs unless renewed
+  - prove personhood -> permanent state allocation
+  - OR deposit collateral -> permanent until withdrawn
+```
+
+first interaction is frictionless. your browser generates a proof, you submit, you get temporary
+shielded state. want permanence? prove you're human or stake something.
+
+for shielded pools: ephemeral notes solve dust. split your note into 100 pieces for privacy -
+fine, but they expire in 30 days unless consolidated or backed by identity. state growth becomes
+bounded by active users, not cumulative history.
+
+the risk: ephemeral notes leak timing. if your note expires without renewal, observers learn
+something. but that's opt-in - users who need long-term privacy will prove identity or pay.
+casual users get temporary privacy for free. different tiers for different needs.
+
+### computational proofs as spam protection
+
+proof of personhood has real value in the ai era - maybe the last moment to establish it before
+synthetic video makes verification impossible. but slamming identity requirements on first
+interaction won't bring adoption.
+
+captcha worked because grandma could click traffic lights. computational proofs could hit the
+same ux - browser does work silently, user clicks submit, done. [ligerito](https://ligerito.rotko.net)
+proves 1M elements in 50ms. binding proofs to recent blockhashes prevents precomputation - you
+can't stockpile proofs, each one requires fresh work.
 
 asymmetric proof/verify enables tiered access without paywalls. 1M parameter proof gets you 20%
 of network capacity. 16M parameters gets 30%. heavier compute, more access. no identity ritual,
-just cpu cycles. cpu-optimized proof params tied to recent blockhashes prevent gpu farm
-precompute. proof of personhood for validator selection, computational proofs for spam.
-different tools for different problems.
+just cpu cycles. cpu-optimized proof params tied to recent blockhashes prevent gpu farm precompute.
+
+proof of personhood for validator selection, computational proofs for spam, economic stake for
+permanent storage. different tools for different problems. the question is whether jam services
+can implement this tiered model or if it needs protocol-level support.
+
+### information economics
+
+the deeper framing: fees should reflect information value, not resource consumption.
+
+as more chains adopt shielded state as default, the privacy set grows. the larger the pool, the
+more valuable the information leaked by leaving it. withdrawals decrease the anonymity set and
+leak information - you're extracting from the organism. deposits increase the set - you're
+contributing. the asymmetry should match:
+
+- **deposits**: free or subsidized. you're adding to collective privacy.
+- **internal transfers**: minimal. shuffling within the pool costs little.
+- **withdrawals**: expensive. you're leaking information and shrinking the set.
+
+this isn't about punishing exits. it's pricing the externality. when you withdraw, everyone
+else's privacy decreases slightly. when you deposit, everyone benefits. fee structure should
+reflect that.
+
+all markets are information markets. consider poker: in a heads-up game, only you and your
+opponent see showdown hands. that information is private - and valuable. if you played against
+a known high-stakes player, the data about how they played specific hands becomes a tradeable
+asset. you could sell it. others would buy it to exploit patterns. the player themselves might
+contract you to keep the hand private. information has a price because information confers advantage.
+
+now scale that intuition. hft front-runs your trades because they see order flow you don't.
+recommendation engines know your preferences before you do. adtech tracks you across the web
+and sells access to your attention. humans have already lost this battle to algorithms.
+designing protocols around government compliance is extremely short-sighted - it optimizes for
+a specific adversary while ignoring the broader surveillance infrastructure already deployed
+against you.
+
+the real threat isn't regulators. it's the information asymmetry baked into every interaction
+with systems that know more about you than you know about yourself. shielded state isn't about
+hiding from governments - it's about not feeding the machine. every transparent transaction
+trains the models. every public balance updates the graph. privacy is defense against
+algorithmic suppression, not just legal prosecution.
+
+this shifts the mental model. we're not building "compliant privacy" or "regulatory-friendly
+anonymity." we're building information sovereignty. the organism protects itself by making
+extraction expensive and contribution free.
+
+### the path to free usage
+
+the optimistic take: we're reaching scale where these systems can function sustainably as free
+to use - just like web2 apps. ligerito verifies in 2ms. polkavm jit runs at 1600 fps. the
+marginal cost per transaction approaches zero. verification is no longer the bottleneck.
+
+the question shifts from "how do we charge per tx" to "who subsidizes infrastructure" - exactly
+how web2 works. premium tiers, institutional users, those who need permanent state - they cover
+the free tier. casual users get ephemeral shielded access for free. freemium model applied to
+privacy. the tech is finally there; the economics just need to catch up.
 
 ## what would enable shielded apps
 
-**threshold signatures for multi-asset custody**
+shielded protocols need deterministic finality. when you spend a note, you reveal a nullifier.
+if that block reverts, the nullifier was visible but the note is still spendable. linkability
+broken permanently. this isn't theoretical - it's why penumbra chose tendermint over polkadot.
 
-threshold signatures don't fix finality - that's a consensus design issue, not a signing problem.
-what they enable is multi-chain custody. jam validators collectively control addresses on bitcoin,
-ethereum, solana. users deposit assets, jam issues wrapped versions, validators threshold-sign
-withdrawals. trustless bridge without centralized custodian.
+### the finality problem
 
-why not just fiat-shamir? for proving consensus to jam itself, sure - non-interactive proofs work.
-but bitcoin doesn't verify zk proofs. it verifies schnorr/ecdsa signatures. for custody you need
-threshold signatures on the target chain's curve. no escape from that.
+tendermint: consensus happens before block production. propose → prevote → precommit → commit.
+2/3 must agree at each stage or no block exists. you never see a block that might revert.
 
-[osst](https://eprint.iacr.org/2025/722) provides two-thirds threshold without multi-round voting.
+jam/polkadot: produce block first, finalize later with grandpa. faster block times, but creates
+a finality gap. safrole eliminates accidental forks, but equivocation and netsplits still cause
+reorgs before grandpa catches up.
 
-```rust
-let contribution = share.contribute(&mut rng, &payload);
-let valid = verify(&group_pubkey, &contributions, threshold, &payload)?;
-```
+tendermint's constraint: every validator must see every other validator's vote at each round.
+O(n²) messages, but the real limit is latency - three network round-trips per block. cosmos hub
+runs 180 validators; could push higher but finality time degrades. polkadot scales to 1000+
+because grandpa finalizes chains, not individual blocks.
 
-tradeoff: requires dkg ceremony. [reshare](https://commonware.xyz/blogs/reshare) solves this by
-piggybacking key refresh on consensus itself. validators derive new shares each epoch from
-replicated log data. no trusted coordinator.
+### osst: scaling threshold agreement
 
-verification cost for 683 signers: grandpa needs 1366 exponentiations (2 per schnorr verify).
-osst needs 685 via pippenger multi-exp batching. both O(n). osst has better constants. ~200ms.
+[osst](https://eprint.iacr.org/2025/722) removes tendermint's scaling barrier. O(n) aggregation
+instead of O(n²) messaging:
 
-**osst for finality?**
+1. block producer proposes
+2. validators sign commitment independently (no coordination)
+3. aggregator collects 683+ contributions
+4. threshold signature proves 2/3 committed
 
-grandpa broadcasts O(n²) messages - every validator sees every vote. works but doesn't scale
-elegantly with 1023 validators. osst reduces this to O(n) contributions that aggregate into one
-threshold signature.
+same finality guarantee as tendermint. scales to 1000 validators.
 
-speed matters too. grandpa needs multiple rounds (prevote, precommit) with network round-trips
-between each. osst is single-round - validators generate contributions independently, aggregator
-collects 683+, done. potential to shave one or more blocks off finality latency.
+grandpa's multi-round protocol (prevote → precommit) with network round-trips becomes single-round
+aggregation. accountability preserved - each contribution `(index, commitment, response)` is a
+schnorr proof. same index in conflicting finality proofs = slashable equivocation.
 
-the concern: jam needs accountability. if validator equivocates, you need proof for slashing.
-grandpa gives this trivially - two conflicting signatures from same key. does osst lose this?
+### jam's deeper constraint
 
-no. each osst contribution `(index, commitment, response)` is a schnorr proof tied to that
-validator's share. same index appearing in two conflicting finality proofs = equivocation evidence.
-accountability preserved.
+osst solves signature aggregation. but jam requires sharded re-execution - validators must
+verify work reports before signing finality. can't finalize what you haven't checked.
 
-the hybrid model:
-- internally: store all contributions for accountability window (same as grandpa, ~46KB)
-- externally: aggregate into single threshold sig (~96 bytes) for bridges
-- grandpa today: same internal storage, but no compact external representation
+this is the actual blocker. not signing speed, but verification time.
 
-this is where osst shines for beefy. currently beefy uses merkle proofs over validator sets -
-verifiers need to check merkle paths plus individual signatures. osst replaces all of that with
-one threshold signature verification. ethereum bridge contract goes from "verify merkle proof +
-N signatures" to "verify one schnorr sig." gas costs drop dramatically, implementation simplifies.
+### execution proofs: removing re-execution
 
-combine osst with [zoda](https://github.com/commonwarexyz/monorepo/blob/main/coding/src/zoda.rs)
-and you get the full light client story. zoda's key property: upon receiving and checking ONE
-shard, you're convinced the original data is validly encoded and reconstructable. no waiting for
-other shards. no trusting that the block producer didn't give you garbage that only reveals itself
-during reconstruction. the merkle proof in each shard proves inclusion AND valid encoding.
+block producer proves correct execution once. validators verify the proof instead of re-executing.
 
-jam currently uses 1D reed-solomon - shards look valid individually but can reconstruct to garbage
-if producer cheated. light client can't detect this until reconstruction. zoda fixes this with 2D
-encoding where each shard includes checksum data proving valid encoding. ~3.1x overhead vs jam's
-~3x. negligible cost for massive security improvement.
+[ligerito](https://ligerito.rotko.net) verification: ~65ms at 2^24 elements. re-execution time
+scales linearly with computation. proof verification scales logarithmically - 2ms at 2^20, 65ms
+at 2^24. the gap widens as programs get larger.
 
-osst + zoda together: light client samples one shard (~300kb), verifies merkle inclusion + checksum
-(instant proof of valid DA), then verifies one threshold signature (instant proof of finality).
-no waiting for 2-3 blocks. no trusting validators. trustless light clients become real.
+[the accidental computer](https://eprint.iacr.org/2025/918) shows how 2D polynomial commitment
+proves both data availability AND validity. same structure, both properties.
 
-if you've ever built a trustless light client on smoldot, you know that finality gap firsthand.
-~18 seconds waiting on every interaction because blocks aren't verifiable until finalized. the ux
-is brutal - users stare at spinners, developers lose patience mid-debugging. osst + zoda would flip this entirely: verify block validity from one
-shard, verify finality from one signature, done in milliseconds not seconds.
+### the complete stack
 
-we've implemented osst with curve backends for ristretto255 (polkadot), pallas (zcash), secp256k1
-(bitcoin), and decaf377 (penumbra): [zeratul/osst](https://github.com/rotkonetworks/zeratul/tree/main/crates/osst).
-the reshare module handles key refresh without trusted coordinator by deriving new shares from
-consensus data each epoch.
+**zoda** ([implementation](https://github.com/commonwarexyz/monorepo/blob/main/coding/src/zoda.rs)):
+2D reed-solomon where each shard proves valid encoding. one shard check = instant DA verification.
+jam's 1D encoding can reconstruct to garbage if producer cheated. data overhead roughly equivalent
+(~3x expansion for both), but zoda gives immediate verification instead of optimistic trust.
 
-### execution verification
+**osst**: threshold signature aggregation. 683+ contributions → one 96-byte signature proving
+2/3 finality. grandpa stores same data internally but has no compact external representation.
 
-jam re-executes work across validators to catch misbehavior. compare results, slash if different.
-works but costs latency and bandwidth. i'd love to see kusama get serious about becoming a
-verification layer for shielded apps. don't think it happens under current jam design. here's
-what i've been experimenting with for client-side execution proofs.
+**ligerito**: execution proof. producer proves once, all validators verify in 65ms.
 
-[ligerito](https://ligerito.rotko.net): prove correct execution once, verify cheaply everywhere.
+combined: light client samples one shard (~300kb), verifies DA instantly, verifies one threshold
+signature, done. milliseconds, not the 18 seconds smoldot users currently endure.
 
-**the core insight**: instead of everyone re-running your computation, you create a short proof
-that it ran correctly. verifier checks the proof in 5ms instead of re-executing for seconds.
-million operations compress to 149kb. that's the magic of zk - not hiding information, but
-compressing verification.
+single-slot finality at 1000 validators. trustless light clients. shielded apps become possible.
+
+we've implemented osst for ristretto255, pallas, secp256k1, and decaf377:
+[zeratul/osst](https://github.com/rotkonetworks/zeratul/tree/main/crates/osst). reshare module
+derives new shares from consensus data each epoch - no trusted coordinator.
+
+### how ligerito works
+
+the core insight: instead of re-running computation, create a short proof it ran correctly.
+verifier checks the proof in milliseconds instead of re-executing for seconds. million operations
+compress to 149kb. not hiding information - compressing verification.
 
 **how it actually works**: imagine you ran a program for 40,000 steps. at each step, some things
 must be true: the program counter increments correctly, the opcode matches the binary, the alu
@@ -468,8 +606,9 @@ the polynomial is non-zero somewhere.
 verifier can't check a million points. but they don't need to. they pick ONE random point and ask
 "what's the value here?" this is
 [schwartz-zippel](https://en.wikipedia.org/wiki/Schwartz%E2%80%93Zippel_lemma): a non-zero
-polynomial almost never happens to be zero at a random point. if it's zero, execution was
-(almost certainly) correct. if not, you cheated. one check, overwhelming confidence.
+polynomial almost never happens to be zero at a random point. soundness error is d/|F| where d
+is polynomial degree and F is field size - for a 128-bit field, that's negligible. one random
+check, cryptographic confidence.
 
 the sumcheck protocol makes this efficient. prover and verifier play a game of random challenges.
 each round halves the problem. after log(n) rounds, checking a million constraints reduces to
@@ -482,7 +621,7 @@ after committing. memory gets authenticated via merkle trees.
 this is a succinct argument of knowledge, not a privacy tool. no zk, no witness hiding - just
 proving execution happened correctly. for deterministic programs with public inputs, the witness
 is recomputable anyway - re-execution with jit is faster than proving. the value is block validity:
-producer proves once, validators verify cheaply. million elements proved in 41ms, verified in 5ms.
+producer proves once, validators verify cheaply. million elements proved in 57ms, verified in 2ms.
 
 doom benchmarks (polkavm interpreter, 11.8M instructions/frame, 32 fps):
 
@@ -499,27 +638,6 @@ at 2^24 we prove 1.4 doom frames in 893ms. without SIMD it was 5x slower. easy w
 `-C target-cpu=native`.
 
 polkavm jit: 1600-1800 fps (standalone). proven execution: ~1.5 fps. 1000x gap.
-
-actual polkajam testnet (v0.1.27, 6-node local, kernel 6.17.4-xanmod):
-
-| metric | interpreter | jit (compiler) |
-|--------|-------------|----------------|
-| block import | 13.5 blocks/s | 30.5 blocks/s |
-| trie insert (1M keys) | 552k keys/s | 552k keys/s |
-| ec encode (14MB) | 56ms | 56ms |
-| ec reconstruct | 122 MiB/s | 122 MiB/s |
-
-jit is 2.3x faster for block import. the gap widens for compute-heavy workloads -
-standalone polkavm shows ~50x difference (1600fps jit vs 32fps interpreter).
-
-note: polkajam nightly builds (dec 29 - jan 3 2026) have broken jit sandbox on newer
-kernels (`failed to initialize Linux sandbox: unexpected sandbox child status`). stable
-v0.1.27 works. the sandbox issue affects `POLKAVM_BACKEND=compiler` - interpreter mode
-works everywhere.
-
-doom.corevm deploys and runs on testnet with jit. service creation via `jamt vm new`
-chunks the 5.3MB binary across work packages. 320x200x24 video mode, continuous frame
-generation. on-chain execution adds overhead from networking, consensus, state management.
 
 worth it? depends on threat model:
 
@@ -544,14 +662,23 @@ jam improves polkadot for general compute. removes substrate complexity. synchro
 it's a real vm. real world computer. for throughput applications it delivers. defi. gaming. data
 availability. jam works.
 
-for kusama i'd hope to see zkjam as a path forward. 2D availability via zoda. deterministic
-finality via threshold signatures. execution proofs via ligerito.
+zoda should be in jam proper - 2D DA is strictly better than 1D for negligible overhead. that's
+not experimental, it's an upgrade.
+
+for kusama i'd love to see a divergent consensus path on top of that. polkadot optimizes for
+validator count and throughput. kusama could optimize for finality latency and shielded apps.
+execution proofs via ligerito remove the re-execution bottleneck. osst removes the signing
+bottleneck. combine them and single-slot finality becomes possible - exactly what shielded
+protocols need. different networks, different tradeoffs. kusama as the privacy-first
+experimental chain would be worth the divergence.
 
 we recently patched penumbra to compute client-side groth16 proofs using [parallel wasm and
 simd128](https://www.youtube.com/watch?v=jFg15np6Psw). turned out the bottleneck isn't computation
 but loading the circuit binary into memory. once cached, proving parallelizes across cores. the
 holy grail is agentic apps where users hold their own state and the chain just verifies transitions.
-jam could be the execution layer. but it needs finality guarantees first for shielded apps.
+jam could be the execution layer. but it needs finality guarantees first, and sustainable state
+economics - ephemeral notes with tiered persistence could make shielded pools viable without
+unbounded commitment tree growth.
 
 true web3 is agentic computation. users hold their own state. chain verifies transitions. current
 status quo: complete state exists publicly, eventually used against you as permanent record. every
