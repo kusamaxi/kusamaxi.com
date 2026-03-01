@@ -9,7 +9,6 @@ tags:
   - blockchain
   - finality
   - privacy
-  - zk
 ---
 
 # missing pieces of public compute
@@ -366,7 +365,7 @@ would love more transparency and public state for routing decisions.
 
 polkadot handles 20k tps per parachain. solana does 200-300 actual user interactions per second.
 we're not capacity constrained. we're ux constrained. gatekeeping this capacity with compulsory
-fee mechanisms or complex identity rituals is overkill.
+fee mechanisms is overkill.
 
 but maybe the gatekeeping is why polkadot runs empty. 20k tps capacity, 0.3 tps usage. penumbra
 tried the opposite - $0.000009 withdrawal fees, no barriers - and also has 3 withdrawals per day.
@@ -403,64 +402,15 @@ penumbra has ~53 million um in shielded pool. that's millions of notes in the co
 every dust note from every split transaction. every change output. permanent state. the tree
 only grows.
 
-this is why fees matter even in a world with computational proofs. spam protection gates WHO
-can submit. but it doesn't address WHAT gets stored. without fees, users split notes into dust
-without penalty. convenient for privacy (more outputs = larger anonymity set) but unsustainable
-for state growth.
+fees matter because spam protection isn't free. verifying proofs still costs compute - someone
+pays for that verification whether it's the submitter or the validator. without fees, users split
+notes into dust without penalty. convenient for privacy (more outputs = larger anonymity set) but
+unsustainable for state growth.
 
 penumbra burns fees - more usage = scarcer supply. but at $0.000009 per withdrawal, the burn is
 decorative. 18 months of operation, ~75k um total burned - but most of that is dex arbitrage, not
 tx fees. actual transaction fees: ~420 um total. monthly issuance is ~33k um. the fee mechanism
 exists but doesn't bite.
-
-### separating submission from persistence
-
-the insight: rate-limiting and state-limiting are different problems. conflating them creates
-the adoption trap - make submission expensive to limit state, kill casual usage.
-
-```
-submission: computational proof
-  - ligerito proves 1M elements in 50ms
-  - bound to recent blockhash (no precomputation)
-  - browser does work silently, user clicks submit
-  - gates rate, not access - no upfront capital
-
-persistence: identity OR economic stake
-  - shielded notes default to ephemeral
-  - pruned after N epochs unless renewed
-  - prove personhood -> permanent state allocation
-  - OR deposit collateral -> permanent until withdrawn
-```
-
-first interaction is frictionless. your browser generates a proof, you submit, you get temporary
-shielded state. want permanence? prove you're human or stake something.
-
-for shielded pools: ephemeral notes solve dust. split your note into 100 pieces for privacy -
-fine, but they expire in 30 days unless consolidated or backed by identity. state growth becomes
-bounded by active users, not cumulative history.
-
-the risk: ephemeral notes leak timing. if your note expires without renewal, observers learn
-something. but that's opt-in - users who need long-term privacy will prove identity or pay.
-casual users get temporary privacy for free. different tiers for different needs.
-
-### computational proofs as spam protection
-
-proof of personhood has real value in the ai era - maybe the last moment to establish it before
-synthetic video makes verification impossible. but slamming identity requirements on first
-interaction won't bring adoption.
-
-captcha worked because grandma could click traffic lights. computational proofs could hit the
-same ux - browser does work silently, user clicks submit, done. [ligerito](https://ligerito.rotko.net)
-proves 1M elements in 50ms. binding proofs to recent blockhashes prevents precomputation - you
-can't stockpile proofs, each one requires fresh work.
-
-asymmetric proof/verify enables tiered access without paywalls. 1M parameter proof gets you 20%
-of network capacity. 16M parameters gets 30%. heavier compute, more access. no identity ritual,
-just cpu cycles. cpu-optimized proof params tied to recent blockhashes prevent gpu farm precompute.
-
-proof of personhood for validator selection, computational proofs for spam, economic stake for
-permanent storage. different tools for different problems. the question is whether jam services
-can implement this tiered model or if it needs protocol-level support.
 
 ### information economics
 
@@ -491,124 +441,6 @@ and sells access to your attention. humans have already lost this battle to algo
 designing protocols around government compliance is extremely short-sighted - it optimizes for
 a specific adversary while ignoring the broader surveillance infrastructure already deployed
 against you.
-
-the real threat isn't regulators. it's the information asymmetry baked into every interaction
-with systems that know more about you than you know about yourself. shielded state isn't about
-hiding from governments - it's about not feeding the machine. every transparent transaction
-trains the models. every public balance updates the graph. privacy is defense against
-algorithmic suppression, not just legal prosecution.
-
-this shifts the mental model. we're not building "compliant privacy" or "regulatory-friendly
-anonymity." we're building information sovereignty. the organism protects itself by making
-extraction expensive and contribution free.
-
-### the path to free usage
-
-the optimistic take: we're reaching scale where these systems can function sustainably as free
-to use - just like web2 apps. ligerito verifies in 2ms. polkavm jit runs at 1600 fps. the
-marginal cost per transaction approaches zero. verification is no longer the bottleneck.
-
-the question shifts from "how do we charge per tx" to "who subsidizes infrastructure" - exactly
-how web2 works. premium tiers, institutional users, those who need permanent state - they cover
-the free tier. casual users get ephemeral shielded access for free. freemium model applied to
-privacy. the tech is finally there; the economics just need to catch up.
-
-## what would enable shielded apps
-
-shielded protocols need deterministic finality. when you spend a note, you reveal a nullifier.
-if that block reverts, the nullifier was visible but the note is still spendable. linkability
-broken permanently. this isn't theoretical - it's why penumbra chose tendermint over polkadot.
-
-### the finality problem
-
-tendermint: consensus happens before block production. propose → prevote → precommit → commit.
-2/3 must agree at each stage or no block exists. you never see a block that might revert.
-
-jam/polkadot: produce block first, finalize later with grandpa. faster block times, but creates
-a finality gap. safrole eliminates accidental forks, but equivocation and netsplits still cause
-reorgs before grandpa catches up.
-
-tendermint's constraint: every validator must see every other validator's vote at each round.
-O(n²) messages, but the real limit is latency - three network round-trips per block. cosmos hub
-runs 180 validators; could push higher but finality time degrades. polkadot scales to 1000+
-because grandpa finalizes chains, not individual blocks.
-
-### osst: scaling threshold agreement
-
-[osst](https://eprint.iacr.org/2025/722) removes tendermint's scaling barrier. O(n) aggregation
-instead of O(n²) messaging:
-
-1. block producer proposes
-2. validators sign commitment independently (no coordination)
-3. aggregator collects 683+ contributions
-4. threshold signature proves 2/3 committed
-
-same finality guarantee as tendermint. scales to 1000 validators.
-
-grandpa's multi-round protocol (prevote → precommit) with network round-trips becomes single-round
-aggregation. accountability preserved - each contribution `(index, commitment, response)` is a
-schnorr proof. same index in conflicting finality proofs = slashable equivocation.
-
-### jam's deeper constraint
-
-osst solves signature aggregation. but jam requires sharded re-execution - validators must
-verify work reports before signing finality. can't finalize what you haven't checked.
-
-this is the actual blocker. not signing speed, but verification time.
-
-### execution proofs: removing re-execution
-
-block producer proves correct execution once. validators verify the proof instead of re-executing.
-
-[ligerito](https://ligerito.rotko.net) verification: ~65ms at 2^24 elements. re-execution time
-scales linearly with computation. proof verification scales logarithmically - 2ms at 2^20, 65ms
-at 2^24. the gap widens as programs get larger.
-
-[the accidental computer](https://eprint.iacr.org/2025/918) shows how 2D polynomial commitment
-proves both data availability AND validity. same structure, both properties.
-
-### the complete stack
-
-**zoda** ([implementation](https://github.com/commonwarexyz/monorepo/blob/main/coding/src/zoda.rs)):
-2D reed-solomon where each shard proves valid encoding. one shard check = instant DA verification.
-jam's 1D encoding can reconstruct to garbage if producer cheated. data overhead roughly equivalent
-(~3x expansion for both), but zoda gives immediate verification instead of optimistic trust.
-
-**osst**: threshold signature aggregation. 683+ contributions → one 96-byte signature proving
-2/3 finality. grandpa stores same data internally but has no compact external representation.
-
-**ligerito**: execution proof. producer proves once, all validators verify in 65ms.
-
-combined: light client samples one shard (~300kb), verifies DA instantly, verifies one threshold
-signature, done. milliseconds, not the 18 seconds smoldot users currently endure.
-
-single-slot finality at 1000 validators. trustless light clients. shielded apps become possible.
-
-we've implemented osst for ristretto255, pallas, secp256k1, and decaf377:
-[zeratul/osst](https://github.com/rotkonetworks/zeratul/tree/main/crates/osst). reshare module
-derives new shares from consensus data each epoch - no trusted coordinator.
-
-### how ligerito works
-
-the core insight: instead of re-running computation, create a short proof it ran correctly.
-verifier checks the proof in milliseconds instead of re-executing for seconds. million operations
-compress to 149kb. not hiding information - compressing verification.
-
-**how it actually works**: imagine you ran a program for 40,000 steps. at each step, some things
-must be true: the program counter increments correctly, the opcode matches the binary, the alu
-computes 2+2=4 not 5. each of these is a constraint. correct execution means every constraint
-holds.
-
-now here's the trick. we encode all those constraints as a polynomial - a mathematical curve. if
-execution was correct, this polynomial equals zero everywhere it matters. if you cheated anywhere,
-the polynomial is non-zero somewhere.
-
-verifier can't check a million points. but they don't need to. they pick ONE random point and ask
-"what's the value here?" this is
-[schwartz-zippel](https://en.wikipedia.org/wiki/Schwartz%E2%80%93Zippel_lemma): a non-zero
-polynomial almost never happens to be zero at a random point. soundness error is d/|F| where d
-is polynomial degree and F is field size - for a 128-bit field, that's negligible. one random
-check, cryptographic confidence.
 
 the sumcheck protocol makes this efficient. prover and verifier play a game of random challenges.
 each round halves the problem. after log(n) rounds, checking a million constraints reduces to
@@ -666,24 +498,27 @@ zoda should be in jam proper - 2D DA is strictly better than 1D for negligible o
 not experimental, it's an upgrade.
 
 for kusama i'd love to see a divergent consensus path on top of that. polkadot optimizes for
-validator count and throughput. kusama could optimize for finality latency and shielded apps.
-execution proofs via ligerito remove the re-execution bottleneck. osst removes the signing
-bottleneck. combine them and single-slot finality becomes possible - exactly what shielded
-protocols need. different networks, different tradeoffs. kusama as the privacy-first
-experimental chain would be worth the divergence.
+validator count and throughput. with client diversity and simplified base layer spec, there is not
+really same need for canary network as there use to, especially now that jam toaster exists. its
+also hard to ratinonale about the benefits of duplicate networks. imo kusama could optimize for
+finality latency and shielded apps. execution proofs via ligerito could remove the re-execution
+bottleneck. osst removes the signing bottleneck. combine them and single-slot finality becomes
+possible - exactly what shielded protocols need. different networks, different tradeoffs. kusama as
+the privacy-first experimental chain would be worth the divergence.
 
 we recently patched penumbra to compute client-side groth16 proofs using [parallel wasm and
 simd128](https://www.youtube.com/watch?v=jFg15np6Psw). turned out the bottleneck isn't computation
-but loading the circuit binary into memory. once cached, proving parallelizes across cores. the
-holy grail is agentic apps where users hold their own state and the chain just verifies transitions.
-jam could be the execution layer. but it needs finality guarantees first, and sustainable state
-economics - ephemeral notes with tiered persistence could make shielded pools viable without
-unbounded commitment tree growth.
+but loading the circuit binary into memory. once cached, proving parallelizes across cores. if you
+could just overcome the size of the circuit binary penumbra-like architecture should really drive.
+binius64 is a good candidate. the holy grail is agentic apps where users hold their own state and
+the chain just verifies transitions. jam could be the execution layer. but it needs finality
+guarantees first for shielded apps.
 
 true web3 is agentic computation. users hold their own state. chain verifies transitions. current
 status quo: complete state exists publicly, eventually used against you as permanent record. every
-transaction visible forever. every balance queryable. every interaction logged. that's not
-sovereignty. i find it increasingly hard to contribute to a permanent public ledger.
+transaction visible forever. every balance queryable. every interaction logged. i would not really
+call that sovereignty by any means. its increasingly hard to rationale and contribute to a public
+ledger.
 
 ---
 sources:
