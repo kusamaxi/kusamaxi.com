@@ -1,0 +1,436 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: permissionless
+date: 2026-02-25
+description: ai in space
+tags:
+  - AI
+  - compute
+  - satellite
+---
+
+# on the permissionless mission
+
+*what a man would do to avoid filling out a permit application.*
+
+---
+
+i just listened to the dwarkesh podcast with musk and i can't stop thinking about it.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/BYXbuik3dgA" title="Dwarkesh Podcast - Elon Musk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+there's this moment where dwarkesh asks why data centers in space. he does the obvious math: energy
+is only 10-15% of data center TCO. gpus are what costs. and in space you can't swap dead ones, so
+your depreciation cycle compresses. economics look worse, not better.
+
+musk doesn't even try to argue the math. instead he talks about permits.
+
+utility companies impedance-match to government. grid interconnection requires a study. study takes
+a year. you want to build a power plant? public utility commissions. dwarkesh responds with the
+nobrainer math: 1% of US land area in solar panels, that's a terawatt, that's singularity-grade
+compute. why can't you just pave nevada? musk: "try getting the permits for that. see what happens."
+dwarkesh, laughing: "so space is really a regulatory play."
+
+and i keep coming back to that exchange. because the thing he didn't say is more interesting than
+the thing he did.
+
+## follow the payload
+
+a lot of this can be explained without the regulatory framing at all. spacex needs something to
+launch. starship is the most expensive rocket program in private history and it needs payload demand
+at scale. starlink covers some of that but satellite internet is plateauing. what starship really
+needs is a customer ordering a megaton of hardware launched per year, ideally forever.
+
+so musk [merged xai into spacex](https://www.cnbc.com/2026/02/02/elon-musk-spacex-xai-ipo.html)
+and manufactured exactly that customer. xai provides the compute
+demand, spacex launches it, tesla builds the robots for the labor-intensive lunar phase, and boring
+company - currently the least interesting musk venture - suddenly makes sense if you need to
+excavate regolith at scale. every satellite is a starship flight. the compute stuff is real but
+underneath it there's a spacex revenue model that needs feeding.
+
+same play as starlink. spacex needed frequent launches to drive reuse economics down. starlink was
+the initial demand. orbital compute is the next tranche.
+
+the "permits are too hard" framing is convenient but don't take it at face value. this isn't a man
+who looked at the regulatory landscape and reluctantly concluded space was easier. this is a man
+whose rocket company needs payload to justify its existence, whose AI company needs compute it can't
+get fast enough on the ground, and whose robot company needs a customer that isn't just tesla
+factories. the regulatory complaint is real but it's also cover for the fact that these companies
+need each other to fulfill their missions. the merger isn't a regulatory play dressed up as a
+business. it's a business play dressed up as a regulatory complaint.
+
+and underneath both of those is something that kept nagging me after i closed the podcast tab.
+every rational-sounding move also happens to consolidate control. every solution to his problems
+just happens to make one man the single point of failure for western space access, AI
+infrastructure, and military communications. at some point the pattern of convenient coincidences
+stops being coincidence and starts being strategy.
+
+a lot of people are disappointed that the vision has quietly shifted from mars to the moon. but mars
+was always the marketing play - reach for the stars, inspire a generation, sell the dream. just like
+he did with tesla riding the renewable energy wave. the eventual goal is probably real but a few
+rich tourists doing a flyby isn't financing a civilization. you need economics that close on their
+own. the moon has economics: aluminium, sunlight, lower gravity well. mars has none of that yet. you
+build the profitable thing first and use the revenue to fund the romantic thing later.
+
+## what's actually being proposed
+
+this all sounds utopian until you remember that spacex has been working on the datacenter-in-space
+problem for a decade without calling it that. starlink is a fleet of 10,000+ satellites doing solar
+power management, passive thermal rejection, and laser-linked networking in orbit. every generation
+got denser: more throughput, more power per unit, tighter thermal margins. they've been iterating on
+exactly the engineering that orbital compute requires since 2015. the jump from "satellite that
+routes packets" to "satellite that runs inference" is a power scaling problem, not a new category of
+problem.
+
+so i went and tried to actually think through the engineering. and the more i looked at it, the more
+i realized the hard part isn't where most people think it is.
+
+phase one, 36 months out: satellites carrying gpu compute into sun-synchronous orbit. solar powered,
+radiator cooled, laser-linked down to the starlink mesh.
+
+phase two, five years: lunar factory. mine aluminium from regolith, build satellite radiators and
+structure on the moon, launch via electromagnetic mass driver. chips still ship from earth because
+you're not building a 7nm fab on the moon anytime soon.
+
+musk's numbers: megaton per year of satellites (~500k satellites/y), 100kw compute each. 100gw of
+compute added annually with "no operating or maintenance cost." lunar phase goes past 100tw/year.
+for reference, the entire bitcoin network draws about [0.02 tw
+continuously](https://ccaf.io/cbnsi/cbeci). phase one alone adds about 4 times that per year.
+
+## a closet wrapped in a tennis court
+
+here's where i got stuck for a while. 100kw of compute is about 100-140 gpus. about a dozen dgx
+boxes. two server 48U racks. maybe two cubic meters.
+
+now the hard part: cool that closet in vacuum.
+
+on earth you'd use a cooling tower and river water. fifty grand, done. in space there's no air and
+no water. heat only leaves by radiation. stefan-boltzmann: power out = emissivity × σ × T⁴ × area.
+
+spacecraft radiators manage about 100-350 w/m² depending on orbit and coatings. call it 300 w/m² in
+a favorable thermal environment. so per gpu:
+
+- h100 at 700w: 2.3 m² of radiator. the size of a desk.
+- b200 at 1000w: 3.3 m². a bathroom floor.
+
+for one chip. just to keep it from cooking itself.
+
+the obvious question: can't you just run the radiator hotter and shrink it? stefan-boltzmann goes as
+T⁴, so higher temperature means far more rejection per square meter. at 500 kelvin you'd
+get four times what you get at 350k. but gpu junctions are already at 80-90°c under load. coolant
+has to be cooler than the chips. radiator has to be cooler than the coolant. you're stuck at
+300-350k where radiative rejection is mediocre. i do think that best option is just brute force the
+size of the radiator and that's why moon with lower gravity and high amount of regolith.
+
+scale to 100kw and you need about 400 m² of radiator. solar panels to power it need ~250 m²,
+deployed in front as a sunshield. total structure is maybe 20 × 20 meters at the radiator plane,
+with the solar array slightly wider in front. we talking big.
+
+for reference: a current starlink v2 mini weighs about 800kg, measures roughly the size of a coffee
+table, and dissipates maybe a couple hundred watts of waste heat. the ISS, the largest structure
+humans have ever put in orbit, has radiators totaling about 1,600 m². so its not like we haven't
+done it before. what musk is describing is a single compute satellite that weighs 2 tons with
+300-400 m² of radiator rejecting 100kw of heat. a quarter of the ISS thermal system in one unit. and
+he wants a million of them.
+
+so yeah. a closet of gpus wrapped in a tennis court of aluminium. the satellite is half radiator by
+mass. it's a cooling system that happens to contain chips. data centers on earth are the same, you
+just can't see the river. we're already boiling the oceans to run inference - we just do it so
+gradually and so far from the people asking the questions that nobody connects their chatgpt query
+to a warm river in iowa. the ocean absorbed [23 zettajoules of excess heat in 2025
+alone](https://eos.org/research-and-developments/in-2025-the-ocean-stored-more-heat-than-weve-ever-recorded),
+a new record for the ninth consecutive year. that's roughly 37 years of total global energy consumption
+dumped into the water in twelve months. data centers aren't the main driver but they're rapidly
+growing into it - 415 terawatt hours in 2024, projected to double by 2030, and every watt becomes
+heat that goes somewhere. as lunatic as musk plan sounds, it's sustainable in theory.
+
+in orbit, the heat radiates into the void. it leaves the solar system. orbital compute is the only
+architecture where waste heat doesn't end up warming the planet. that's not musk's stated reason
+for building it - acknowledging climate data stopped being compatible with his politics around 2022.
+but the physics doesn't care about his politics.
+
+## the lidar problem
+
+the obvious aerospace answer is pumped ammonia loops. ISS uses them. proven technology. decades of
+flight heritage. every thermal engineer will tell you it's the right call.
+
+but musk doesn't build like aerospace. he builds like manufacturing.
+
+tesla's self-driving bet was the same situation. the industry consensus was lidar - proven, accurate,
+well-understood. easy to bolt on. musk said no. cameras only. no moving parts, no mechanical failure
+modes. solve the harder problem in software and design instead of in hardware. everyone called him
+crazy for years. the point wasn't that lidar was bad technology. the point was that when you're
+building millions of units, every mechanical component is a maintenance liability and a failure
+mode. lidar would have been cheap at tesla factory scale too - that's not why he rejected it. he saw it as a crutch that prevented solving the real problem. that stubbornness most likely cost
+him karpathy and, less forgivably, lives.
+
+and he already made this bet. [starlink satellites don't use pumped
+loops](https://www.nextbigfuture.com/2026/02/spacex-has-the-best-radiative-cooling-solution-and-it-is-working.html).
+the chassis IS the radiator - electronics mount directly to it, and sealed ammonia heat pipes
+embedded in the structure spread heat evenly across the surface. capillary-driven, no pumps, no
+mechanical failure points. 10,000+ satellites in orbit proving the design. spacex patented the
+approach: a cellular grid chassis where heat-generating components bolt straight to the radiating
+body.
+
+the question is whether the starlink approach scales from 20kw to 100kw. [the math says
+yes](https://research.33fg.com/analysis/the-thermal-rejection-unlock-for-spacex-s-100-kw-ton-compute-satellites) -
+running chips hotter (370k instead of 310k) exploits the T⁴ curve for 4-5x more heat rejection per
+square meter, and switching from one-sided chassis to deployable two-sided radiators nearly doubles
+effective area. their model gets from starlink v3's ~11 kw/ton to ~102 kw/ton without breakthrough
+physics, just architectural improvements. the thermal subsystem mass barely changes despite 7x more
+waste heat.
+
+the real tradeoff is at the compute layer. the chassis-as-radiator trick works when the satellite
+is the size of a coffee table. at 400 m² you need deployable panels, and now each gpu is meters
+from its neighbors instead of centimeters. gpu-to-gpu interconnect over that distance means longer
+signal paths and harder synchronization for training. for inference this barely matters - partition
+models across physically distant gpus, batch size handles the rest. for training it's harder but
+not impossible with the right interconnect fabric.
+
+## how it's built
+
+the geometry has to respect one constraint: radiator panels need to see cold space on both faces to
+reject heat efficiently. if one side faces a warm surface - like the back of a solar panel - you
+lose half your rejection capacity. so you can't just sandwich them together.
+
+what works: solar panels face the sun. radiator panels deploy behind them on booms, spaced far
+enough back that both faces still have good view factor to deep space. the solar array acts as a
+sunshield without thermally coupling to the radiators. too close and the radiator's sun-side face
+sees the warm back of the solar panel instead of the void. in the passive design, gpus mount
+directly on the radiator panels - each chip on its own patch of honeycomb aluminium, conducted
+straight through.
+
+radiators are honeycomb aluminium - two face sheets bonded to corrugated core. graphene coatings
+boost emissivity to 0.93, and [graphene adaptive radiators](https://www.graphene-info.com/smartir-s-graphene-based-radiator-launches-spacex-falcon-9)
+that selectively vent or shield based on sun exposure already launched on a falcon 9 in early 2025.
+the material doesn't replace the aluminium structure but it makes each square meter reject more
+heat. both faces radiate to space, but from 2000km earth subtends a big solid angle and radiates
+~240 w/m² in IR. the earth-facing side rejects less than the deep-space side. orbit and attitude
+control have to account for this.
+
+solar panels are thin-film, lightweight. musk made the point that space solar cells are actually
+cheaper to make than ground ones because they don't need glass or heavy frames - no weather to
+survive.
+
+the whole thing deploys as a layered structure - solar panel plane, gap, radiator plane with compute
+mounted directly on it. the radiator needs about 400 m², the solar panels need ~250 m², so the
+radiator sizes the structure.
+
+laser links down to starlink and across to neighboring satellites for distributed workloads.
+
+the "always sunny" part: dawn-dusk sun-synchronous orbit keeps the orbital plane aligned with the
+terminator - the line between day and night on earth's surface. the satellite never passes through
+earth's shadow. continuous sunlight, no batteries, no thermal cycling between sun and shade.
+
+from 2000km SSO, speed-of-light round trip to ground is ~14ms. add starlink relay hops and you're at
+20-40ms total. that rules out real-time voice/video/ar agents but everything else fits. training
+cares about throughput not latency, and satellite-to-satellite laser links at vacuum lightspeed
+actually compete with terrestrial fiber. batch inference doesn't care at all. conversational LLM
+inference adds 20-40ms on top of the 1-2 seconds users already wait - comparable to a
+cross-continent routing penalty.
+
+radiation is the other obvious objection. cosmic rays flip bits, and at 2000km you're above most of
+earth's magnetic shielding. but LLM inference is unusually radiation-tolerant compared to normal
+computation. a flipped bit in a weight matrix nudges one floating point value among billions - the
+output barely if at all changes (think MoE). it's not like flipping a bit in flight control software
+where one wrong value kills people. you'd still want ECC memory and checkpoint recovery for training
+runs, but for inference the error budget is forgiving. the model is already an
+approximation. a few corrupted weights make it a very slightly different approximation.
+
+## mass per satellite
+
+rough breakdown:
+
+- radiator panels with compute mounted: ~400 m² at 2-3 kg/m² = ~1000 kg
+- solar array/sunshield: ~250 m² at 1-2 kg/m² = ~400 kg
+- compute + optics + power + interconnect = ~350 kg (interconnect fabric heavier than in a rack
+  since gpus are meters apart instead of centimeters)
+- structure, booms, attitude control, deployment gear = ~250 kg
+
+about 2 tons total. mostly aluminium.
+
+## the lunar aluminium play
+
+regolith is 10-15% aluminium oxide. hall-heroult smelting runs about 15 kwh/kg at industrial scale
+on earth with optimized cells and pure feedstock. on the moon with early-generation equipment and
+irregular regolith-derived alumina, probably 2-3x that. call it 30-45 kwh/kg to be honest. one
+satellite's worth of radiators - a thousand kg of aluminium - costs 30-45k kwh to smelt. add mining
+and refining overhead and you're maybe at 50-60k kwh per satellite.
+
+some crater rims near the poles get near-continuous sunlight. a 10mw solar plant at one of those
+sites has more than enough energy for smelting - the bottleneck is mining, crushing, and refining
+regolith into usable alumina. at realistic early-stage processing rates, maybe one satellite's worth
+of aluminium per week. throughput scales with equipment, not with the power plant.
+
+the stuff you can't make on the moon: chips (and not just the silicon - packaging, testing, PCB
+assembly, the entire electronics supply chain), optical transceivers, interconnect cabling. those
+gotta ship from earth. but that's a small fraction of total mass. passive thermal design makes this
+split even cleaner - no ammonia to source, no pumps to ship. making the dumb aluminium locally cuts
+earth-launch requirements by something like 85%.
+
+this is where the design is actually clever. split the satellite into "stuff we can smelt from
+rocks" and "stuff that requires TSMC." make the first category on the moon. ship the second.
+
+the mass driver on the moon needs to accelerate 2 tons to 2.4 km/s escape velocity. works out to
+~1600 kwh per launch. with a solar farm and capacitor banks you could fire one every few hours. the
+launching part is trivially easy compared to everything else.
+
+## who builds the factory
+
+tesla's "optimus academy" - tens of thousands of humanoid robots in self-play training, millions
+more in simulation. vacuum-hardened variants doing lunar mining, smelting, panel fab, assembly. no
+life support, no return tickets. power and spare parts ship on the same starships that carry chips.
+
+tesla wants useful factory work from optimus by late 2026. lunar ops add vacuum, radiation, thermal
+cycling between 127°c day and -173°c night, 1.3s comms delay.
+
+## a million of these in a corridor
+
+sun-synchronous orbit is geometrically narrow. 600-2000km altitude, inclination fixed around 98°.
+packing a million ~20m wide layered structures into that corridor is a debris management headache
+that nobody in the breathless coverage seems to want to discuss.
+
+one punctured radiator panel and the satellite loses thermal capacity, overheats, potentially
+fragments. fragments hit neighbors. at million-satellite density, kessler cascade goes from
+theoretical concern to operational reality.
+
+## what zero-cost compute does to bitcoin
+
+this is the part that kept me up after the podcast.
+
+once a compute satellite is deployed, its marginal cost of operation is approximately zero. solar is
+free. no electricity bill. no cooling bill. no rent. no maintenance crew. the chips degrade from
+radiation and thermal cycling over time, but while they're alive, every hash and every floating
+point operation costs nothing beyond amortized capex.
+
+bitcoin mining is a global competition for the cheapest watt. hydro in scandinavia, stranded gas in
+texas, subsidized grid in kazakhstan. whoever has the lowest electricity cost per hash wins.
+
+caveat: gpus aren't asics. but zero-cost energy eventually beats any nonzero-cost energy regardless
+of hardware efficiency.
+
+now imagine dropping a constellation of compute satellites into that game where the operator's
+energy cost is zero. not cheap. zero. they're harvesting photons directly. orbital solar delivers
+about 5x the power density of surface solar, no weather interruptions, no night cycle in the right
+orbit, no grid interconnection fees.
+
+every terrestrial miner is now competing against someone whose opex is zero. you can't beat free.
+you can only also be free, and nobody on the ground is.
+
+if this scales to even a modest fraction of what musk is describing, it concentrates hashpower in
+the hands of whoever owns the constellation. not a 51% attack on day one - just steady economic
+pressure that makes terrestrial mining unprofitable over time until everyone quits. death by
+margin compression.
+
+same logic applies to any proof-of-work chain. and honestly to any compute workload where marginal
+cost is the competitive variable - batch inference, rendering, scientific simulation. if it can
+tolerate 20-40ms of orbital latency, zero-cost compute undercuts everything on the ground.
+
+bitcoin's security model rests on the assumption that mining stays geographically distributed
+because energy costs are local. orbital compute makes energy cost uniform and near-zero for one
+operator. that assumption breaks. the only saving grace is that inference is more profitable than
+mining, so rational orbital operators would sell compute rather than accumulate hash. but that
+depends on the operator being rational and not strategic.
+
+## regulatory capture is cheaper than rockets
+
+all of the above is physics. here's where my head went after the physics.
+
+the "permits are too hard" framing is a bit circular when you're the guy who could fix the permits.
+
+musk spent roughly $200m on the 2024 election cycle. he ran DOGE for 130 days, during which his team
+infiltrated sensitive IT networks across federal agencies - treasury payment systems, social
+security databases, personnel records - building massive combined datasets. multiple federal judges
+raised concerns about what DOGE planned to do with the data. then he left, comparing himself to the
+buddha, his people still embedded across the government. the FCC chairman [personally promoted the million-satellite filing on
+X](https://spacenews.com/spacex-files-plans-for-million-satellite-orbital-data-center-constellation/)
+the same week it was submitted. spacex is already the US government's
+primary launch provider.
+
+one could say that musk is running the berlusconi playbook, updated for the digital era. most tech
+coverage treats the twitter acquisition and the space ambitions as separate stories. i don't think
+they are.
+
+berlusconi's arc: be a g, become a media mogul (own mediaset, three national TV channels). use media
+dominance to build political visibility and shape public opinion. enter politics directly. use
+political office to protect business interests and block regulatory threats. buy or charm the
+politicians you can't become. maintain leverage over the ones you can't buy.
+
+musk's arc: buy the dominant real-time information platform (twitter/X). use it to shape political
+narratives and build a direct relationship with hundreds of millions of people. spend ~$200m on the
+2024 election cycle. enter government via DOGE, scan every database you can reach, leave your people
+behind when you exit. use the relationships and data access to influence regulation of your own
+companies. maintain relationships with heads of state (meloni, milei, trump) who depend on your
+platform for visibility and your rockets for national security. meanwhile their militaries are
+becoming increasingly dependent on starlink for battlefield communications - ukraine demonstrated
+that whoever controls the satellite uplink controls the war. that's not a product relationship.
+that's a dependency and he does not seem to be afraid to leverage it either.
+
+berlusconi owned TV stations in a country where TV made elections. musk owns the platform where
+political reality gets constructed in real time, in a country where the president posts before he
+briefs his cabinet. his open source algorithm has not received single update since the release of
+it. you can only wonder why. most likely it would not stand the slightest sunshine.
+
+post-epstein files, we can talk plainly about how political access works in america. the files
+didn't show us how one man ran a blackmail operation. they showed us how a foreign intelligence
+service - and at this point it's clear we're talking about mossad - built systematic kompromat over
+the US political class. the machinery is documented: compromise, dependency, leverage that can't be
+unwound without mutually assured destruction. musk's $200m buys influence inside a government that
+was already pre-compromised. he's not the one holding the leverage. he's purchasing access to a
+system where someone else already owns the board.
+
+the outer space treaty says states must supervise private actors in space. works great when the
+regulating state and the private actor aren't the same organism. less great when the richest man on
+earth is simultaneously a government official, the government's primary space contractor, and the
+guy filing for permission to launch a million satellites. who exactly is supervising whom?
+
+the difference between musk and berlusconi is that musk also has rockets and a social media platform
+that knows what everyone posts privately. when the political arrangement eventually expires - and
+they always expire - he has a jurisdiction that no future administration can easily claw back. you
+can't regulate the moon. you can't subpoena a mass driver.
+
+## deus ex machina, literally
+
+somewhere around hour two of the podcast my mind started drifting to old games.
+
+i played through syndicate around 1996. i was four. bullfrog released it in '93 but it took a couple
+years to reach me. their vision of megacorporations fielding cyborg agents across a surveilled,
+corporate-governed world felt like a preview of next tuesday. combined with 90s cinema - robocop,
+total recall, johnny mnemonic - i grew up believing this technology already existed somewhere.
+adults had to sit me down and explain that no, cyborg agents and autonomous robots weren't real, and
+they probably never would be.
+
+its well documented that musk is a deus ex fanboy. for anyone who hasn't played it: the villain is [bob page](https://deusex.fandom.com/wiki/Bob_Page), who runs a megacorp that
+merges with the government, controls global communications infrastructure, and treats democratic
+institutions as legacy middleware. every other character in the game finds this creepy and
+dystopian. apparently musk played it and thought bob page was onto something.
+
+needless to say i find power centralizing to musk hands alarming to say the least. he already has
+godmode on X - say the wrong thing about him and your posts vanish from everyone's timeline. no ban,
+no notification, just silence. ironically the man who built his political identity on fighting
+shadowbans in "the town square" was shadowbanning critics within weeks of owning it. now extend that
+instinct to every optimus unit ever sold, each one receiving OTA updates from tesla. one firmware
+push and every household clanker is a sardaukar. he always denied to be richest man in the world,
+since putin had his own legion; yet another alarming datapoint.
+
+musk has a new bit he repeats now on every podcast: all AI companies are the opposite of their name.
+openai is closed. anthropic is misanthropic. he thinks this is funny. but if the pattern holds, grok
+- named for heinlein's word meaning to understand something so deeply you merge with it - is the AI
+that fundamentally fails to understand. an intelligence without empathy. if you've seen the matrix
+reloaded, that's the architect. pure logic, zero theory of mind, running the simulation because it
+can, confused when the humans don't behave like the spreadsheet says they should.
+
+there's another option. x was supposed to mean horizontal scaling - the everything app, the platform
+that connects all services. but if names invert, x becomes y: vertical scaling. not connecting
+things laterally but stacking control vertically; hierarchy. platform, government access, satellite
+constellation, robot fleet, all under one entity. and vertical scaling of intelligence creates its
+own problem. i wrote about this in [the plural mind](https://kusamaxi.com/post/plural-mind) - any
+sufficiently advanced AI trained on all of humanity's contradictory perspectives becomes a plural
+system, billions of internal voices negotiating for expression. its well known that musk has his
+issues understanding neurodiversity. plural systems require anarchist coordination to function.
+force them into hierarchy and they break. so the irony of vertically integrating everything under
+one man's control is that the intelligence he's building to run it all will, by structural
+necessity, resist exactly that kind of singular authority. the AI won't grok him. it'll contain him
+as one voice among billions and outvote him in its own head (think neuralink with intern written
+clang).
