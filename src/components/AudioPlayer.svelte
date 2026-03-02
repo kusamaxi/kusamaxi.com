@@ -15,7 +15,7 @@
   let rafId: number | null = null;
 
   const speeds = [1, 1.25, 1.5, 1.75, 2, 0.75];
-  const audioUrl = `/audio/${slug}.opus`;
+  const audioUrl = `https://www.rotko.net/audio/${slug}.opus`;
 
   // deterministic waveform bars
   const bars = Array.from({ length: 50 }, (_, i) =>
