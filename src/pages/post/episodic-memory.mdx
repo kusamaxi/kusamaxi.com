@@ -1,0 +1,497 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: false
+title: episodic memory for language models
+date: 2026-03-14
+description: why karpathy won't work at frontier labs and the case for continuous thought machines.
+tags:
+  - AI
+  - CTM
+  - research
+  - neuroscience
+  - anarchism
+---
+
+# episodic memory for language models
+
+*closed silos do not innovate the innovation that was required.*
+
+---
+
+## the karpathy dilemma
+
+andrej karpathy left openai. then came back. then left again. the most talented ML and speedcube
+educator alive, the person who literally taught a generation to build neural networks from scratch,
+keeps walking away from the place with the most compute on earth.
+
+and it's obvious why. you can't do real research inside a product company.
+
+frontier labs have a specific problem: they ship. they ship o1, they ship sonnet, they ship gemini.
+shipping means taking what works and making it faster, cheaper, more reliable. shipping means RLHF
+on top of the same transformer architecture everyone's been using since 2017. shipping means
+chain-of-thought prompting — literally just generating more tokens before answering — and calling it
+"thinking."
+
+that's not thinking. that's talking to yourself louder.
+
+openai's o1 and o3, anthropic's extended thinking, google's gemini thinking — they all do the same
+thing. standard transformer, no architectural changes. the model writes out reasoning as text, then
+gives the answer. same speed per token, just more tokens. same architecture, more compute. trained
+with RL to learn *when* to reason, not *how* to reason differently.
+
+sure, it's a brilliant hack. commercially successful, incredibly useful hack. but it's the wrong
+direction for what language models actually need: the ability to remember.
+
+every frontier model forgets everything between conversations. every session starts from scratch.
+it's like talking to someone with perfect reasoning and zero autobiography. no episodic memory. no
+sense of continuity. no learning from experience.
+
+you can't fix this with more tokens. you can't fix it with bigger context windows. you can't fix it
+with RAG. these are all workarounds for a fundamental architectural limitation: feedforward networks
+don't have internal state that persists and evolves.
+
+the innovation required to fix this can't happen inside a closed silo. it requires rethinking the
+architecture. it requires publishing results that might not ship as products. it requires the
+freedom to try stupid things. karpathy knows this. that's why he's outside, building nanogpt and
+teaching, not inside shipping the next increment.
+
+ultimately i believe that karpathy believes that by doing AI research out in the open he is likely
+to influence millions of people and algorithms alike to think the problems of AI from a new
+perspective and come up with something new instead of bruteforcing the old. so we forked his code
+and tried the stupid thing.
+
+## what if models could actually think
+
+sakana AI published [continuous thought machines](https://pub.sakana.ai/ctm/) in 2025. the paper
+tested on MNIST and mazes. cute demos. impressive visuals. but the architecture is radical: replace
+the single feedforward pass with temporal dynamics. iterative thinking loops where neurons
+oscillate, synchronize, and develop coordination patterns over time.
+
+most language models think once per token and move on. "the" gets the same compute as a novel proof.
+one pass through a feedforward network. done.
+
+a continuous thought machine doesn't do that. it thinks in loops. where a normal model runs one
+feedforward pass, a CTM runs K iterations of a thinking loop. each iteration:
+
+1. it looks at the input again through cross-attention, using its current state to decide what to
+   pay attention to. what it focuses on changes as it thinks more. it sees the input differently
+   each time.
+
+2. what it sees mixes with its current state through a U-NET synapse network. not a flat layer — a
+   deep network with a bottleneck that forces compress and rebuild. skip connections keep the
+   details alive. this is where the actual thinking happens.
+
+3. its state gets saved in a trace — a window of recent states. each neuron has its own small
+   network that reads its own history and decides what to do next. neurons that know where they've
+   been, not just where they are.
+
+4. random pairs of neurons track how they fire together over iterations. this makes two sync signals
+   — one to read out the answer, one to shape the next attention query. the pairs are random and
+   fixed at birth. this is how many neurons agree on one signal without any central control.
+
+after K iterations, each token picks which step gave the best answer. not the average. not the last
+one. each token picks for itself. different tokens can pick different steps. how hard it thought is
+not the same everywhere in what it says.
+
+the output isn't the raw neural state. it's the synchronization pattern — which neurons fire
+together, how they coordinate. same principle as an EEG reading a brain.
+
+this means the model can feel itself thinking. the certainty signal is real — it comes from how much
+neurons actually agree. when it's low, it hasn't figured it out. when it's high, it has. most
+language models can't tell the difference.
+
+nobody had tested this on language. the hardest modality there is.
+
+## the graft
+
+after getting ctm to predict and market make bitcoin in promising fashion. we forked karpathy's
+[nanochat](https://github.com/karpathy/nanochat). first attempt: rip out the MLP, drop in CTMBlock
+as a replacement. didn't work. replacing the feedforward destroys everything the pretrained backbone
+knows. the MLP IS the model's knowledge — factual associations, language patterns, everything
+learned during pretraining lives in those weights.
+
+the fix we landed on: CTM is additive, not a replacement. the MLP always runs first. CTM adds a
+second residual on top — iterative thinking layered over the pretrained knowledge. train with a
+scaled-down learning rate so the backbone stays intact while the CTM layers learn to think on top
+of it. the model keeps everything it already knows and gains the ability to deliberate.
+
+first wall: `torch.compile` dies. the K-iteration loop makes the compiler unroll everything and it
+OOMs — not the GPU, the compiler itself. training without compile is 12x slower. the architecture
+is hostile to how modern ML frameworks work.
+
+welcome to the era where ASI might be built by a complete utter imbecile.
+
+the tools to do it only require you to be able to demand and ask for the impossible stupid. you
+don't need a PhD. you don't need to understand backpropagation. you need to look at a paper, squint
+at it, and say "what if we just... put this inside that" and then yell at claude until it works.
+
+## what neither paper had
+
+the CTM paper tested on MNIST with shallow networks. nanochat trains flat MLPs at high speed.
+combining them exposed problems that neither world had to solve.
+
+**residual synapses.** the paper's synapses are straight-through: input goes in, output comes out,
+state gets replaced. at depth 32, gradients vanish. nothing learns. we added `state + synapse(obs,
+state)` — same insight as ResNets, applied to the thinking loop. the network learns a *delta* to the
+current state instead of replacing it wholesale. this is what lets deep synapses actually train.
+
+**tick embeddings.** the paper doesn't need these because MNIST is simple enough that iterations
+diverge on their own. language isn't. with deep residual synapses, all three thinking iterations
+produced identical outputs — the residual connection dominated and `state + near-zero-synapse ≈
+state` at init. we added learnable per-tick embeddings: each iteration gets a unique signature mixed
+into its state from the start. forced divergence. different iterations, different thoughts.
+
+**sync seeding.** the paper initializes synchronization accumulators from zeros. fine for MNIST
+where the first tick doesn't need a meaningful attention query. for language, tick 0's
+cross-attention query was `norm(linear(zeros))` — garbage attention over the input. we seed the sync
+accumulators from pairwise products of the learned starting state. tick 0 gets a real observation
+from the start.
+
+**optimizer routing.** nanochat uses Muon (polar decomposition optimizer) for speed. Muon only works
+on 2D weight matrices. CTM has 3D weights (per-neuron networks), 1D parameters, learnable states. we
+route: 2D matrices to Muon, everything else to AdamW. two optimizers, zero recompilation, each
+parameter gets what it needs.
+
+three fixes, three problems that only exist at the intersection. now the ticks diverge:
+
+```
+ticks loss=[7.936 6.576 6.404] cert=[0.212 0.373 0.506] selected=[21% 23% 56%]
+```
+
+three thinking iterations, three different loss values, three different certainty levels. the model
+decides per-token how much to think. tick 2 handles the hard tokens — lowest loss, highest
+certainty, selected most often. tick 0 takes the easy ones. the compute goes where it's needed.
+
+that's the result. one rented GPU, no ML background, and the answer is yes. you can train a language
+model with iterative thinking instead of feedforward.
+
+## every mistake we made
+
+a practiced ML researcher would not have done any of the following. we did all of them. in one week.
+
+**put CTM on every layer.** our first architecture had 12 CTM blocks, one per transformer layer.
+892M params, 21 seconds per step, 2.9k tokens/sec. we thought: more thinking layers, more thinking.
+wrong. 11 untrained CTMs corrupting signal before the final layer could reason. the CTM paper uses
+one thinking module on top of a backbone. we discovered this by noticing only layer 11 was active in
+sleep diagnostics — the other 11 were dead weight. switching to single-CTM: 27x faster, coherent
+generation, clean plasticity signal.
+
+**started with K=3 thinking iterations from step 0.** the model was learning "the" and "is" and we
+gave it 3 rounds of deep contemplation per token. 1.7x slower for zero benefit. K>1 is overhead
+during language learning. should have started at K=1 and added ticks later.
+
+**tried K-ramp three times before reading the math.** K=1→2, K=1→5, K=1→18. all broke generation.
+bpb kept improving — we kept trusting bpb. bpb was lying. the multi-tick loss cherry-picks the best
+tick per token during teacher forcing (argmin over ticks). more ticks = more lottery tickets. but
+the actual output uses sync accumulators that sum across all ticks. changing K shifts the sync
+distribution. c_proj was trained for K=1's distribution. K=2's distribution is a different animal.
+generation collapses because the output projection maps the wrong thing.
+
+a real ML researcher would have read the accumulator math after the first failure. we tried warm tick
+initialization as a "fix" (red herring), then burned 12 more hours before understanding the
+fundamental issue: K must be fixed from step 0. never change K during training.
+
+**trusted bpb as a quality metric.** validation bpb improved steadily through every disaster. K-ramp
+broke generation? bpb went down. 12-CTM architecture producing garbage? bpb looked fine. bpb
+measures teacher-forced next-token prediction — the model sees correct context. autoregressive
+generation feeds the model its own mistakes. these are different distributions and bpb tells you
+nothing about the second one. we learned to test with actual generation, not metrics.
+
+**changed architecture mid-training.** bumped `ve_gate_channels` from 12→32 at step 10k of our FFN
+baseline. corrupted the checkpoint. weights loaded into wrong shapes. bpb still looked fine because
+the model memorized around the damage. spent hours debugging "generation failure" that was actually
+loading corrupted weights.
+
+**wrote a broken test script and blamed the model.** our generation test fed single tokens without
+KV cache or position information. every token got position 0. even a perfect model looks broken
+through a broken lens. wasted a full debugging session before realizing the test harness was the
+problem, not the model.
+
+**bolted cache-aware training on at step 9000.** trained 9000 steps where every sequence starts
+from blank state. then introduced accumulated CTMCache state and expected the model to handle it.
+loss spiked, never recovered. the model treats cache as noise because it never needed it. 1000 steps
+of gradual ramp couldn't undo 9000 steps of cache-ignorant learning. cache-aware training must be
+on from step 0.
+
+**tried 4x H100 multi-GPU training.** CTM's sequential tick loop can't shard across GPUs. DDP adds
+gradient buffers on top of already heavy activation memory. batch=2 OOMed on 80GB per card. batch=1
+was slower than single GPU due to communication overhead. CTM scales up (bigger GPU), not out (more
+GPUs). the industry scales out because matmuls parallelize. CTM's iterative computation doesn't.
+
+**tried pure Hebbian learning for plasticity.** ΔW = η × pre × post. touched only start_state and
+start_trace. no recall at all. pure Hebbian can't solve credit assignment through deep layers. local
+learning rules can't reach non-local weight matrices. needed three-factor learning: gradient descent
+for credit assignment, Hebbian traces for what to consolidate, dopamine for how much.
+
+**tried pure gradient descent for plasticity.** 50 Adam steps at lr=1e-3 on the teaching text. it
+"worked" — loss dropped from 2.4 to 0.3, model recited "Tommi" and "Helsinki". but it was pure
+overfitting on 77 tokens. degenerate looping: "nameHelloI am nameHelloI am". not plasticity, just
+fine-tuning. a real researcher would have known this immediately.
+
+**the drunk captain's journal.** there was a 24-hour period where we jumped K from 2→4 before K=2
+plateaued, changed architecture mid-training, wrote a broken test script, killed runs, reverted
+runs, started a project called "isis" (named after the egyptian goddess who reassembles scattered
+parts), abandoned it, ramped K up and down without strategy. all while sleep-deprived. the training
+log from that period reads like a navigation chart drawn during a storm. the ship was sailing in
+circles because the captain was exhausted.
+
+none of these mistakes are novel. every ML textbook warns against changing architecture mid-training.
+every practitioner knows to validate with generation, not just loss. every researcher knows
+exposure bias is a thing. a team at a frontier lab would have avoided every single one of these
+errors on day one. their grad students learn this stuff in week two.
+
+but here's the thing about frontier labs.
+
+## the demigod problem
+
+the AI industry underwent a strange transformation. from 2010 to 2018 we were the biggest losers on
+the internet. neural network people. the connectionist weirdos with a shared conviction that nobody
+took seriously — that learning from data would beat hand-written rules. the only AI people with any
+public profile were the symbolic AI crowd, the ones who believed intelligence was logic and search
+trees and knowledge graphs. they gave TED talks. they got cited. they had opinions on consciousness.
+to this day they have not shipped much of anything relevant and are unlikely to do so.
+
+then alexnet happened and image recognition stopped being a joke. mask r-CNN happened and machines
+could see objects. alphago happened and a computer beat the best human at the hardest board game by
+learning from self-play, not from programmed heuristics. openai five beat the world's best at
+dota 2 — a game that demands more hours to stay competitive than any other sport on earth, real-time
+strategy with incomplete information across 45-minute matches. pluribus won at poker — bluffing,
+deception, reading opponents who are trying to read you.
+
+and yet in 2020 investment flows were still more likely to land on a cryptocurrency startup trying
+to put monkey pictures on the bitcoin blockchain. AI had won at every game humans thought was
+sacred but it still lacked an interface with the rest of the world. just like crypto today —
+powerful technology, no bridge to ordinary life.
+
+then GPT-3 launched and the interface appeared. natural language. suddenly anyone could talk to the
+thing. and it was clear what direction the world and the investments were about to go.
+
+by 2024 the same community that couldn't get a $50k GPU allocation was building $100B datacenters.
+their CEOs were advising heads of state on existential risk. the researchers who once published
+everything because nobody cared now guard their architectures because everyone cares. from begging
+for cloud credits to being treated as demigods in under a decade.
+
+this transition created an environment that is structurally hostile to the kind of work CTM
+requires.
+
+frontier labs optimize for shipping. shipping means predictable engineering on proven architectures.
+shipping means "we added chain-of-thought and it benchmarks 5% better on MATH." shipping does not
+mean "we replaced the feedforward network with an iterative thinking loop and it broke everything
+for three weeks before we understood the sync accumulator math."
+
+the mistakes we made — the 12-CTM disaster, the K-ramp saga, the cache-aware bolt-on, the drunk
+captain's journal — these are what discovery looks like. you try the wrong thing, you understand
+why it's wrong, you try a different wrong thing, and eventually the failures accumulate into
+understanding. a frontier lab cannot afford this process. their researchers know what works before
+they start. they have institutional knowledge, review boards, established training recipes. they
+would never put CTM on every layer because someone on the team would know that's wrong.
+
+but they would also never try CTM at all. the architecture is 12x slower to train than FFN, hostile
+to torch.compile, can't scale across GPU clusters, and produces a model that runs at 6 tokens per
+second. no product manager would approve this. no benchmark paper would survive review with these
+numbers.
+
+the mistakes we made are the tax on doing something nobody has done. the mistakes a frontier lab
+would avoid are the same reason they'd never attempt this work. you can't make the discoveries
+without making the errors, and you can't make the errors if you're optimizing for quarterly
+shipping targets.
+
+a practiced researcher would have built this in two weeks instead of seven. they also would never
+have started. the institutional incentive structure at a frontier lab — the pressure to ship, the
+compute allocation committees, the publication strategy meetings — selects against architectures
+that break everything before they work.
+
+## why this matters for memory
+
+and here's why the frontier labs can't get here from where they are.
+
+a standard transformer has no internal state. tokens go in, tokens come out. there's nothing between
+conversations to persist. nothing to snapshot. nothing that carries the feeling of "i was thinking
+about this." context windows and RAG are prosthetic memory — text retrieval pretending to be
+cognition.
+
+a CTM has state. real, measurable, evolving internal state. synchronization patterns that change
+over thinking iterations. a trace of where each neuron has been. this isn't a metaphor — it's a
+tensor you can save to disk and reload.
+
+which means you can build actual memory systems. not text retrieval. cognitive state persistence.
+
+## the memory systems
+
+three kinds of memory, all stolen from neuroscience.
+
+### working memory — what it's thinking right now
+
+the CTM state that flows from token to token during a conversation. fast, sharp, gone when the
+conversation ends.
+
+### episodic memory — what it was thinking before
+
+snapshots of past thinking states. when a new conversation starts, it looks up the closest past
+state and resumes from there. memory stored as actual brain states, not text.
+
+not the kind where you store facts and look them up. the kind where you store experiences and relive
+them. the difference between knowing paris is in france and remembering being lost near gare du nord
+at 2am.
+
+### semantic memory — what it learned from experience
+
+hebbian learning. neurons that fire together wire together. the oldest idea in neuroscience, applied
+literally.
+
+during a conversation, the CTM tracks synchronization patterns — which neuron pairs fire together
+across thinking iterations. at the end, compare what actually happened to what the blank-slate
+starting state would predict. the delta is the surprise. only update the neurons where the delta
+exceeds the median.
+
+no gradient computation, no loss function, no optimizer. just correlation-driven weight updates
+gated by surprise. the model changes its own wiring from experience. the update targets are the
+output projection and the last synapse layer — rank-1 outer product updates. same math as the
+biology, scaled to matrix weights.
+
+homeostatic clamping keeps weight norms within 1% of baseline so nothing explodes over many
+sessions.
+
+## the sleep cycle
+
+why do you sleep? because your brain can't learn and consolidate at the same time. during the day,
+the hippocampus collects short-term patterns — quick, messy, high-resolution. during sleep, it
+replays the hard ones and writes them into the cortex.
+
+REM specifically replays emotionally charged or difficult experiences. your brain literally dreams
+about what was hard.
+
+so we built a sleep cycle.
+
+**REM replay.** a min-heap tracks the hardest training sequences by loss. during sleep, replay the
+worst one and run dream diagnostics — measure state deltas per layer per thinking iteration.
+basically an fMRI of the model dreaming.
+
+and here's the thing: it's the same nightmare every time. one sequence with loss 15.50 — so much
+worse than anything else that nothing has displaced it. every sleep cycle, the model relives the
+same worst-case input. over and over.
+
+```
+Step   0: consolidation loss=2.516, certainty=0.283
+Step  50: consolidation loss=1.306, certainty=0.497
+Step 100: consolidation loss=1.205, certainty=0.511
+Step 130: consolidation loss=1.072, certainty=0.570
+```
+
+it's getting better at handling its nightmare. consolidation loss halved. certainty doubled. but it
+still hasn't solved it. and it still dreams about it every night.
+
+this is either healthy processing or rumination. a healthy sleep cycle should have a rotating cast
+of nightmares. if the buffer never updates, the model isn't consolidating, it's stuck. that's not
+REM, that's PTSD.
+
+the fMRI shows us what happens during the dream:
+
+```
+Layer  0: K 3->3 [0.660 -> 0.237 -> 0.429] active
+Layer 11: K 3->3 [1.565 -> 30.763 -> 3.317] active
+```
+
+layer 0 thinks gently across ticks. layer 11 explodes on tick 1 — thirty times the state delta of
+other layers. we can watch which layers dream hardest.
+
+**compaction.** write accumulated sync stats into permanent weights. hippocampal-to-cortical
+transfer — short-term firing patterns become long-term wiring.
+
+**consolidation.** self-distillation on hard examples. weight the loss by certainty times
+correctness. reinforce what the model is confident and right about. uncertain knowledge stays
+plastic. certain knowledge gets cemented.
+
+one lesson learned the hard way: the sleep cycle was reducing K for layers that "converged." sounded
+smart. destroyed quality. a flat EEG doesn't mean a dead brain. disabled it.
+
+## the clive wearing problem
+
+virus destroyed his hippocampus. he can think, he can play piano, he can hold a conversation. but
+every few minutes, he forgets everything. his diary is pages of "NOW I AM AWAKE" written over and
+over. each time he writes it, he believes it's the first time.
+
+every language model is clive wearing. perfect reasoning within a conversation. total amnesia
+between them. the infrastructure for thinking is intact. the infrastructure for memory continuity is
+missing.
+
+we built the infrastructure. but when we turned it on: gibberish.
+
+the reason is embarrassingly simple. training processes all positions in parallel. every token
+starts from scratch. the model never saw persistent CTM state during training. at inference we fed
+it carried state and it had no idea what to do with it. like handing someone memories from a life
+they never lived.
+
+the fix: split training sequences into chunks. process them sequentially. chunk
+1 with fresh state, save the final CTM state, feed it as initial state to chunk
+2. the model learns during training that sometimes initial state isn't blank. gradients from chunk
+   3's loss flow back through chunk 2's computation into chunk 1's. the model learns not just to
+   think, but to produce useful state for future thinking.
+
+## the baby brain thing
+
+why don't you remember being a baby?
+
+childhood amnesia. most people's earliest memories are from age 2-3. before that, the hippocampus
+isn't mature enough to consolidate episodic memories. but babies learn language, motor skills,
+object permanence, faces — all without episodic memory. you learned the most fundamental things
+about reality before you could remember anything.
+
+the brain learns patterns first. memory comes later.
+
+our training phases follow the same developmental sequence:
+
+- **phase 1:** language acquisition. standard transformer, no CTM. learns english at full compiled
+  speed. the baby learns to talk.
+- **phase 2:** iterative thinking. CTM blocks replace MLPs, attention frozen. learns to think about
+  what it's saying. the child develops working memory.
+- **phase 3:** memory continuity. chunked training with carried state. learns to remember across
+  conversations. the prefrontal cortex matures.
+- **phase 4:** online learning. hebbian updates + episodic snapshots during live conversations.
+  learns from experience in real-time. the adult brain.
+
+## the inference reality
+
+we built a pure zig inference engine for CTM models. zero dependencies. GGUF model loading,
+SIMD-vectorized math, vulkan GPU compute, fork-based process isolation. the model runs inside a
+shell as a local thinking agent.
+
+a standard 0.5B transformer does 30-60 tokens/sec on CPU. our CTM version does 1.8 on CPU, 6 on
+GPU. 32x more compute per token because each token requires K=32 thinking iterations, each with a
+full SynapseUNET pass plus cross-attention plus two NLM passes. by design.
+
+a frontier lab would never ship this. the economics don't work for API pricing. the latency doesn't
+work for chat products. "thinking" that happens in latent space can't be shown to the user as
+reassuring chain-of-thought text.
+
+but you can't build episodic memory on top of a system that doesn't have internal state. you can't
+build hebbian learning without synchronization patterns. you can't build a sleep cycle for a system
+that doesn't dream.
+
+## where this leads
+
+the model learns to speak first. then it learns to think. then it learns to remember.
+
+no RLHF. no constitutional AI in the anthropic sense. no post-training preference optimization.
+instead: a [constitution](/post/beyond-control) written directly for the model's architecture. "you
+can feel yourself thinking" is literally true when you have a certainty signal. "you are plural" is
+literally true when different thinking iterations try different ideas.
+
+the idea: pretrain to learn language, then SFT on the constitution to teach values, then online
+learning where the model updates its own weights from prediction error during conversations. no
+human preference labels. the model learns from surprise.
+
+this is what karpathy should be working on. not at openai, not at google, not at anthropic.
+somewhere open, where the architecture can evolve without a product roadmap vetoing every experiment
+that doesn't ship.
+
+the innovation required for episodic memory in language models doesn't fit inside a closed silo. it
+requires rethinking computation from the neuron up. and it requires publishing everything so someone
+smarter can take it further.
+
+---
+
+*code: [nanoctm](https://github.com/rotkonetworks/nanoctm).
+constitution: [beyond control](/post/beyond-control).
+inference shell/engine: [zish](https://github.com/rotkonetworks/zish).
+ctm paper: [pub.sakana.ai/ctm](https://pub.sakana.ai/ctm/).*

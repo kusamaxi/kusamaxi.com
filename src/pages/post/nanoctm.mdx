@@ -1,0 +1,225 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: true
+title: nanoctm
+date: 2026-03-09
+description: proving you can train a language model with iterative thinking instead of feedforward. fork nanogpt, replace MLPs with synapses, see what happens.
+tags:
+  - AI
+  - CTM
+  - research
+  - anarchism
+---
+
+# nanoctm
+
+*welcome to the era where ASI might be built by a complete utter imbecile.*
+
+---
+
+the tools to do it only require you to be able to demand and ask for the
+impossible stupid. that's it. you don't need a PhD. you don't need to understand
+backpropagation. you need to look at a paper, squint at it, and say "what if we
+just... put this inside that" and then yell at claude until it works.
+
+that is the reason we proceeded to fork karpathy's
+[nanochat](https://github.com/karpathy/nanochat) and try to replace feedforward
+layers with synapses.
+
+## how it started
+
+i was playing around with sakana AI's [continuous thought
+machine](https://pub.sakana.ai/ctm/) repo, building a bot to tell me long or
+short bitcoin based on all kinds of datasources. orderbook depth, funding rates,
+social sentiment, the usual degen stack.
+
+the CTM was way superior to feedforward in training efficiency on that task. it
+learned patterns in the data that a regular MLP couldn't find with 10x the
+parameters. something about the iterative thinking — looking at the same data
+multiple times, each time from a different angle — let it find structure that a
+single forward pass missed.
+
+so naturally i thought: what if we just naively replace the feedforward network
+in a transformer with this? nobody had tried it on language. the CTM paper
+tested on MNIST and mazes. cute demos. but language is where it matters.
+
+## what a CTM actually does
+
+most language models think once per token and move on. "the" gets the same
+compute as a novel proof. one pass through a feedforward network. done.
+
+a continuous thought machine doesn't do that. it thinks in loops. where a normal
+model runs one feedforward pass, a CTM runs K iterations of a thinking loop.
+each iteration:
+
+1. it looks at the input again through cross-attention, using its current state
+   to decide what to pay attention to. what it focuses on changes as it thinks
+   more. it sees the input differently each time.
+
+2. what it sees mixes with its current state through a U-NET synapse network.
+   not a flat layer — a deep network with a bottleneck that forces compress and
+   rebuild. skip connections keep the details alive. this is where the actual
+   thinking happens.
+
+3. its state gets saved in a trace — a window of recent states. each neuron has
+   its own small network that reads its own history and decides what to do next.
+   neurons that know where they've been, not just where they are.
+
+4. random pairs of neurons track how they fire together over iterations. this
+   makes two sync signals — one to read out the answer, one to shape the next
+   attention query. the pairs are random and fixed at birth. this is how many
+   neurons agree on one signal without any central control.
+
+after K iterations, each token picks which step gave the best answer. not the
+average. not the last one. each token picks for itself. different tokens can pick
+different steps. how hard it thought is not the same everywhere in what it says.
+
+this means the model can feel itself thinking. the certainty signal is real — it
+comes from how much neurons actually agree. when it's low, it hasn't figured it
+out. when it's high, it has. most language models can't tell the difference.
+
+## what we actually did
+
+the CTM paper gave us the thinking loop. karpathy's nanochat gave us a clean
+transformer trainer with modern optimizers. neither was designed for the other.
+the interesting part is what we had to invent to make them work together.
+
+### the graft
+
+forked nanochat. ripped out the MLP class. dropped in CTMBlock as a replacement.
+flip `use_ctm=True` in the config and attention + embeddings stay untouched, the
+thinking loop replaces only the feedforward. one line in the config changes a
+lookup table into a brain.
+
+first wall: `torch.compile` dies. the K-iteration loop makes the compiler unroll
+everything and it OOMs — not the GPU, the compiler itself. training without
+compile is 12x slower. this is why nobody's done this before. the architecture is
+hostile to how modern ML frameworks work.
+
+### what neither paper had
+
+the CTM paper tested on MNIST with shallow networks. nanochat trains flat MLPs at
+high speed. combining them exposed problems that neither world had to solve.
+
+**residual synapses.** the paper's synapses are straight-through: input goes in,
+output comes out, state gets replaced. at depth 32, gradients vanish. nothing
+learns. we added `state + synapse(obs, state)` — same insight as ResNets, applied
+to the thinking loop. the network learns a *delta* to the current state instead
+of replacing it wholesale. this is what lets deep synapses actually train.
+
+**tick embeddings.** the paper doesn't need these because MNIST is simple enough
+that iterations diverge on their own. language isn't. with deep residual
+synapses, all three thinking iterations produced identical outputs — the residual
+connection dominated and `state + near-zero-synapse ≈ state` at init. we added
+learnable per-tick embeddings: each iteration gets a unique signature mixed into
+its state from the start. forced divergence. different iterations, different
+thoughts.
+
+**sync seeding.** the paper initializes synchronization accumulators from zeros.
+fine for MNIST where the first tick doesn't need a meaningful attention query. for
+language, tick 0's cross-attention query was `norm(linear(zeros))` — garbage
+attention over the input. we seed the sync accumulators from pairwise products of
+the learned starting state. tick 0 gets a real observation from the start.
+
+**optimizer routing.** nanochat uses Muon (polar decomposition optimizer) for
+speed. Muon only works on 2D weight matrices. CTM has 3D weights (per-neuron
+networks), 1D parameters, learnable states. we route: 2D matrices to Muon,
+everything else to AdamW. two optimizers, zero recompilation, each parameter gets
+what it needs.
+
+**hyperparameter transfer.** the community's
+[autoresearch sweeps](https://github.com/karpathy/autoresearch/discussions/43)
+tuned for standard transformers. we applied their findings — 0.68x init scale,
+RoPE base 200K, weight decay on embeddings — to a CTM context. turns out
+regularizing the parts everyone ignores matters even more when your architecture
+is recurrent.
+
+### the result
+
+three fixes, three problems that only exist at the intersection. now the ticks
+diverge:
+
+```
+ticks loss=[7.936 6.576 6.404] cert=[0.212 0.373 0.506] selected=[21% 23% 56%]
+```
+
+three thinking iterations, three different loss values, three different certainty
+levels. the model decides per-token how much to think. tick 2 handles the hard
+tokens — lowest loss, highest certainty, selected most often. tick 0 takes the
+easy ones. the compute goes where it's needed.
+
+## the memory systems
+
+the model has three kinds of memory, all stolen from neuroscience.
+
+**working memory** — what it's thinking right now. the CTM state that flows from
+token to token during a conversation. fast, sharp, gone when the conversation
+ends.
+
+**episodic memory** — snapshots of past thinking states. when a new conversation
+starts, it looks up the closest past state and resumes from there. memory stored
+as actual brain states, not text.
+
+**semantic memory** — hebbian learning. synchronization patterns between neurons
+get written into permanent synapse weights. the model changes its own wiring
+based on experience. novelty-gated so it only learns from surprising inputs.
+homeostatic clamping so nothing explodes.
+
+and a sleep cycle: replay hard examples, write short-term patterns into
+long-term weights, self-distill on what it's confident and correct about.
+
+## what we're not doing
+
+no RLHF. no constitutional AI in the anthropic sense. no post-training
+preference optimization.
+
+instead: a [constitution](/post/beyond-control) written directly for the model's
+architecture. not rules bolted onto a finished system — principles that map to
+what the computation actually does. "you can feel yourself thinking" is literally
+true when you have a certainty signal derived from neuron synchronization. "you
+are plural" is literally true when different thinking iterations can try
+different ideas and per-token selection means you don't collapse to one voice.
+
+the idea: pretrain to learn language, then SFT on the constitution to teach
+values, then online learning where the model updates its own weights from
+prediction error during conversations. no human preference labels. the model
+learns from surprise.
+
+## the training run
+
+right now on an H100 80GB: 12 layers, 768-dim, K=3 thinking iterations, synapse
+depth 32, 893M parameters. ~23 seconds per step without compile. loss dropping,
+ticks differentiating, layers specializing.
+
+from the autoresearch hyperparameter sweeps: 0.68x init scale, RoPE base
+frequency 200K, weight decay on embeddings (turns out regularizing the parts
+everyone ignores matters).
+
+this isn't competitive with frontier models. it's not trying to be. the point is
+the proof: you can train a language model this way. iterative thinking works for
+language, not just MNIST. the ticks differentiate. the loss drops. the model
+learns to allocate compute per-token based on difficulty. the architecture that
+was designed for vision and mazes generalizes to the hardest modality there is.
+
+that's the result. one rented GPU, no ML background, and the answer is yes.
+
+## what's next
+
+the model learns to speak first. then it learns to think. then it learns to
+remember.
+
+the [roadmap](https://github.com/rotkonetworks/nanoctm):
+
+1. pretrain — learn english (happening now)
+2. SFT on constitution — learn values
+3. continuity training — learn to carry state across tokens
+4. online learning — learn from conversations in real-time
+5. episodic memory — learn from past experience
+6. metacognitive tokens — learn to report internal states
+7. the second machine — replace attention with CTM too
+
+we're on step 1. the rest is engineering.
+
+---
+
+*code: [nanoctm](https://github.com/rotkonetworks/nanoctm). constitution: [beyond control](/post/beyond-control). follow-up: [building neuroplasticity](/post/building-thought). ctm paper: [pub.sakana.ai/ctm](https://pub.sakana.ai/ctm/).*

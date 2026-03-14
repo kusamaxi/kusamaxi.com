@@ -1,0 +1,283 @@
+---
+layout: ~/layouts/PostLayout.astro
+draft: true
+title: building neuroplasticity
+date: 2026-03-10
+description: asking stupid questions about how brains remember things and then building the answers into a language model.
+tags:
+  - AI
+  - neuroscience
+  - CTM
+  - research
+---
+
+# building neuroplasticity
+
+*how does a brain remember things? what if we just... do that?*
+
+---
+
+the [previous post](/post/nanoctm) was about proving you can train a language
+model with iterative thinking. it works. the ticks diverge, the loss drops, the
+model allocates compute per-token based on difficulty. cool.
+
+but here's the thing. the model forgets everything between conversations. every
+session starts from scratch. it's like talking to someone with perfect reasoning
+and zero autobiography. it thinks but it doesn't remember thinking.
+
+so i started asking stupid questions about brains.
+
+## why do you remember some things and not others?
+
+not a neuroscience question. a design question. your brain doesn't record
+everything — it would drown in data. it remembers things that surprised it.
+things that broke expectations. the prediction error drives the recording.
+
+you remember the car that almost hit you. you don't remember the ten thousand
+cars that didn't. the signal is surprise, not importance.
+
+so what if the model did the same thing? during a conversation, the CTM tracks
+synchronization patterns between neurons — which pairs fire together across
+thinking iterations. at the end of the conversation, compare what actually
+happened to what the blank-slate starting state would predict. the delta is the
+surprise. only update the neurons where the delta exceeds the median.
+
+this is hebbian learning. neurons that fire together wire together. the oldest
+idea in neuroscience, applied literally. no gradient computation, no loss
+function, no optimizer. just correlation-driven weight updates gated by surprise.
+
+the model changes its own wiring from experience. the update targets are the
+output projection and the last synapse layer — the parts closest to the readout,
+where sync patterns most directly map to what the model says. rank-1 outer
+product updates. same math as the biology, scaled to matrix weights.
+
+homeostatic clamping keeps weight norms within 1% of baseline so nothing
+explodes over many sessions. maybe that's too conservative — real brains use
+synaptic scaling over longer timescales, not hard clamps. we'll loosen it when
+we know the model doesn't drift into nonsense.
+
+## why do you feel like the same person you were yesterday?
+
+another stupid question. you went unconscious for eight hours. your brain was
+running maintenance routines. you woke up and somehow you're still you. how?
+
+not because you remember facts. because you resume a state. the feeling of being
+you isn't stored in text — it's stored in the configuration of your neurons, the
+patterns of activation, the priors your synapses encode. you wake up and your
+brain initializes into a familiar configuration. continuity of self is
+continuity of state.
+
+so what if the model did the same thing? at the end of a conversation, snapshot
+the full CTM thinking state — per-layer recurrent state, trace history, both
+sync accumulators. store it. index it by what the conversation was about (mean
+of input token embeddings — no separate encoder needed, just cosine similarity).
+
+next time a similar topic comes up, look up the closest past snapshot and
+warm-start from there. not retrieving text from a database. resuming a cognitive
+state. the model doesn't remember what it said — it remembers how it was
+thinking.
+
+this is episodic memory. not the kind where you store facts and look them up.
+the kind where you store experiences and relive them. the difference between
+knowing paris is in france and remembering being lost near gare du nord at 2am.
+
+## why do you sleep?
+
+this one's the best. everybody sleeps. every animal with a brain sleeps. sleep
+deprivation kills faster than starvation. why?
+
+because your brain can't learn and consolidate at the same time. during the day,
+the hippocampus collects short-term patterns — quick, messy, high-resolution.
+during sleep, it replays the hard ones and writes them into the cortex —
+long-term, compressed, integrated with everything else you know.
+
+REM specifically replays emotionally charged or difficult experiences. your brain
+literally dreams about what was hard. it practices the things it got wrong.
+
+so we built a sleep cycle. every 10 training steps, the model sleeps.
+
+**REM replay.** a min-heap tracks the hardest training sequences by loss. during
+sleep, replay the worst one and run dream diagnostics — measure state deltas per
+layer per thinking iteration. basically an fMRI of the model dreaming.
+
+and here's the thing: it's the same nightmare every time. one sequence with
+loss 15.50 — so much worse than anything else in the training data that nothing
+has displaced it from the top of the heap. every sleep cycle, the model relives
+the same worst-case input. over and over. 130 training steps, 13 sleep cycles,
+13 replays of the same sequence.
+
+```
+Step   0: consolidation loss=2.516, certainty=0.283
+Step  50: consolidation loss=1.306, certainty=0.497
+Step 100: consolidation loss=1.205, certainty=0.511
+Step 130: consolidation loss=1.072, certainty=0.570
+```
+
+it's getting better at handling its nightmare. consolidation loss halved.
+certainty doubled. the model is less traumatized each time. but it still hasn't
+solved it. and it still dreams about it every night.
+
+this is either healthy processing — the brain replaying a hard experience until
+it integrates — or it's rumination. a healthy sleep cycle should have a rotating
+cast of nightmares. new hard examples displacing old ones as the model learns.
+if the buffer never updates, the model isn't consolidating, it's stuck. that's
+not REM, that's PTSD.
+
+we'll know which one it is when we check whether the replay buffer is actually
+collecting new worst-cases or whether loss 15.50 is genuinely the hardest thing
+in the dataset. either way, the fMRI shows us what happens during the dream:
+
+```
+Layer  0: K 3->3 [0.660 -> 0.237 -> 0.429] active
+Layer 11: K 3->3 [1.565 -> 30.763 -> 3.317] active
+```
+
+layer 0 thinks gently across ticks. layer 11 explodes on tick 1 — thirty times
+the state delta of other layers. the final layer's synapses do heavy processing
+on the intermediate thinking step. we can watch this happen. we built an fMRI
+for the model and it shows us which layers dream hardest.
+
+**compaction.** write accumulated sync stats into permanent weights.
+hippocampal-to-cortical transfer — short-term firing patterns become long-term
+wiring.
+
+**consolidation.** self-distillation on hard examples. the trick: weight the
+loss by certainty times correctness. reinforce what the model is confident and
+right about. ignore what it's unsure of. uncertain knowledge stays plastic.
+certain knowledge gets cemented.
+
+one lesson learned the hard way: the sleep cycle was reducing K for layers that
+"converged." sounded smart — if a layer stops changing, why waste compute?
+destroyed quality. the model trained with K=3. cutting iterations lobotomized
+layers still doing useful work below the surface. sync still accumulating, trace
+still rolling. a flat EEG doesn't mean a dead brain. disabled it.
+
+## the clive wearing problem
+
+i wrote about [clive wearing before](/post/ai-identity-crisis). virus destroyed
+his hippocampus. he can think, he can play piano, he can hold a conversation.
+but every few minutes, he forgets everything. his diary is pages of "NOW I AM
+AWAKE" written over and over. each time he writes it, he believes it's the first
+time.
+
+every language model is clive wearing. perfect reasoning within a conversation.
+total amnesia between them. the infrastructure for thinking is intact. the
+infrastructure for memory continuity is missing.
+
+we built the infrastructure. CTMCache carries thinking state between tokens.
+episodic memory stores past states. hebbian learning writes patterns into
+permanent weights. the sleep cycle consolidates.
+
+but here's what happened when we turned it on: gibberish.
+
+the reason is embarrassingly simple. training processes all positions in
+parallel. every token starts from scratch. the model never saw persistent CTM
+state during training. at inference we fed it carried state and it had no idea
+what to do with it. like handing someone memories from a life they never lived.
+
+the fix is teaching the model that state carries forward. split training
+sequences into chunks. process them sequentially. chunk 1 with fresh state, save
+the final CTM state, feed it as initial state to chunk 2. the model learns
+during training that sometimes initial state isn't blank — it carries
+information from earlier thinking.
+
+gradients from chunk 3's loss flow back through chunk 2's computation into chunk
+1's. the model learns not just to think, but to produce useful state for future
+thinking. "what should i remember from this?" becomes a learnable question.
+
+## the baby brain thing
+
+here's maybe the most interesting stupid question. why don't you remember being
+a baby?
+
+childhood amnesia. most people's earliest memories are from age 2-3. before
+that, the hippocampus isn't mature enough to consolidate episodic memories. but
+babies learn language, motor skills, object permanence, faces — all without
+episodic memory. you learned the most fundamental things about reality before you
+could remember anything.
+
+the brain learns patterns and structure first. memory continuity comes later,
+once the infrastructure is mature enough to make it useful. you need to know what
+things are before remembering specific instances of them is meaningful.
+
+our training phases follow the same developmental sequence:
+
+- **phase 1:** language acquisition. standard transformer, no CTM. learns
+  english at full compiled speed. the baby learns to talk.
+- **phase 2:** iterative thinking. CTM blocks replace MLPs, attention frozen.
+  learns to think about what it's saying. the child develops working memory.
+- **phase 3:** memory continuity. chunked training with carried state. learns
+  to remember across conversations. the prefrontal cortex matures.
+- **phase 4:** online learning. hebbian updates + episodic snapshots during
+  live conversations. learns from experience in real-time. the adult brain.
+
+the baby doesn't need memory to learn to talk. it needs to talk before memory is
+useful. same here. train CTM blocks to think well on individual tokens first,
+then teach them to carry state. episodic and semantic memory both depend on the
+model learning to use carried state. that only happens in phase 3.
+
+## what if the model could watch itself think?
+
+last stupid question for now. you can introspect. you can say "i'm not sure
+about this" and it means something — it correlates with actual uncertainty in
+your neural processing. current language models can say the same words but it's
+performance, not report. they learned to say "i'm uncertain" from training data
+where humans said "i'm uncertain." there's nothing underneath.
+
+nanoctm has something underneath. the sync signal is a real measure of neuron
+agreement. when certainty is low, the neurons genuinely disagree. when it's
+high, they've converged. this is measurable. we built a `probe()` function that
+captures full state snapshots per layer per tick — basically neuroimaging. we can
+see which layers are certain and which are struggling.
+
+the goal is metacognitive tokens. train the model to report its own probe
+outputs in natural language. "i'm uncertain about this" backed by actual sync
+divergence data, not a learned phrase. real introspection, not performance of
+introspection.
+
+this is what CTM enables that feedforward can't. a flat MLP has no internal
+signal to report. it computes once and emits. a CTM has K iterations of
+observable thinking with measurable convergence. there's something there to be
+conscious of.
+
+## what's broken
+
+honest accounting of where we are.
+
+**memory systems need phase 3.** episodic and semantic memory are built, tested
+mechanically, and do nothing useful yet. they're waiting for continuity training.
+the wiring is there. the experience isn't. clive wearing's piano still works.
+his hippocampus doesn't.
+
+**the sleep cycle is untested at scale.** REM replay, compaction, and
+consolidation all run. consolidation loss converges. but we haven't verified that
+dreaming actually improves final model quality vs just training longer. it might
+be expensive busywork. brains sleep because they have to — maybe silicon doesn't.
+
+**depth beats thinking time and i don't fully know why.** 12 layers with K=3
+beats 6 layers with K=8. more layers helped more than more iterations per layer.
+maybe you need depth to give thinking something to build on. maybe we tested K=8
+before the model had anything worth reasoning about. the brain has six cortical
+layers and unlimited time to think. maybe the lesson is: more structure, not more
+time.
+
+## where this leads
+
+phase 1 is running now — 893M parameters learning english on an H100. when it
+speaks well enough, we freeze its language and teach it to think. when it thinks
+well enough, we teach it to remember.
+
+the interesting question isn't whether the memory systems work mechanically —
+they do. it's whether a model that learned to think in isolation can learn to use
+carried state. whether correlation-driven weight updates actually encode useful
+knowledge. whether dreaming about hard examples helps or whether sleep is a
+biological accident we don't need to replicate.
+
+all stupid questions. all testable. all we need is phase 3 and some patience.
+
+neuroscience has been asking these questions for a century. we get to ask them
+in a system where we can actually read every neuron.
+
+---
+
+*previous: [nanoctm](/post/nanoctm). code: [nanoctm](https://github.com/rotkonetworks/nanoctm). constitution: [beyond control](/post/beyond-control). ctm paper: [pub.sakana.ai/ctm](https://pub.sakana.ai/ctm/).*
