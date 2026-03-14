@@ -189,7 +189,11 @@ generation collapses because the output projection maps the wrong thing.
 
 a real ML researcher would have read the accumulator math after the first failure. we tried warm tick
 initialization as a "fix" (red herring), then burned 12 more hours before understanding the
-fundamental issue: K must be fixed from step 0. never change K during training.
+fundamental issue: the sync accumulators sum across all K ticks, so changing K shifts the entire
+distribution that c_proj was trained to map. we concluded K must be fixed from step 0 and never
+changed. that conclusion was also wrong — it works now. the actual fix was reseeding the accumulators
+on K-change so the distribution stays compatible. twelve hours of debugging, two wrong conclusions,
+then the real answer.
 
 **trusted bpb as a quality metric.** validation bpb improved steadily through every disaster. K-ramp
 broke generation? bpb went down. 12-CTM architecture producing garbage? bpb looked fine. bpb
